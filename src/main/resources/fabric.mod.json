@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "enchanttransfer",
+  "version": "${version}",
+
+  "name": "Enchant Transfer Mod",
+  "description": "This mod allows you to transfer enchantments between objects",
+  "authors": [
+    "arensis"
+  ],
+  "contact": {
+    "homepage": "https://github.com/arensis",
+    "sources": "https://github.com/arensis/enchant-transfer-mod"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/enchanttransfer/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.alfonsormadrid.enchanttransfer.EnchantTransferMod"
+    ]
+  },
+  "mixins": [],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
