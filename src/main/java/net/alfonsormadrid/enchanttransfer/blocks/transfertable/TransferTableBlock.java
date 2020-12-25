@@ -1,11 +1,16 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.Material;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.world.BlockView;
 
-public class TransferTableBlock extends Block {
+
+
+public class TransferTableBlock extends Block implements BlockEntityProvider {
     public TransferTableBlock() {
         super(
             Block.Settings
@@ -15,4 +20,11 @@ public class TransferTableBlock extends Block {
                 .ticksRandomly()
         );
     }
+
+    @Override
+    public BlockEntity createBlockEntity(BlockView blockView) {
+        return new TransferTableBlockEntity();
+    }
+
+
 }
