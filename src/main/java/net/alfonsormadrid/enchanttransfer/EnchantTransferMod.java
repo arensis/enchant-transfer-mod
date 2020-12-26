@@ -4,17 +4,24 @@ import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBloc
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableItem;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.GrindstoneScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class EnchantTransferMod implements ModInitializer {
 	public static final String MOD_ID = "enchanttransfer";
+	public static final Identifier TRANSFER_TABLE_BLOCK_IDENTIFIER = new Identifier(MOD_ID, "transfer_table_block");
 
+	public static final ScreenHandlerType<TransferTableScreenHandler> TRANSFER_TABLE_SCREEN_HANDLER =
+			ScreenHandlerRegistry.registerSimple(TRANSFER_TABLE_BLOCK_IDENTIFIER, TransferTableScreenHandler::new);
 	public static final TransferTableBlock TRANSFER_TABLE_BLOCK = new TransferTableBlock();
 	public static final ItemGroup ENCHANT_TRANSFER = FabricItemGroupBuilder.build(
 			new Identifier(MOD_ID, "general"),
@@ -28,8 +35,8 @@ public class EnchantTransferMod implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "magic_card_item"), MAGIC_CARD_ITEM);
-		Registry.register(Registry.BLOCK_ENTITY_TYPE, new Identifier(MOD_ID, "transfer_table_block"), TRANSFER_TABLE_BLOCK_ENTITY);
-		Registry.register(Registry.BLOCK,new Identifier(MOD_ID, "transfer_table_block"), TRANSFER_TABLE_BLOCK);
-		Registry.register(Registry.ITEM, new Identifier(MOD_ID, "transfer_table_block"), TRANSFER_TABLE_ITEM);
+		Registry.register(Registry.BLOCK_ENTITY_TYPE, TRANSFER_TABLE_BLOCK_IDENTIFIER, TRANSFER_TABLE_BLOCK_ENTITY);
+		Registry.register(Registry.BLOCK, TRANSFER_TABLE_BLOCK_IDENTIFIER, TRANSFER_TABLE_BLOCK);
+		Registry.register(Registry.ITEM, TRANSFER_TABLE_BLOCK_IDENTIFIER, TRANSFER_TABLE_ITEM);
 	}
 }
