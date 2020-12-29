@@ -20,4 +20,12 @@ public class MagicCardItem extends Item {
         return TypedActionResult.success(playerEntity.getOffHandStack());
     }
 
+    @Override
+    public boolean isEnchantable(ItemStack stack) {
+        if (stack.getEnchantments().size() < 1) {
+            return super.isEnchantable(stack);
+        } else {
+            return false;
+        }
+    }
 }
