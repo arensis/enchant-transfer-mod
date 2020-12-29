@@ -1,7 +1,12 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
+import net.alfonsormadrid.enchanttransfer.gui.transfertable.CombineCardSlotPositions;
+import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.gui.transfertable.TransferItemSlotPositions;
 import net.alfonsormadrid.enchanttransfer.services.CombineCardService;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.CraftingResultInventory;
@@ -11,6 +16,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class TransferTableScreenHandler extends ScreenHandler {
     private final Inventory combineCardsInput;
@@ -41,6 +51,89 @@ public class TransferTableScreenHandler extends ScreenHandler {
         this.builtTransferSlots();
     }
 
+    private void builtCombineCardSlots() {
+        this.addSlot(buildMagicCardSlot(
+                0, CombineCardSlotPositions.topCard.positionX, CombineCardSlotPositions.topCard.positionY
+        ));
+        this.addSlot(buildMagicCardSlot(
+                1, CombineCardSlotPositions.bottomCard.positionX, CombineCardSlotPositions.bottomCard.positionY
+        ));
+        this.addSlot(buildMagiCardResultSlot(
+                0, CombineCardSlotPositions.resultCard.positionX, CombineCardSlotPositions.bottomCard.positionY
+        ));
+    }
+
+    private Slot buildMagicCardSlot(int index, int x, int y) {
+        return new Slot(this.combineCardsInput, index, x, y) {
+            public boolean canInsert(ItemStack stack) {
+                return itemIsMagicCard(stack);
+            }
+            //Logic for onTakeItem method (remove output item)
+        };
+    }
+
+    private Slot buildMagiCardResultSlot(int index, int x, int y) {
+        return new Slot(this.combineCardsOutput, index, x, y) {
+            public boolean canInsert(ItemStack stack) {
+                return false;
+            }
+            //Logic for onTakeItem method (remove input items)
+        };
+    }
+
+    private void builtTransferSlots() {
+        this.addSlot(buildTransferInputSlot(
+                0, TransferItemSlotPositions.transferItem.positionX, TransferItemSlotPositions.transferItem.positionX
+        ));
+
+        this.buildTransferItemContentSlots();
+    }
+
+    private void buildTransferItemContentSlots() {
+        List<SlotPosition> contentPositions = TransferItemSlotPositions.transferItemContentPositions;
+
+        IntStream.range(0, this.transferItemContent.size())
+            .forEach(index ->
+                this.addSlot(buildTransferItemContentSlot(
+                    index, contentPositions.get(index).positionX, contentPositions.get(index).positionY))
+            );
+    }
+
+    private Slot buildTransferInputSlot(int index, int x, int y) {
+        return new Slot(this.transferInput, 0, 50, 30) {
+            public boolean canInsert(ItemStack stack) {
+                return stack.isEnchantable();
+            }
+        };
+    }
+
+    private Slot buildTransferItemContentSlot(int index, int x, int y) {
+        return new Slot(this.transferItemContent, index, x, y) {
+            public boolean canInsert(ItemStack stack) {
+                return transferInputIsNotEmpty() && itemIsMagicCard(stack);
+            }
+            //Logic for onTakeItem (remove enchant of input item)
+            //Logic for insert method (add enchant of input item)
+        };
+    }
+
+    private boolean transferInputIsNotEmpty() {
+        return !this.transferInput.getStack(0).isEmpty();
+    }
+
+    private SimpleInventory buildInitInventory(int size) {
+        return new SimpleInventory(size) {
+            public void markDirty(){
+                super.markDirty();
+                TransferTableScreenHandler.this.onContentChanged(this);
+            }
+        };
+    }
+
+    private boolean itemIsMagicCard(ItemStack stack) {
+        return stack.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM;
+    }
+
     @Override
     public boolean canUse(PlayerEntity player) {
         return canUse(this.context, player, EnchantTransferMod.TRANSFER_TABLE_BLOCK);
@@ -54,8 +147,23 @@ public class TransferTableScreenHandler extends ScreenHandler {
         }
 
         if (inventory == this.transferInput) {
-            //logic for transfer item
+            this.updatedTransferItemContent();
         }
+    }
+
+    private void updatedTransferItemContent() {
+        Map<Enchantment, Integer> transferItemEnchantments =
+                EnchantmentHelper.get(this.transferInput.getStack(0));
+
+        List<ItemStack> itemMagicCards = transferItemEnchantments.entrySet().stream().map(enchantmentEntry -> {
+            ItemStack magicCardEnchanted = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
+            magicCardEnchanted.addEnchantment(enchantmentEntry.getKey(), enchantmentEntry.getValue());
+            return magicCardEnchanted;
+        }).collect(Collectors.toList());
+
+        IntStream.of(0, itemMagicCards.size()).forEach(index -> {
+            this.transferItemContent.setStack(index, itemMagicCards.get(index));
+        });
     }
 
     private void updateCombineCardsOutput() {
@@ -64,42 +172,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
         } else {
             this.combineCardsOutput.setStack(0, ItemStack.EMPTY);
         }
-    }
 
-    private void builtCombineCardSlots() {
-        this.addSlot(buildMagicCardSlot(0, 20, 30));
-        this.addSlot(buildMagicCardSlot(1, 20, 40));
-        this.addSlot(new Slot(this.combineCardsOutput, 0, 50, 40) {
-            public boolean canInsert(ItemStack stack) {
-                return false;
-            }
-            //Logic for onTakeItem method
-        });
-    }
-
-    private Slot buildMagicCardSlot(int index, int x, int y) {
-        return new Slot(this.combineCardsInput, index, x, y) {
-            public boolean canInsert(ItemStack stack) {
-                return stack.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM;
-            }
-        };
-    }
-
-    private void builtTransferSlots() {
-        this.addSlot(new Slot(this.transferInput, 0, 50, 30) {
-            public boolean canInsert(ItemStack stack) {
-                return stack.isEnchantable();
-            }
-        });
-        //Add slots for contain of transfer input
-    }
-
-    private SimpleInventory buildInitInventory(int size) {
-        return new SimpleInventory(size) {
-            public void markDirty(){
-                super.markDirty();
-                TransferTableScreenHandler.this.onContentChanged(this);
-            }
-        };
+        this.sendContentUpdates();
     }
 }

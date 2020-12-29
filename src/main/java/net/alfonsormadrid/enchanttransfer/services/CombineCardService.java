@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 import java.util.Optional;
 
 public class CombineCardService {
-
     ItemStack card1;
     ItemStack card2;
 
