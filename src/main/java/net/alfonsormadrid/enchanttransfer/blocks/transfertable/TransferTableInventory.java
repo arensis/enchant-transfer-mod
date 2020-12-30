@@ -1,4 +1,4 @@
-package net.alfonsormadrid.enchanttransfer.blocks;
+package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;
@@ -6,12 +6,7 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.collection.DefaultedList;
 
-/**
- * A simple {@code Inventory} implementation with only default methods + an item list getter.
- *
- * Originally by Juuz
- */
-public interface EnchantInventory extends Inventory {
+public interface TransferTableInventory extends Inventory {
 
     /**
      * Retrieves the item list of this inventory.
@@ -22,14 +17,14 @@ public interface EnchantInventory extends Inventory {
     /**
      * Creates an inventory from the item list.
      */
-    static EnchantInventory of(DefaultedList<ItemStack> items) {
+    static TransferTableInventory of(DefaultedList<ItemStack> items) {
         return () -> items;
     }
 
     /**
      * Creates a new inventory with the specified size.
      */
-    static EnchantInventory ofSize(int size) {
+    static TransferTableInventory ofSize(int size) {
         return of(DefaultedList.ofSize(size, ItemStack.EMPTY));
     }
 
@@ -128,4 +123,5 @@ public interface EnchantInventory extends Inventory {
     default boolean canPlayerUse(PlayerEntity player) {
         return true;
     }
+
 }

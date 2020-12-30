@@ -11,7 +11,7 @@ import net.minecraft.world.World;
 
 public class MagicCardItem extends Item {
     public MagicCardItem() {
-        super(new Item.Settings().group(EnchantTransferMod.ENCHANT_TRANSFER).fireproof());
+        super(new Item.Settings().group(EnchantTransferMod.ENCHANT_TRANSFER_ITEM_GROUP).fireproof());
     }
 
     @Override

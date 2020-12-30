@@ -49,6 +49,23 @@ public class TransferTableScreenHandler extends ScreenHandler {
 
         this.builtCombineCardSlots();
         this.builtTransferSlots();
+
+        addSlotGrid(9, 3, 8, 84, playerInventory, 9);
+        addSlotGrid(9, 1, 8, 142, playerInventory, 0);
+    }
+
+
+    public void addSlotGrid(int columnsAmount, int rowsAmount, int startPositionX, int startPositionY, Inventory inventory, int startInventoryIndex) {
+        IntStream.range(0, rowsAmount).forEach(rowIndex -> {
+            IntStream.range(0, columnsAmount).forEach(columnIndex -> {
+                int slotWidth = 18;
+                int positionX = startPositionX + columnIndex * slotWidth;
+                int positionY = startPositionY + rowIndex * slotWidth;
+                int slotIndex = columnIndex + rowIndex * columnsAmount + startInventoryIndex;
+
+                this.addSlot(new Slot(inventory, slotIndex, positionX, positionY));
+            });
+        });
     }
 
     private void builtCombineCardSlots() {
@@ -59,7 +76,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
                 1, CombineCardSlotPositions.bottomCard.positionX, CombineCardSlotPositions.bottomCard.positionY
         ));
         this.addSlot(buildMagiCardResultSlot(
-                0, CombineCardSlotPositions.resultCard.positionX, CombineCardSlotPositions.bottomCard.positionY
+                0, CombineCardSlotPositions.resultCard.positionX, CombineCardSlotPositions.resultCard.positionY
         ));
     }
 
@@ -83,7 +100,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
 
     private void builtTransferSlots() {
         this.addSlot(buildTransferInputSlot(
-                0, TransferItemSlotPositions.transferItem.positionX, TransferItemSlotPositions.transferItem.positionX
+                0, TransferItemSlotPositions.transferItem.positionX, TransferItemSlotPositions.transferItem.positionY
         ));
 
         this.buildTransferItemContentSlots();
@@ -91,7 +108,6 @@ public class TransferTableScreenHandler extends ScreenHandler {
 
     private void buildTransferItemContentSlots() {
         List<SlotPosition> contentPositions = TransferItemSlotPositions.transferItemContentPositions;
-
         IntStream.range(0, this.transferItemContent.size())
             .forEach(index ->
                 this.addSlot(buildTransferItemContentSlot(
@@ -100,7 +116,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     private Slot buildTransferInputSlot(int index, int x, int y) {
-        return new Slot(this.transferInput, 0, 50, 30) {
+        return new Slot(this.transferInput, index, x, y) {
             public boolean canInsert(ItemStack stack) {
                 return stack.isEnchantable();
             }
@@ -136,7 +152,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return canUse(this.context, player, EnchantTransferMod.TRANSFER_TABLE_BLOCK);
+        return this.combineCardsInput.canPlayerUse(player);
     }
 
     @Override

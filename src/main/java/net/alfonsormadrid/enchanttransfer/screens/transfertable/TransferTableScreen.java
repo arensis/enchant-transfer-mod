@@ -1,6 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
@@ -8,11 +9,10 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-public class TransferTableScreen extends HandledScreen<ScreenHandler> {
-    //A path to the gui texture. In this example we use the texture from the dispenser
-    private static final Identifier TEXTURE = new Identifier("minecraft", "textures/gui/container/dispenser.png");
+public class TransferTableScreen extends HandledScreen<TransferTableScreenHandler> {
+    private static final Identifier TEXTURE = new Identifier(EnchantTransferMod.MOD_ID, "textures/gui/container/transfer_table.png");
 
-    public TransferTableScreen(ScreenHandler handler, PlayerInventory inventory, Text title) {
+    public TransferTableScreen(TransferTableScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
     }
 
