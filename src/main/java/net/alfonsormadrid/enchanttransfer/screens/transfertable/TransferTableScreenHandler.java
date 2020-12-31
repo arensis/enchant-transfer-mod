@@ -17,6 +17,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
     private final Inventory transferItemContent;
     private final ScreenHandlerContext context;
     private final CombineCardService combineCardService;
+    private final int TRANSFER_ITEM_CONTENT_SIZE = 12;
 
     public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory) {
         this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
@@ -39,7 +41,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
         this.combineCardsInput = buildInitInventory(2);
         this.combineCardsOutput = new CraftingResultInventory();
         this.transferInput = buildInitInventory(1);
-        this.transferItemContent = buildInitInventory(12);
+        this.transferItemContent = buildInitInventory(TRANSFER_ITEM_CONTENT_SIZE);
         this.context = context;
 
         this.combineCardService = new CombineCardService(
@@ -118,7 +120,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
     private Slot buildTransferInputSlot(int index, int x, int y) {
         return new Slot(this.transferInput, index, x, y) {
             public boolean canInsert(ItemStack stack) {
-                return stack.isEnchantable();
+                return stack.isEnchantable() || stack.hasEnchantments();
             }
         };
     }
@@ -128,8 +130,8 @@ public class TransferTableScreenHandler extends ScreenHandler {
             public boolean canInsert(ItemStack stack) {
                 return transferInputIsNotEmpty() && itemIsMagicCard(stack);
             }
-            //Logic for onTakeItem (remove enchant of input item)
-            //Logic for insert method (add enchant of input item)
+            //Logic for onTakeItem (remove enchant from input item)
+            //Logic for insert method (add enchant on input item)
         };
     }
 
@@ -168,18 +170,30 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     private void updatedTransferItemContent() {
+        List<ItemStack> itemMagicCards = getMagicCardsFromItem();;
+
+        if(!itemMagicCards.isEmpty()) {
+            IntStream.of(0, itemMagicCards.size()).forEach(index -> {
+                System.out.println("Index: " + index);
+                System.out.println("ItemMagicCardSize: " + itemMagicCards.size());
+                this.transferItemContent.setStack(index, itemMagicCards.get(index));
+            });
+        }
+    }
+
+    private List<ItemStack> getMagicCardsFromItem() {
         Map<Enchantment, Integer> transferItemEnchantments =
                 EnchantmentHelper.get(this.transferInput.getStack(0));
 
-        List<ItemStack> itemMagicCards = transferItemEnchantments.entrySet().stream().map(enchantmentEntry -> {
-            ItemStack magicCardEnchanted = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
-            magicCardEnchanted.addEnchantment(enchantmentEntry.getKey(), enchantmentEntry.getValue());
-            return magicCardEnchanted;
-        }).collect(Collectors.toList());
+        if (!transferItemEnchantments.isEmpty()) {
+            return transferItemEnchantments.entrySet().stream().map(enchantmentEntry -> {
+                ItemStack magicCardEnchanted = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
+                magicCardEnchanted.addEnchantment(enchantmentEntry.getKey(), enchantmentEntry.getValue());
+                return magicCardEnchanted;
+            }).collect(Collectors.toList());
+        }
 
-        IntStream.of(0, itemMagicCards.size()).forEach(index -> {
-            this.transferItemContent.setStack(index, itemMagicCards.get(index));
-        });
+        return Collections.emptyList();
     }
 
     private void updateCombineCardsOutput() {
