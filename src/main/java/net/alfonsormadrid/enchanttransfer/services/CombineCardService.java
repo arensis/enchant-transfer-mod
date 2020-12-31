@@ -39,6 +39,14 @@ public class CombineCardService {
         return !card1.isEmpty() && !card2.isEmpty();
     }
 
+    public void setCard1(ItemStack card1) {
+        this.card1 = card1;
+    }
+
+    public void setCard2(ItemStack card2) {
+        this.card2 = card2;
+    }
+
     private boolean cardsHaveSameEnchant() {
         return card1.getEnchantments().containsAll(card2.getEnchantments());
     }
