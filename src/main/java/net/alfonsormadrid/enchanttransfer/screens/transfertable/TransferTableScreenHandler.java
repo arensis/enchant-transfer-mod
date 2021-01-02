@@ -58,6 +58,35 @@ public class TransferTableScreenHandler extends ScreenHandler {
         return this.combineCardsInput.canPlayerUse(player);
     }
 
+    /* -- Corregir para correcto funcionamiento
+    -- Si no hay item entonces pasar la carta a combinación de cartas
+    -- Si hay item transferir carta al primer slot libre del contenido del item
+    @Override
+    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
+        ItemStack newStack = ItemStack.EMPTY;
+        Slot slot = this.slots.get(invSlot);
+        if (slot != null && slot.hasStack()) {
+            ItemStack originalStack = slot.getStack();
+            newStack = originalStack.copy();
+            if (invSlot < this.inventory.size()) {
+                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
+                return ItemStack.EMPTY;
+            }
+
+            if (originalStack.isEmpty()) {
+                slot.setStack(ItemStack.EMPTY);
+            } else {
+                slot.markDirty();
+            }
+        }
+
+        return newStack;
+    }
+    */
+
     @Override
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
