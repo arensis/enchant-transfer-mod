@@ -1,5 +1,6 @@
 {
   "itemGroup.enchanttransfer.general": "Enchant Transfer Mod",
   "item.enchanttransfer.magic_card_item": "Transfer magic card",
-  "block.enchanttransfer.transfer_table_block": "Transfer Table"
+  "block.enchanttransfer.transfer_table_block": "§fTransfer Table",
+  "enchanttransfer.container.inventory":"§fInventory"
 }

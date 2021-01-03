@@ -11,6 +11,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.BookItem;
+import net.minecraft.item.EnchantedBookItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
@@ -58,35 +60,6 @@ public class TransferTableScreenHandler extends ScreenHandler {
         return this.combineCardsInput.canPlayerUse(player);
     }
 
-    /* -- Corregir para correcto funcionamiento
-    -- Si no hay item entonces pasar la carta a combinación de cartas
-    -- Si hay item transferir carta al primer slot libre del contenido del item
-    @Override
-    public ItemStack transferSlot(PlayerEntity player, int invSlot) {
-        ItemStack newStack = ItemStack.EMPTY;
-        Slot slot = this.slots.get(invSlot);
-        if (slot != null && slot.hasStack()) {
-            ItemStack originalStack = slot.getStack();
-            newStack = originalStack.copy();
-            if (invSlot < this.inventory.size()) {
-                if (!this.insertItem(originalStack, this.inventory.size(), this.slots.size(), true)) {
-                    return ItemStack.EMPTY;
-                }
-            } else if (!this.insertItem(originalStack, 0, this.inventory.size(), false)) {
-                return ItemStack.EMPTY;
-            }
-
-            if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
-            } else {
-                slot.markDirty();
-            }
-        }
-
-        return newStack;
-    }
-    */
-
     @Override
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
@@ -106,7 +79,6 @@ public class TransferTableScreenHandler extends ScreenHandler {
      */
 
     private void updateTransferItemContent(Map<Enchantment, Integer> enchants) {
-        removeAllTransferContentItemStacks();
         addMagiCardsToTransferItemContent(buildMagicCardsFromEnchants(enchants));
     }
 
@@ -247,7 +219,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
         return new Slot(this.transferInput, 0, x, y) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return stack.isEnchantable() || stack.hasEnchantments();
+                return stack.isEnchantable() || stack.hasEnchantments() || stack.getItem() instanceof EnchantedBookItem;
             }
 
             @Override
