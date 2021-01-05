@@ -11,9 +11,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.BookItem;
-import net.minecraft.item.EnchantedBookItem;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
@@ -96,8 +94,15 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     private ItemStack createCopyTransferInputWith(Map<Enchantment, Integer> enchants) {
-        ItemStack copyTransferInput = new ItemStack(this.transferInput.getStack(0).getItem());
+        Item transferInputItem = this.transferInput.getStack(0).getItem();
+
+        if(enchants.isEmpty() && isEnchantedBook(transferInputItem)) {
+            return new ItemStack(Items.BOOK);
+        }
+
+        ItemStack copyTransferInput = new ItemStack(transferInputItem);
         enchants.forEach(copyTransferInput::addEnchantment);
+
         return copyTransferInput;
     }
 
@@ -219,7 +224,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
         return new Slot(this.transferInput, 0, x, y) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return stack.isEnchantable() || stack.hasEnchantments() || stack.getItem() instanceof EnchantedBookItem;
+                return stack.isEnchantable() || stack.hasEnchantments() || isEnchantedBook(stack.getItem());
             }
 
             @Override
@@ -228,6 +233,10 @@ public class TransferTableScreenHandler extends ScreenHandler {
                 return super.onTakeItem(player, stack);
             }
         };
+    }
+
+    private boolean isEnchantedBook(Item item) {
+        return item == Items.ENCHANTED_BOOK;
     }
 
     private boolean containsTheSameEnchant(ItemStack stack) {

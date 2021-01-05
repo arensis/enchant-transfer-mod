@@ -23,7 +23,7 @@ public class CombineCardService {
 
         if(card1Level.isPresent() && card2Level.isPresent() && enchantment.isPresent()) {
             ItemStack outputCard = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
-            Integer updatedLevel = card1Level.get() + card2Level.get();
+            Integer updatedLevel = card1Level.get() + 1;
             outputCard.addEnchantment(enchantment.get(), updatedLevel);
             return outputCard;
         } else {
@@ -32,11 +32,18 @@ public class CombineCardService {
     }
 
     public boolean cardsCanCombine() {
-        return twoCardsInserted() && cardsHaveSameEnchant();
+        return twoEnchantedCardsInserted() && cardsHaveSameEnchant() && noMaxLevelCards();
     }
 
-    private boolean twoCardsInserted() {
-        return !card1.isEmpty() && !card2.isEmpty();
+    private boolean noMaxLevelCards() {
+        Optional<Integer> card1Level = EnchantmentHelper.get(card1).values().stream().findFirst();
+        Optional<Enchantment> enchantment = EnchantmentHelper.get(card1).keySet().stream().findFirst();
+
+        return card1Level.isPresent() && enchantment.isPresent() && card1Level.get() < enchantment.get().getMaxLevel();
+    }
+
+    private boolean twoEnchantedCardsInserted() {
+        return !card1.isEmpty() && !card2.isEmpty() && card1.hasEnchantments() && card2.hasEnchantments();
     }
 
     public void setCard1(ItemStack card1) {
