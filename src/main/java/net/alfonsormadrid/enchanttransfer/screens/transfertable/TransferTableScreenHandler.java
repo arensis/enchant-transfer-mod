@@ -65,11 +65,6 @@ public class TransferTableScreenHandler extends ScreenHandler {
         if (inventory == this.combineCardsInput) {
             updateCombineCardsOutput();
         }
-
-        if (inventory == this.transferInput) {
-            Map<Enchantment, Integer> enchants = EnchantmentHelper.get(this.transferInput.getStack(0));
-            updateTransferItemContent(enchants);
-        }
     }
 
     /**
@@ -232,6 +227,13 @@ public class TransferTableScreenHandler extends ScreenHandler {
                 removeAllTransferContentItemStacks();
                 return super.onTakeItem(player, stack);
             }
+
+            @Override
+            public void setStack(ItemStack itemStack) {
+                super.setStack(itemStack);
+                Map<Enchantment, Integer> enchants = EnchantmentHelper.get(itemStack);
+                updateTransferItemContent(enchants);
+            }
         };
     }
 
@@ -259,7 +261,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
         return new Slot(this.transferItemContent, index, x, y) {
             @Override
             public boolean canInsert(ItemStack stack) {
-                return transferInputIsNotEmpty() && itemIsMagicCard(stack) && !containsTheSameEnchant(stack);
+                return transferInputIsNotEmpty() && itemIsMagicCard(stack) && !containsTheSameEnchant(stack) && !containsIncompatibleEnchant(stack);
             }
 
             @Override
@@ -274,6 +276,10 @@ public class TransferTableScreenHandler extends ScreenHandler {
                 addNewEnchantToItem();
             }
         };
+    }
+
+    private boolean containsIncompatibleEnchant(ItemStack stack) {
+        return false;
     }
 
     public void addSlotGrid(int columnsAmount, int rowsAmount, int startPositionX, int startPositionY, Inventory inventory, int startInventoryIndex) {
