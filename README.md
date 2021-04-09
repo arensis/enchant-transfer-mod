@@ -21,5 +21,3 @@ https://fabricmc.net/use/
 - build: Compila el proyecto y deja el jar en build/libs
 - runClient: Lanza la ejecución de minecraft incluyendo el mod
 - runServer: Lanza un servidor de minecraft con fabric que incluye el mod
-
-This template is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
