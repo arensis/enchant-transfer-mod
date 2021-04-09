@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TransferItemContentSlot extends TransferSlot {
-    private Inventory itemInventory;
+    private final Inventory itemInventory;
 
     public TransferItemContentSlot(Inventory inventory, Inventory itemInventory, int index, SlotPosition positions) {
         super(inventory, index, positions);
