@@ -21,7 +21,7 @@ public class CombineCardService {
         Optional<Integer> card2Level = EnchantmentHelper.get(card2).values().stream().findFirst();
         Optional<Enchantment> enchantment = EnchantmentHelper.get(card1).keySet().stream().findFirst();
 
-        if(card1Level.isPresent() && card2Level.isPresent() && enchantment.isPresent()) {
+        if(card1Level.isPresent() && card2Level.isPresent()) {
             ItemStack outputCard = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
             Integer updatedLevel = card1Level.get() + 1;
             outputCard.addEnchantment(enchantment.get(), updatedLevel);
@@ -44,14 +44,6 @@ public class CombineCardService {
 
     private boolean twoEnchantedCardsInserted() {
         return !card1.isEmpty() && !card2.isEmpty() && card1.hasEnchantments() && card2.hasEnchantments();
-    }
-
-    public void setCard1(ItemStack card1) {
-        this.card1 = card1;
-    }
-
-    public void setCard2(ItemStack card2) {
-        this.card2 = card2;
     }
 
     private boolean cardsHaveSameEnchant() {

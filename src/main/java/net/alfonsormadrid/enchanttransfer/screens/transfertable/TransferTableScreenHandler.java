@@ -1,81 +1,51 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.alfonsormadrid.enchanttransfer.gui.transfertable.CombineCardSlotPositions;
 import net.alfonsormadrid.enchanttransfer.gui.transfertable.TransferItemSlotPositions;
-import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardSlot;
-import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardResultSlot;
-import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.TransferItemSlot;
-import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.TransferItemContentSlot;
-import net.alfonsormadrid.enchanttransfer.services.CombineCardService;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.TransferTableInventorySlots;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.magiccard.FirstMagicCardSlot;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.magiccard.MagicCardResultSlot;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.magiccard.SecondMagicCardSlot;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.transferitem.TransferItemSlot;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.transferitem.TransferItemContentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.*;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+
 import java.util.stream.IntStream;
 
 public class TransferTableScreenHandler extends ScreenHandler {
-    private final Inventory combineCardsInput;
-    private final Inventory combineCardsOutput;
-    private final Inventory transferItem;
-    private final Inventory transferItemContent;
-    private final ScreenHandlerContext context;
-    private final CombineCardService combineCardService;
+    private final Inventory transferTableInventory;
+
+//    private final Inventory combineCardsInput;
+//    private final Inventory combineCardsOutput;
+//    private final Inventory transferItem;
+//    private final Inventory transferItemContent;
 
     public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
-    }
-
-    public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory, final ScreenHandlerContext context) {
         super(EnchantTransferMod.TRANSFER_TABLE_SCREEN_HANDLER, syncId);
-        this.combineCardsInput = buildInitInventory(2);
-        this.combineCardsOutput = buildInitInventory(1);
-        this.transferItem = buildInitInventory(1);
-        this.transferItemContent = buildInitInventory(12);
-        this.context = context;
+        this.transferTableInventory = buildInitInventory(16);
 
-        this.combineCardService = new CombineCardService(
-                this.combineCardsInput.getStack(0),
-                this.combineCardsInput.getStack(1)
-        );
+//        this.combineCardsInput = buildInitInventory(2);
+//        this.combineCardsOutput = buildInitInventory(1);
+//        this.transferItem = buildInitInventory(1);
+//        this.transferItemContent = buildInitInventory(12);
 
-        this.builtCombineCardSlots();
-        this.addSlot(new TransferItemSlot(this.transferItem, this.transferItemContent, TransferItemSlotPositions.transferItem));
-        this.buildTransferItemContentSlots();
-
-        addSlotGrid(9, 3, 8, 84, playerInventory, 9);
-        addSlotGrid(9, 1, 8, 142, playerInventory, 0);
+        this.buildMagicCardSlots();
+        this.buildTransferSlots();
+        this.buildPlayerInventorySlots(playerInventory);
     }
 
     @Override
     public boolean canUse(PlayerEntity player) {
-        return this.combineCardsInput.canPlayerUse(player);
-    }
-
-    @Override
-    public void onContentChanged(Inventory inventory) {
-        super.onContentChanged(inventory);
-
-        if (inventory == this.combineCardsInput) {
-            updateCombineCardsOutput();
-        }
-    }
-
-    private void updateCombineCardsOutput() {
-        combineCardService.setCard1(this.combineCardsInput.getStack(0));
-        combineCardService.setCard2(this.combineCardsInput.getStack(1));
-
-        if (this.combineCardService.cardsCanCombine()) {
-            this.combineCardsOutput.setStack(0, this.combineCardService.combineCards());
-        } else {
-            this.combineCardsOutput.setStack(0, ItemStack.EMPTY);
-        }
-
-        this.sendContentUpdates();
+        return this.transferTableInventory.canPlayerUse(player);
+//        return this.combineCardsInput.canPlayerUse(player) &&
+//                this.combineCardsOutput.canPlayerUse(player) &&
+//                this.transferItem.canPlayerUse(player) &&
+//                this.transferItemContent.canPlayerUse(player);
     }
 
     private SimpleInventory buildInitInventory(int size) {
@@ -87,29 +57,47 @@ public class TransferTableScreenHandler extends ScreenHandler {
         };
     }
 
-    private void builtCombineCardSlots() {
-        this.addSlot(new MagicCardSlot(this.combineCardsInput, 0, CombineCardSlotPositions.topCard));
-        this.addSlot(new MagicCardSlot(this.combineCardsInput, 1, CombineCardSlotPositions.bottomCard));
-        this.addSlot(
-            new MagicCardResultSlot(
-                this.combineCardsOutput,
-                this.combineCardsInput,
-                0,
-                CombineCardSlotPositions.resultCard
-            )
-        );
+    private void buildMagicCardSlots() {
+        this.addSlot(new FirstMagicCardSlot(this.transferTableInventory));
+        this.addSlot(new SecondMagicCardSlot(this.transferTableInventory));
+        this.addSlot(new MagicCardResultSlot(this.transferTableInventory));
+//        this.addSlot(new FirstMagicCardSlot(this.combineCardsInput, this.combineCardsOutput));
+//        this.addSlot(new SecondMagicCardSlot(this.combineCardsInput, this.combineCardsOutput));
+//        this.addSlot(new MagicCardResultSlot(this.combineCardsOutput, this.combineCardsInput));
     }
 
-    private void buildTransferItemContentSlots() {
-        IntStream.range(0, this.transferItemContent.size())
-                .forEach(index ->
+    private void buildTransferSlots() {
+        this.addSlot(new TransferItemSlot(this.transferTableInventory, TransferItemSlotPositions.transferItem));
+//        this.addSlot(new TransferItemSlot(this.transferItem, this.transferItemContent, TransferItemSlotPositions.transferItem));
+
+        IntStream.range(TransferTableInventorySlots.ITEM_CONTENT_FIRST_SLOT.getSlotIndex(), TransferTableInventorySlots.ITEM_CONTENT_LAST_SLOT.getSlotIndex())
+                .forEach(index -> {
+                        System.out.println("Total inventory size: " + this.transferTableInventory.size());
+                        System.out.println("Index: " + index) ;
                         this.addSlot(
                                 new TransferItemContentSlot(
-                                        this.transferItemContent,
-                                        this.transferItem,
+                                        this.transferTableInventory,
                                         index,
-                                        TransferItemSlotPositions.transferItemContentPositions.get(index)
-                                )));
+                                        TransferTableInventorySlots.ITEM_SLOT.getSlotIndex(),
+                                        TransferItemSlotPositions.transferItemContentPositions.get(index - TransferTableInventorySlots.ITEM_CONTENT_FIRST_SLOT.getSlotIndex())
+                                )
+                        );
+                });
+
+//        IntStream.range(0, this.transferItemContent.size())
+//                .forEach(index ->
+//                        this.addSlot(
+//                                new TransferItemContentSlot(
+//                                        this.transferItemContent,
+//                                        this.transferItem,
+//                                        index,
+//                                        TransferItemSlotPositions.transferItemContentPositions.get(index)
+//                                )));
+    }
+
+    private void buildPlayerInventorySlots(PlayerInventory playerInventory) {
+        addSlotGrid(9, 3, 8, 84, playerInventory, 9);
+        addSlotGrid(9, 1, 8, 142, playerInventory, 0);
     }
 
     public void addSlotGrid(int columnsAmount, int rowsAmount, int startPositionX, int startPositionY, Inventory inventory, int startInventoryIndex) {

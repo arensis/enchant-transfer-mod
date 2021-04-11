@@ -1,4 +1,4 @@
-package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
+package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.transferitem;
 
 import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
 import net.minecraft.enchantment.Enchantment;
@@ -18,12 +18,18 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TransferItemContentSlot extends TransferSlot {
-    private final Inventory itemInventory;
+//    private final Inventory itemInventory;
+    private Integer itemInventorySlotIndex;
 
-    public TransferItemContentSlot(Inventory inventory, Inventory itemInventory, int index, SlotPosition positions) {
+    public TransferItemContentSlot(Inventory inventory, int index, int itemInventorySlotIndex, SlotPosition positions) {
         super(inventory, index, positions);
-        this.itemInventory = itemInventory;
+        this.itemInventorySlotIndex = itemInventorySlotIndex;
     }
+
+//    public TransferItemContentSlot(Inventory inventory, Inventory itemInventory, int index, SlotPosition positions) {
+//        super(inventory, index, positions);
+//        this.itemInventory = itemInventory;
+//    }
 
     @Override
     public boolean canInsert(ItemStack stack) {
@@ -46,7 +52,10 @@ public class TransferItemContentSlot extends TransferSlot {
         super.setStack(itemStack);
     }
 
-    private boolean itemInventoryIsNotEmpty() { return !this.itemInventory.getStack(0).isEmpty(); }
+    private boolean itemInventoryIsNotEmpty() {
+        return !this.inventory.getStack(itemInventorySlotIndex).isEmpty();
+//        return !this.itemInventory.getStack(0).isEmpty();
+    }
 
     private boolean containsTheSameEnchant(ItemStack stack) {
         return mapItemStacksToEnchants(getAllItemContentInventoryStacks())
@@ -56,7 +65,8 @@ public class TransferItemContentSlot extends TransferSlot {
     }
 
     private boolean containsIncompatibleEnchant(ItemStack stack) {
-        ItemStack itemInventoryStack = this.itemInventory.getStack(0);
+//        ItemStack itemInventoryStack = this.itemInventory.getStack(0);
+        ItemStack itemInventoryStack = this.inventory.getStack(itemInventorySlotIndex);
         Collection<Enchantment> enchantments = EnchantmentHelper.get(itemInventoryStack).keySet();
 
         if(!isBook(itemInventoryStack.getItem())) {
@@ -73,12 +83,14 @@ public class TransferItemContentSlot extends TransferSlot {
 
     private void removeEnchantFromItemInventory(ItemStack stack) {
         ItemStack newItemStack = createCopyItemInventoryWith(itemInventoryEnchantsFilteredBy(stack));
-        this.itemInventory.setStack(0, newItemStack);
+        this.inventory.setStack(itemInventorySlotIndex, newItemStack);
+//        this.itemInventory.setStack(0, newItemStack);
     }
 
     private void addEnchantToItemInventory(ItemStack stack) {
         ItemStack newItemStack = createCopyItemInventoryWith(mergeItemInventoryEnchantmentsWith(stack));
-        this.itemInventory.setStack(0, newItemStack);
+        this.inventory.setStack(itemInventorySlotIndex, newItemStack);
+//        this.itemInventory.setStack(0, newItemStack);
     }
 
     private Map<Enchantment, Integer> mapItemStacksToEnchants(List<ItemStack> stacks) {
@@ -99,11 +111,16 @@ public class TransferItemContentSlot extends TransferSlot {
     }
 
     private Map<Enchantment, Integer> itemInventoryEnchantsFilteredBy(ItemStack stack) {
-        return EnchantmentHelper.get(this.itemInventory.getStack(0))
+        return EnchantmentHelper.get(this.inventory.getStack(itemInventorySlotIndex))
                 .entrySet()
                 .stream()
                 .filter(entry -> !containsEnchantment(stack, entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+//        return EnchantmentHelper.get(this.itemInventory.getStack(0))
+//                .entrySet()
+//                .stream()
+//                .filter(entry -> !containsEnchantment(stack, entry.getKey()))
+//                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 
@@ -112,7 +129,8 @@ public class TransferItemContentSlot extends TransferSlot {
         ItemStack newItemStack = new ItemStack(itemInventoryType);
 
         if(!isBook(itemInventoryType)) {
-            Text oldText = this.itemInventory.getStack(0).getName();
+            Text oldText = this.inventory.getStack(itemInventorySlotIndex).getName();
+//            Text oldText = this.itemInventory.getStack(0).getName();
             newItemStack.setCustomName(oldText);
         }
 
@@ -122,14 +140,16 @@ public class TransferItemContentSlot extends TransferSlot {
 
     private Map<Enchantment, Integer> mergeItemInventoryEnchantmentsWith(ItemStack stack) {
         Map<Enchantment, Integer> newEnchant = EnchantmentHelper.get(stack);
-        Map<Enchantment, Integer> currentEnchants = EnchantmentHelper.get(this.itemInventory.getStack(0));
+        Map<Enchantment, Integer> currentEnchants = EnchantmentHelper.get(this.inventory.getStack(itemInventorySlotIndex));
+//        Map<Enchantment, Integer> currentEnchants = EnchantmentHelper.get(this.itemInventory.getStack(0));
         currentEnchants.putAll(newEnchant);
 
         return currentEnchants;
     }
 
     private Item getItemType(Map<Enchantment, Integer> enchants) {
-        Item itemInventoryType = this.itemInventory.getStack(0).getItem();
+        Item itemInventoryType = this.inventory.getStack(itemInventorySlotIndex).getItem();
+//        Item itemInventoryType = this.itemInventory.getStack(0).getItem();
 
         if(enchants.isEmpty() && isEnchantedBook(itemInventoryType)) {
             return Items.BOOK;
@@ -149,7 +169,8 @@ public class TransferItemContentSlot extends TransferSlot {
     private boolean isUnEnchantedBookItem(Item item) { return item == Items.BOOK; }
 
     private boolean isEnchantmentAcceptableForItem(ItemStack enchantmentStack) {
-        ItemStack itemInventoryStack = this.itemInventory.getStack(0);
+        ItemStack itemInventoryStack = this.inventory.getStack(itemInventorySlotIndex);
+//        ItemStack itemInventoryStack = this.itemInventory.getStack(0);
 
         if(!isBook(itemInventoryStack.getItem())) {
             return EnchantmentHelper.get(enchantmentStack)
