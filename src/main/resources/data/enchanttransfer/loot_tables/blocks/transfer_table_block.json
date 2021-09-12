@@ -11,7 +11,11 @@
       ],
       "conditions": [
         {
-          "condition": "minecraft:survives_explosion"
+          "condition": "minecraft:match_tool",
+          "predicate": {
+            "items": ["enchanttransfer:transfer_table_item"],
+            "count": 1
+          }
         }
       ]
     }
