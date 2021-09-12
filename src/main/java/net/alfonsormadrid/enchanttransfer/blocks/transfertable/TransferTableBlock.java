@@ -1,6 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
+import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.mob.PiglinBrain;
@@ -19,6 +20,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
+import static net.alfonsormadrid.enchanttransfer.EnchantTransferMod.TRANSFER_TABLE_BLOCK_IDENTIFIER;
+
 
 public class TransferTableBlock extends BlockWithEntity {
     public TransferTableBlock() {
@@ -34,6 +37,10 @@ public class TransferTableBlock extends BlockWithEntity {
                         SoundEvents.BLOCK_CHAIN_HIT,
                         SoundEvents.BLOCK_SLIME_BLOCK_FALL)
                 )
+                .breakByTool(FabricToolTags.PICKAXES, 2)
+                .requiresTool()
+                .strength(5.0f, 30.0f)
+                .luminance(10)
         );
     }
 
