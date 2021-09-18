@@ -112,8 +112,10 @@ public class TransferItemContentSlot extends TransferSlot {
         ItemStack newItemStack = new ItemStack(itemInventoryType);
 
         if(!isBook(itemInventoryType)) {
-            Text oldText = this.itemInventory.getStack(0).getName();
-            newItemStack.setCustomName(oldText);
+            Text originalItemName = this.itemInventory.getStack(0).getName();
+            int originalItemDamage = this.itemInventory.getStack(0).getDamage();
+            newItemStack.setCustomName(originalItemName);
+            newItemStack.setDamage(originalItemDamage);
         }
 
         EnchantmentHelper.set(enchants, newItemStack);
