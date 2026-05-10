@@ -6,6 +6,7 @@ import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,7 +22,15 @@ public class TransferItemSlot extends TransferSlot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return !itemIsMagicCard(stack) && (stack.isEnchantable() || !stack.getEnchantments().isEmpty() || isEnchantedBook(stack.getItem()));
+        return !itemIsMagicCard(stack) && (stack.isEnchantable()
+                || !stack.getEnchantments().isEmpty()
+                || isEnchantedBook(stack.getItem())
+                || stack.getItem() == Items.BOOK);
+    }
+
+    @Override
+    public int getMaxItemCount() {
+        return 1;
     }
 
     @Override
