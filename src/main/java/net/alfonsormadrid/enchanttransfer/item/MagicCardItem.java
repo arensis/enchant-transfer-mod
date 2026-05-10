@@ -10,7 +10,7 @@ import net.minecraft.world.World;
 
 public class MagicCardItem extends Item {
     public MagicCardItem() {
-        super(new Item.Settings().fireImmune());
+        super(new Item.Settings().fireproof());
     }
 
     @Override

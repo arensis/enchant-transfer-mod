@@ -7,7 +7,7 @@ public class TransferTableItem extends BlockItem {
     public TransferTableItem(TransferTableBlock transferTableBlock) {
         super(
             transferTableBlock,
-            new Item.Settings().fireImmune()
+            new Item.Settings().fireproof()
         );
     }
 }
