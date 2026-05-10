@@ -1,7 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
 import com.mojang.serialization.MapCodec;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +25,7 @@ public class TransferTableBlock extends BlockWithEntity {
 
     public TransferTableBlock() {
         this(
-            FabricBlockSettings.copyOf(Blocks.CHEST)
+            AbstractBlock.Settings.copy(Blocks.CHEST)
                 .sounds(
                     new BlockSoundGroup(
                         5.0F,
