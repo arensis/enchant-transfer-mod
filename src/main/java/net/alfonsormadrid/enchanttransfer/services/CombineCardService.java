@@ -23,7 +23,8 @@ public class CombineCardService {
 
         if (enchantmentEntry.isPresent()) {
             int currentLevel = enchants1.getLevel(enchantmentEntry.get());
-            ItemStack outputCard = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
+            int resultCount = Math.min(card1.getCount(), card2.getCount());
+            ItemStack outputCard = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM, resultCount);
             outputCard.addEnchantment(enchantmentEntry.get(), currentLevel + 1);
             return outputCard;
         } else {
