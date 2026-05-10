@@ -3,9 +3,13 @@ package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stat;
@@ -14,7 +18,9 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import static net.alfonsormadrid.enchanttransfer.EnchantTransferMod.TRANSFER_TABLE_BLOCK_IDENTIFIER;
 
@@ -49,6 +55,18 @@ public class TransferTableBlock extends BlockWithEntity {
     @Override
     protected MapCodec<? extends BlockWithEntity> getCodec() {
         return CODEC;
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        if (!world.isClient) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            Vec3d center = Vec3d.ofCenter(pos);
+            serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK,
+                    center.x, center.y + 0.5, center.z, 40, 0.45, 0.45, 0.45, 0.25);
+            serverWorld.spawnParticles(ParticleTypes.END_ROD,
+                    center.x, center.y + 0.5, center.z, 20, 0.35, 0.35, 0.35, 0.08);
+        }
     }
 
     @Override
