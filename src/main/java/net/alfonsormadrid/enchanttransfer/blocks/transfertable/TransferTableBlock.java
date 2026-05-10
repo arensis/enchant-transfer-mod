@@ -38,7 +38,7 @@ public class TransferTableBlock extends BlockWithEntity {
                 )
                 .requiresTool()
                 .strength(5.0f, 30.0f)
-                .luminance(10)
+                .luminance(state -> 10)
         );
     }
 
