@@ -29,6 +29,11 @@ public class TransferItemContentSlot extends TransferSlot {
     }
 
     @Override
+    public int getMaxItemCount() {
+        return 1;
+    }
+
+    @Override
     public boolean canInsert(ItemStack stack) {
         return itemInventoryIsNotEmpty() &&
                 itemIsMagicCard(stack) &&
