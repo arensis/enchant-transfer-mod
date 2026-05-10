@@ -45,7 +45,13 @@ public class TransferItemContentSlot extends TransferSlot {
 
     @Override
     public void setStack(ItemStack itemStack) {
-        addEnchantToItemInventory(itemStack);
+        ItemStack current = this.getStack();
+        if (!current.isEmpty()) {
+            removeEnchantFromItemInventory(current);
+        }
+        if (!itemStack.isEmpty()) {
+            addEnchantToItemInventory(itemStack);
+        }
         super.setStack(itemStack);
     }
 

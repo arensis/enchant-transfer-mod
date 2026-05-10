@@ -33,23 +33,14 @@ public class TransferItemSlot extends TransferSlot {
     @Override
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
-        ItemEnchantmentsComponent enchants = getEffectiveEnchantments(itemStack);
-        updateItemContentInventory(enchants);
+        removeAllItemContentInventoryStacks();
+        List<ItemStack> magicCards = buildMagicCardsFromEnchants(getEffectiveEnchantments(itemStack));
+        IntStream.range(0, magicCards.size())
+                .forEach(index -> this.itemContentInventory.setStack(index, magicCards.get(index)));
     }
 
     private void removeAllItemContentInventoryStacks() {
         IntStream.range(0, this.itemContentInventory.size()).forEach(this.itemContentInventory::removeStack);
-    }
-
-    private void updateItemContentInventory(ItemEnchantmentsComponent enchants) {
-        addMagicCardsToItemContentInventory(buildMagicCardsFromEnchants(enchants));
-    }
-
-    private void addMagicCardsToItemContentInventory(List<ItemStack> magicCards) {
-        if (this.itemContentInventory.isEmpty()) {
-            IntStream.range(0, magicCards.size())
-                    .forEach(index -> this.itemContentInventory.setStack(index, magicCards.get(index)));
-        }
     }
 
     private List<ItemStack> buildMagicCardsFromEnchants(ItemEnchantmentsComponent enchants) {
