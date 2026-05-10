@@ -15,6 +15,7 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandlerType;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -30,7 +31,7 @@ public class EnchantTransferMod implements ModInitializer {
 
 	public static final ScreenHandlerType<TransferTableScreenHandler> TRANSFER_TABLE_SCREEN_HANDLER =
 			Registry.register(Registries.SCREEN_HANDLER, TRANSFER_TABLE_BLOCK_IDENTIFIER,
-					new ScreenHandlerType<TransferTableScreenHandler>((syncId, inv) -> new TransferTableScreenHandler(syncId, inv)));
+					new ScreenHandlerType<TransferTableScreenHandler>((syncId, inv) -> new TransferTableScreenHandler(syncId, inv), FeatureFlags.VANILLA_FEATURES));
 
 	public static final TransferTableItem TRANSFER_TABLE_ITEM = new TransferTableItem(TRANSFER_TABLE_BLOCK);
 	public static BlockEntityType<TransferTableBlockEntity> TRANSFER_TABLE_BLOCK_ENTITY =
