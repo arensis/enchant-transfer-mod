@@ -1,0 +1,96 @@
+name: PR Automation
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [master]
+
+jobs:
+  automate:
+    if: |
+      github.event.pull_request.merged == true && (
+        contains(github.event.pull_request.labels.*.name, 'tag/major') ||
+        contains(github.event.pull_request.labels.*.name, 'tag/minor') ||
+        contains(github.event.pull_request.labels.*.name, 'tag/patch') ||
+        contains(github.event.pull_request.labels.*.name, 'force-release')
+      )
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ── Version bump ────────────────────────────────────────────────────────
+      - name: Bump version and create tag
+        id: version
+        env:
+          HAS_MAJOR: ${{ contains(github.event.pull_request.labels.*.name, 'tag/major') }}
+          HAS_MINOR: ${{ contains(github.event.pull_request.labels.*.name, 'tag/minor') }}
+          HAS_PATCH: ${{ contains(github.event.pull_request.labels.*.name, 'tag/patch') }}
+        run: |
+          CURRENT=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
+          MAJOR=$(echo $CURRENT | cut -d'.' -f1)
+          MINOR=$(echo $CURRENT | cut -d'.' -f2)
+          PATCH=$(echo $CURRENT | cut -d'.' -f3)
+
+          if [ "$HAS_MAJOR" = "true" ]; then
+            MAJOR=$((MAJOR + 1)); MINOR=0; PATCH=0
+          elif [ "$HAS_MINOR" = "true" ]; then
+            MINOR=$((MINOR + 1)); PATCH=0
+          elif [ "$HAS_PATCH" = "true" ]; then
+            PATCH=$((PATCH + 1))
+          fi
+
+          NEW="$MAJOR.$MINOR.$PATCH"
+
+          if [ "$NEW" != "$CURRENT" ]; then
+            sed -i "s/mod_version = .*/mod_version = $NEW/" gradle.properties
+            git config user.name  "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add gradle.properties
+            git commit -m "chore: bump version to $NEW [skip ci]"
+            git tag "v$NEW"
+            git push origin master --follow-tags
+            echo "bumped=true" >> $GITHUB_OUTPUT
+          else
+            echo "bumped=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "version=$NEW"   >> $GITHUB_OUTPUT
+          echo "tag=v$NEW"      >> $GITHUB_OUTPUT
+
+      # ── Release ─────────────────────────────────────────────────────────────
+      - name: Set up Java 21
+        if: contains(github.event.pull_request.labels.*.name, 'force-release')
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant Gradle wrapper permissions
+        if: contains(github.event.pull_request.labels.*.name, 'force-release')
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        if: contains(github.event.pull_request.labels.*.name, 'force-release')
+        run: ./gradlew build
+
+      - name: Find main JAR
+        if: contains(github.event.pull_request.labels.*.name, 'force-release')
+        id: jar
+        run: echo "path=$(find build/libs -name '*.jar' ! -name '*-sources*' ! -name '*-dev*' | head -1)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        if: contains(github.event.pull_request.labels.*.name, 'force-release')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "Enchant Transfer Mod ${{ steps.version.outputs.tag }}"
+          files: ${{ steps.jar.outputs.path }}
+          generate_release_notes: true
