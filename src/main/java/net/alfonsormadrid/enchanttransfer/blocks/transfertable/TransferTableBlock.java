@@ -64,9 +64,22 @@ public class TransferTableBlock extends BlockWithEntity {
             Vec3d center = Vec3d.ofCenter(pos);
             serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK,
                     center.x, center.y + 0.5, center.z, 40, 0.45, 0.45, 0.45, 0.25);
-            serverWorld.spawnParticles(ParticleTypes.END_ROD,
+            serverWorld.spawnParticles(ParticleTypes.SCULK_SOUL,
                     center.x, center.y + 0.5, center.z, 20, 0.35, 0.35, 0.35, 0.08);
         }
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!newState.isOf(this) && !world.isClient) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            Vec3d center = Vec3d.ofCenter(pos);
+            serverWorld.spawnParticles(ParticleTypes.LAVA,
+                    center.x, center.y + 0.5, center.z, 25, 0.4, 0.4, 0.4, 0.3);
+            serverWorld.spawnParticles(ParticleTypes.PORTAL,
+                    center.x, center.y + 0.5, center.z, 50, 0.5, 0.5, 0.5, 0.6);
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
     }
 
     @Override
