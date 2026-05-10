@@ -3,11 +3,9 @@ package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
 
 import java.util.List;
 import java.util.stream.Collectors;

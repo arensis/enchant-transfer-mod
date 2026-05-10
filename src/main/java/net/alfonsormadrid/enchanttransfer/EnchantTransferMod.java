@@ -8,15 +8,9 @@ import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScr
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootPool;
-import net.minecraft.loot.entry.LootTableLootEntry;
-import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
@@ -28,17 +22,15 @@ import net.minecraft.util.Identifier;
 public class EnchantTransferMod implements ModInitializer {
 	public static final String MOD_ID = "enchanttransfer";
 	public static final Identifier TRANSFER_TABLE_BLOCK_IDENTIFIER = Identifier.of(MOD_ID, "transfer_table_block");
-	public static final Identifier TRANSFER_TABLE_BLOCK_LOOT_TABLE_ID = Identifier.of(MOD_ID, "blocks/transfer_table_block");
 
 	public static final TransferTableBlock TRANSFER_TABLE_BLOCK = new TransferTableBlock();
 
 	public static final RegistryKey<ItemGroup> ITEM_GROUP_KEY =
 			RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(MOD_ID, "general"));
 
-	public static final ScreenHandlerType<TransferTableScreenHandler> TRANSFER_TABLE_SCREEN_HANDLER;
-	static {
-		TRANSFER_TABLE_SCREEN_HANDLER = ScreenHandlerRegistry.registerSimple(TRANSFER_TABLE_BLOCK_IDENTIFIER, TransferTableScreenHandler::new);
-	}
+	public static final ScreenHandlerType<TransferTableScreenHandler> TRANSFER_TABLE_SCREEN_HANDLER =
+			Registry.register(Registries.SCREEN_HANDLER, TRANSFER_TABLE_BLOCK_IDENTIFIER,
+					new ScreenHandlerType<>(TransferTableScreenHandler::new));
 
 	public static final TransferTableItem TRANSFER_TABLE_ITEM = new TransferTableItem(TRANSFER_TABLE_BLOCK);
 	public static BlockEntityType<TransferTableBlockEntity> TRANSFER_TABLE_BLOCK_ENTITY =
@@ -61,19 +53,6 @@ public class EnchantTransferMod implements ModInitializer {
 		ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP_KEY).register(entries -> {
 			entries.add(TRANSFER_TABLE_ITEM);
 			entries.add(MAGIC_CARD_ITEM);
-		});
-
-		modifyLootTables();
-	}
-
-	private void modifyLootTables() {
-		LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
-			if (TRANSFER_TABLE_BLOCK_LOOT_TABLE_ID.equals(key.getValue())) {
-				LootPool.Builder pool = LootPool.builder()
-						.rolls(ConstantLootNumberProvider.create(1))
-						.with(LootTableLootEntry.builder(key));
-				tableBuilder.pool(pool);
-			}
 		});
 	}
 }
