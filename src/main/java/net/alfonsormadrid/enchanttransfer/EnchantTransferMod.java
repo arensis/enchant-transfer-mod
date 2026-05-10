@@ -30,7 +30,7 @@ public class EnchantTransferMod implements ModInitializer {
 
 	public static final ScreenHandlerType<TransferTableScreenHandler> TRANSFER_TABLE_SCREEN_HANDLER =
 			Registry.register(Registries.SCREEN_HANDLER, TRANSFER_TABLE_BLOCK_IDENTIFIER,
-					new ScreenHandlerType<>(TransferTableScreenHandler::new));
+					new ScreenHandlerType<TransferTableScreenHandler>((syncId, inv) -> new TransferTableScreenHandler(syncId, inv)));
 
 	public static final TransferTableItem TRANSFER_TABLE_ITEM = new TransferTableItem(TRANSFER_TABLE_BLOCK);
 	public static BlockEntityType<TransferTableBlockEntity> TRANSFER_TABLE_BLOCK_ENTITY =

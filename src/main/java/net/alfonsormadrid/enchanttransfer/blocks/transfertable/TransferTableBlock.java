@@ -1,5 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
+import com.mojang.serialization.MapCodec;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -20,8 +21,11 @@ import static net.alfonsormadrid.enchanttransfer.EnchantTransferMod.TRANSFER_TAB
 
 
 public class TransferTableBlock extends BlockWithEntity {
+
+    public static final MapCodec<TransferTableBlock> CODEC = createCodec(TransferTableBlock::new);
+
     public TransferTableBlock() {
-        super(
+        this(
             FabricBlockSettings.copyOf(Blocks.CHEST)
                 .sounds(
                     new BlockSoundGroup(
@@ -37,6 +41,15 @@ public class TransferTableBlock extends BlockWithEntity {
                 .strength(5.0f, 30.0f)
                 .luminance(10)
         );
+    }
+
+    private TransferTableBlock(AbstractBlock.Settings settings) {
+        super(settings);
+    }
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
     }
 
     @Override
