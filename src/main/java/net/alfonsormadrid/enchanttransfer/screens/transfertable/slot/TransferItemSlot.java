@@ -33,7 +33,7 @@ public class TransferItemSlot extends TransferSlot {
     @Override
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
-        ItemEnchantmentsComponent enchants = itemStack.getEnchantments();
+        ItemEnchantmentsComponent enchants = getEffectiveEnchantments(itemStack);
         updateItemContentInventory(enchants);
     }
 

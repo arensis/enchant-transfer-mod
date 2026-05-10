@@ -102,7 +102,7 @@ public class TransferItemContentSlot extends TransferSlot {
     }
 
     private Map<RegistryEntry<Enchantment>, Integer> itemInventoryEnchantsFilteredBy(ItemStack stack) {
-        ItemEnchantmentsComponent component = this.itemInventory.getStack(0).getEnchantments();
+        ItemEnchantmentsComponent component = getEffectiveEnchantments(this.itemInventory.getStack(0));
         return component.getEnchantments().stream()
                 .filter(entry -> !containsEnchantment(stack, entry))
                 .collect(Collectors.toMap(entry -> entry, component::getLevel));
@@ -121,13 +121,19 @@ public class TransferItemContentSlot extends TransferSlot {
             newItemStack.setDamage(originalItemDamage);
         }
 
-        enchants.forEach(newItemStack::addEnchantment);
+        if (isBook(itemInventoryType)) {
+            ItemEnchantmentsComponent.Builder builder = new ItemEnchantmentsComponent.Builder(ItemEnchantmentsComponent.DEFAULT);
+            enchants.forEach(builder::add);
+            newItemStack.set(DataComponentTypes.STORED_ENCHANTMENTS, builder.build());
+        } else {
+            enchants.forEach(newItemStack::addEnchantment);
+        }
         return newItemStack;
     }
 
     private Map<RegistryEntry<Enchantment>, Integer> mergeItemInventoryEnchantmentsWith(ItemStack stack) {
         Map<RegistryEntry<Enchantment>, Integer> merged = new HashMap<>();
-        ItemEnchantmentsComponent current = this.itemInventory.getStack(0).getEnchantments();
+        ItemEnchantmentsComponent current = getEffectiveEnchantments(this.itemInventory.getStack(0));
         current.getEnchantments().forEach(entry -> merged.put(entry, current.getLevel(entry)));
 
         ItemEnchantmentsComponent newEnchants = stack.getEnchantments();
