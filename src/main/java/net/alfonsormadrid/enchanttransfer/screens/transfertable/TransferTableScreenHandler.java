@@ -90,6 +90,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
 
         if (original.isEmpty()) {
             slot.setStack(ItemStack.EMPTY);
+            slot.onTakeItem(player, copy);
         } else {
             slot.markDirty();
         }
