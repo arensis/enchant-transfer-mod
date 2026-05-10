@@ -1,31 +1,64 @@
 # Enchant Transfer Mod
 
-## Configuración del IDE
+Mod de Fabric para Minecraft que permite transferir encantamientos entre objetos mediante **Magic Cards** y una **Transfer Table**.
 
-- Descargar el plugin Minecraft Development
+- Extrae encantamientos de cualquier objeto o libro encantado en forma de cartas
+- Aplica esas cartas a otros objetos compatibles
+- Combina dos cartas del mismo encantamiento y nivel para obtener una de nivel superior
 
-- Cambiar el modo de compilar desde el IntelliJ
-    1. Abrir la configuración de Gradle
-    2. Situarse en `Build, Execution, Deployment` -> `Build Tools` -> `Gradle`
-    3. En el apartado `Build and run` cambiar:
-        1. `Build and run using` -> **IntelliJ IDEA**
-        2. `Run test using` -> **IntelliJ IDEA**
-    4. Ir a `File` -> `Project Structure` -> `Project Settings` -> `Project`
-        - Cambiar `Project compiler ouput` -> `$PROJECT_DIR$/out` 
+**Versión:** 1.0.0 · **Minecraft:** 1.21.1 · **Loader:** Fabric
 
-- Revisar versiones de fabric para disponer de la última para nuestra versión de minecraft
-  - https://fabricmc.net/versions.html
-    > Sólo actualizar grade.properties, el build.gradle las coje de forma automática
-- En caso de dar problemas con fabric-loom revisar de añadir la siguiente versión a la que tengamos y añadirlo en build.gradle:
-   - https://github.com/FabricMC/fabric-loom
-    > En caso de actualizar la versión de minecraft revisar y dejar configurado la versión de fabric-loom que venga en el mod de ejemplo (si actualizamos a la versión más actual de minecraft):
-    > - https://github.com/FabricMC/fabric-example-mod/blob/1.17/build.gradle
-        
-## Probar mod
+---
 
-Es necesario tener instalado minecraft en el equipo y además instalar fabric a través del ejecutable que se puede descargar en:
-https://fabricmc.net/use/
+## Requisitos
 
-- build: Compila el proyecto y deja el jar en build/libs
-- runClient: Lanza la ejecución de minecraft incluyendo el mod
-- runServer: Lanza un servidor de minecraft con fabric que incluye el mod
+| Dependencia | Versión mínima |
+|-------------|---------------|
+| Java | 21 |
+| Minecraft | 1.21.1 |
+| Fabric Loader | ≥ 0.15.0 |
+| Fabric API | 0.102.0+1.21.1 |
+
+---
+
+## Configuración del IDE (IntelliJ IDEA)
+
+1. Instalar el plugin **Minecraft Development**
+2. Cambiar el modo de compilación:
+   - `Settings` → `Build, Execution, Deployment` → `Build Tools` → `Gradle`
+   - En `Build and run using` seleccionar **IntelliJ IDEA**
+   - En `Run test using` seleccionar **IntelliJ IDEA**
+3. Configurar el output del compilador:
+   - `File` → `Project Structure` → `Project Settings` → `Project`
+   - `Project compiler output` → `$PROJECT_DIR$/out`
+
+---
+
+## Actualizar versiones de dependencias
+
+Todas las versiones están centralizadas en `gradle.properties`:
+
+```properties
+minecraft_version = 1.21.1
+yarn_mappings      = 1.21.1+build.3
+loader_version     = 0.16.5
+fabric_version     = 0.102.0+1.21.1
+java_version       = 21
+```
+
+Para consultar las versiones disponibles: https://fabricmc.net/versions.html
+
+Si se actualiza la versión de `fabric-loom` (definida en `build.gradle`), se puede tomar como referencia el mod de ejemplo oficial:
+https://github.com/FabricMC/fabric-example-mod
+
+---
+
+## Tareas Gradle
+
+| Tarea | Descripción |
+|-------|-------------|
+| `./gradlew build` | Compila el proyecto y genera el JAR en `build/libs/` |
+| `./gradlew runClient` | Lanza Minecraft con el mod cargado (cliente) |
+| `./gradlew runServer` | Lanza un servidor de Minecraft con el mod |
+
+> Para `runClient` y `runServer` no es necesario tener Minecraft instalado por separado; Fabric Loom descarga los assets automáticamente.
