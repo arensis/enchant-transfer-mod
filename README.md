@@ -6,7 +6,11 @@ Mod de Fabric para Minecraft que permite transferir encantamientos entre objetos
 - Aplica esas cartas a otros objetos compatibles
 - Combina dos cartas del mismo encantamiento y nivel para obtener una de nivel superior
 
-**Versión:** 1.0.0 · **Minecraft:** 1.21.1 · **Loader:** Fabric
+![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Minecraft](https://img.shields.io/badge/minecraft-1.21.1-62b47a?logo=minecraft&logoColor=white)
+![Fabric](https://img.shields.io/badge/fabric_loader-≥0.15.0-dbd0b4)
+![Java](https://img.shields.io/badge/java-21-ED8B00?logo=openjdk&logoColor=white)
+![License](https://img.shields.io/badge/license-CC0--1.0-lightgrey)
 
 ---
 
