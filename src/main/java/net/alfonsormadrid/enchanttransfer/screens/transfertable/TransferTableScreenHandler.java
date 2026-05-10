@@ -51,6 +51,52 @@ public class TransferTableScreenHandler extends ScreenHandler {
         addSlotGrid(9, 1, 8, 142, playerInventory, 0);
     }
 
+    // Slot layout:
+    //   0-1  : MagicCardSlot (combine input)
+    //   2    : MagicCardResultSlot
+    //   3    : TransferItemSlot
+    //   4-15 : TransferItemContentSlot (12 enchantment card slots)
+    //   16-42: Player main inventory
+    //   43-51: Player hotbar
+    private static final int GUI_SLOTS_END        = 16;
+    private static final int PLAYER_INV_START     = 16;
+    private static final int PLAYER_INV_END       = 43;
+    private static final int HOTBAR_START         = 43;
+    private static final int HOTBAR_END           = 52;
+
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+        Slot slot = this.slots.get(slotIndex);
+        if (!slot.hasStack()) {
+            return ItemStack.EMPTY;
+        }
+
+        ItemStack original = slot.getStack();
+        ItemStack copy = original.copy();
+
+        if (slotIndex < GUI_SLOTS_END) {
+            // GUI → player inventory (hotbar last)
+            if (!this.insertItem(original, PLAYER_INV_START, HOTBAR_END, true)) {
+                return ItemStack.EMPTY;
+            }
+        } else {
+            // Player inventory → GUI: try each group in order; each slot's canInsert filters correctly
+            if (!this.insertItem(original, 0, 2, false)           // MagicCardSlots
+                    && !this.insertItem(original, 3, 4, false)     // TransferItemSlot
+                    && !this.insertItem(original, 4, GUI_SLOTS_END, false)) { // TransferItemContentSlots
+                return ItemStack.EMPTY;
+            }
+        }
+
+        if (original.isEmpty()) {
+            slot.setStack(ItemStack.EMPTY);
+        } else {
+            slot.markDirty();
+        }
+
+        return copy;
+    }
+
     @Override
     public boolean canUse(PlayerEntity player) {
         return this.combineCardsInput.canPlayerUse(player);
