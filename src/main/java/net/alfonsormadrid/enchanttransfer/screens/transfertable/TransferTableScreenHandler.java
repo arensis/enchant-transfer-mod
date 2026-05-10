@@ -80,11 +80,26 @@ public class TransferTableScreenHandler extends ScreenHandler {
                 return ItemStack.EMPTY;
             }
         } else {
-            // Player inventory → GUI: try each group in order; each slot's canInsert filters correctly
-            if (!this.insertItem(original, 0, 2, false)           // MagicCardSlots
-                    && !this.insertItem(original, 3, 4, false)     // TransferItemSlot
-                    && !this.insertItem(original, 4, GUI_SLOTS_END, false)) { // TransferItemContentSlots
-                return ItemStack.EMPTY;
+            // Player inventory → GUI
+            if (original.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM) {
+                if (this.slots.get(3).hasStack()) {
+                    // Item in transfer slot: try content slots first (canInsert enforces all restrictions),
+                    // fall back to MagicCardSlots if the enchantment is not applicable
+                    if (!this.insertItem(original, 4, GUI_SLOTS_END, false)
+                            && !this.insertItem(original, 0, 2, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                } else {
+                    // No item in transfer slot: go straight to MagicCardSlots
+                    if (!this.insertItem(original, 0, 2, false)) {
+                        return ItemStack.EMPTY;
+                    }
+                }
+            } else {
+                // Non-magic-card: try TransferItemSlot only
+                if (!this.insertItem(original, 3, 4, false)) {
+                    return ItemStack.EMPTY;
+                }
             }
         }
 
