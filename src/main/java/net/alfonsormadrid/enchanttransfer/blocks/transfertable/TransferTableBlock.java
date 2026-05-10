@@ -1,32 +1,34 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.mob.PiglinBrain;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-
-import static net.alfonsormadrid.enchanttransfer.EnchantTransferMod.TRANSFER_TABLE_BLOCK_IDENTIFIER;
-
+import org.jetbrains.annotations.Nullable;
 
 public class TransferTableBlock extends BlockWithEntity {
+
+    public static final MapCodec<TransferTableBlock> CODEC = createCodec(TransferTableBlock::new);
+
     public TransferTableBlock() {
-        super(
-            FabricBlockSettings.copyOf(Blocks.CHEST)
+        this(
+            AbstractBlock.Settings.copy(Blocks.CHEST)
                 .sounds(
                     new BlockSoundGroup(
                         5.0F,
@@ -37,26 +39,58 @@ public class TransferTableBlock extends BlockWithEntity {
                         SoundEvents.BLOCK_CHAIN_HIT,
                         SoundEvents.BLOCK_SLIME_BLOCK_FALL)
                 )
-                .breakByTool(FabricToolTags.PICKAXES, 2)
                 .requiresTool()
                 .strength(5.0f, 30.0f)
-                .luminance(10)
+                .luminance(state -> 10)
         );
     }
 
+    private TransferTableBlock(AbstractBlock.Settings settings) {
+        super(settings);
+    }
+
     @Override
-    public BlockEntity createBlockEntity(BlockView blockView) {
-        return new TransferTableBlockEntity();
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
+
+    @Override
+    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        if (!world.isClient) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            Vec3d center = Vec3d.ofCenter(pos);
+            serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK,
+                    center.x, center.y + 0.5, center.z, 40, 0.45, 0.45, 0.45, 0.25);
+            serverWorld.spawnParticles(ParticleTypes.SCULK_SOUL,
+                    center.x, center.y + 0.5, center.z, 20, 0.35, 0.35, 0.35, 0.08);
+        }
+    }
+
+    @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        if (!newState.isOf(this) && !world.isClient) {
+            ServerWorld serverWorld = (ServerWorld) world;
+            Vec3d center = Vec3d.ofCenter(pos);
+            serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING,
+                    center.x, center.y + 0.5, center.z, 25, 0.4, 0.4, 0.4, 0.3);
+            serverWorld.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                    center.x, center.y + 0.5, center.z, 50, 0.5, 0.5, 0.5, 0.6);
+        }
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TransferTableBlockEntity(pos, state);
     }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        //With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient) {
             return ActionResult.SUCCESS;
         } else {
@@ -64,7 +98,6 @@ public class TransferTableBlock extends BlockWithEntity {
             if (namedScreenHandlerFactory != null) {
                 player.openHandledScreen(namedScreenHandlerFactory);
                 player.incrementStat(this.getOpenStat());
-                PiglinBrain.onGuardedBlockInteracted(player, true);
             }
 
             return ActionResult.CONSUME;

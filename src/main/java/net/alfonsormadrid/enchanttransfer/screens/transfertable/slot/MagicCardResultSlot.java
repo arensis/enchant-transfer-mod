@@ -6,8 +6,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 
-import java.util.stream.IntStream;
-
 public class MagicCardResultSlot extends Slot {
     private final Inventory combineCardsInput;
 
@@ -22,12 +20,15 @@ public class MagicCardResultSlot extends Slot {
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
-        removeCombineCardsInputStack();
-        return super.onTakeItem(player, stack);
+    public void onTakeItem(PlayerEntity player, ItemStack stack) {
+        decrementCombineCardsInput(stack.getCount());
+        super.onTakeItem(player, stack);
     }
 
-    private void removeCombineCardsInputStack() {
-        IntStream.range(0, this.combineCardsInput.size()).forEach(this.combineCardsInput::removeStack);
+    private void decrementCombineCardsInput(int amount) {
+        for (int i = 0; i < this.combineCardsInput.size(); i++) {
+            this.combineCardsInput.getStack(i).decrement(amount);
+        }
+        this.combineCardsInput.markDirty();
     }
 }

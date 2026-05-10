@@ -1,6 +1,5 @@
 package net.alfonsormadrid.enchanttransfer.item;
 
-import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,7 +10,7 @@ import net.minecraft.world.World;
 
 public class MagicCardItem extends Item {
     public MagicCardItem() {
-        super(new Item.Settings().group(EnchantTransferMod.ENCHANT_TRANSFER_ITEM_GROUP).fireproof());
+        super(new Item.Settings().fireproof());
     }
 
     @Override
@@ -22,7 +21,7 @@ public class MagicCardItem extends Item {
 
     @Override
     public boolean isEnchantable(ItemStack stack) {
-        if (stack.getEnchantments().size() < 1) {
+        if (stack.getEnchantments().isEmpty()) {
             return super.isEnchantable(stack);
         } else {
             return false;
