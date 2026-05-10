@@ -2,14 +2,14 @@ package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -23,7 +23,7 @@ public class TransferItemSlot extends TransferSlot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return !itemIsMagicCard(stack) && (stack.isEnchantable() || stack.hasEnchantments() || isEnchantedBook(stack.getItem()));
+        return !itemIsMagicCard(stack) && (stack.isEnchantable() || !stack.getEnchantments().isEmpty() || isEnchantedBook(stack.getItem()));
     }
 
     @Override
@@ -35,7 +35,7 @@ public class TransferItemSlot extends TransferSlot {
     @Override
     public void setStack(ItemStack itemStack) {
         super.setStack(itemStack);
-        Map<Enchantment, Integer> enchants = EnchantmentHelper.get(itemStack);
+        ItemEnchantmentsComponent enchants = itemStack.getEnchantments();
         updateItemContentInventory(enchants);
     }
 
@@ -43,21 +43,21 @@ public class TransferItemSlot extends TransferSlot {
         IntStream.range(0, this.itemContentInventory.size()).forEach(this.itemContentInventory::removeStack);
     }
 
-    private void updateItemContentInventory(Map<Enchantment, Integer> enchants) {
-        addMagiCardsToItemContentInventory(buildMagicCardsFromEnchants(enchants));
+    private void updateItemContentInventory(ItemEnchantmentsComponent enchants) {
+        addMagicCardsToItemContentInventory(buildMagicCardsFromEnchants(enchants));
     }
 
-    private void addMagiCardsToItemContentInventory(List<ItemStack> magicCards) {
+    private void addMagicCardsToItemContentInventory(List<ItemStack> magicCards) {
         if (this.itemContentInventory.isEmpty()) {
             IntStream.range(0, magicCards.size())
                     .forEach(index -> this.itemContentInventory.setStack(index, magicCards.get(index)));
         }
     }
 
-    private List<ItemStack> buildMagicCardsFromEnchants(Map<Enchantment, Integer> enchants) {
-        return enchants.entrySet().stream().map(enchantmentEntry -> {
+    private List<ItemStack> buildMagicCardsFromEnchants(ItemEnchantmentsComponent enchants) {
+        return enchants.getEnchantments().stream().map(entry -> {
             ItemStack magicCardEnchanted = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
-            magicCardEnchanted.addEnchantment(enchantmentEntry.getKey(), enchantmentEntry.getValue());
+            magicCardEnchanted.addEnchantment(entry, enchants.getLevel(entry));
             return magicCardEnchanted;
         }).collect(Collectors.toList());
     }

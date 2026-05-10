@@ -4,12 +4,12 @@ import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScr
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
 
 @Environment(EnvType.CLIENT)
 public class EnchantTransferClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        ScreenRegistry.register(EnchantTransferMod.TRANSFER_TABLE_SCREEN_HANDLER, TransferTableScreen::new);
+        HandledScreens.register(EnchantTransferMod.TRANSFER_TABLE_SCREEN_HANDLER, TransferTableScreen::new);
     }
 }

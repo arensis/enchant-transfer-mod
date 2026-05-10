@@ -1,9 +1,10 @@
 package net.alfonsormadrid.enchanttransfer.services;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
+import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.entry.RegistryEntry;
 
 import java.util.Optional;
 
@@ -17,14 +18,13 @@ public class CombineCardService {
     }
 
     public ItemStack combineCards() {
-        Optional<Integer> card1Level = EnchantmentHelper.get(card1).values().stream().findFirst();
-        Optional<Integer> card2Level = EnchantmentHelper.get(card2).values().stream().findFirst();
-        Optional<Enchantment> enchantment = EnchantmentHelper.get(card1).keySet().stream().findFirst();
+        ItemEnchantmentsComponent enchants1 = card1.getEnchantments();
+        Optional<RegistryEntry<Enchantment>> enchantmentEntry = enchants1.getEnchantments().stream().findFirst();
 
-        if(card1Level.isPresent() && card2Level.isPresent() && enchantment.isPresent()) {
+        if (enchantmentEntry.isPresent()) {
+            int currentLevel = enchants1.getLevel(enchantmentEntry.get());
             ItemStack outputCard = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
-            Integer updatedLevel = card1Level.get() + 1;
-            outputCard.addEnchantment(enchantment.get(), updatedLevel);
+            outputCard.addEnchantment(enchantmentEntry.get(), currentLevel + 1);
             return outputCard;
         } else {
             return ItemStack.EMPTY;
@@ -36,14 +36,17 @@ public class CombineCardService {
     }
 
     private boolean noMaxLevelCards() {
-        Optional<Integer> card1Level = EnchantmentHelper.get(card1).values().stream().findFirst();
-        Optional<Enchantment> enchantment = EnchantmentHelper.get(card1).keySet().stream().findFirst();
+        ItemEnchantmentsComponent enchants = card1.getEnchantments();
+        Optional<RegistryEntry<Enchantment>> enchantmentEntry = enchants.getEnchantments().stream().findFirst();
 
-        return card1Level.isPresent() && enchantment.isPresent() && card1Level.get() < enchantment.get().getMaxLevel();
+        return enchantmentEntry.isPresent()
+                && enchants.getLevel(enchantmentEntry.get()) < enchantmentEntry.get().value().getMaxLevel();
     }
 
     private boolean twoEnchantedCardsInserted() {
-        return !card1.isEmpty() && !card2.isEmpty() && card1.hasEnchantments() && card2.hasEnchantments();
+        return !card1.isEmpty() && !card2.isEmpty()
+                && !card1.getEnchantments().isEmpty()
+                && !card2.getEnchantments().isEmpty();
     }
 
     public void setCard1(ItemStack card1) {
@@ -55,6 +58,17 @@ public class CombineCardService {
     }
 
     private boolean cardsHaveSameEnchant() {
-        return card1.getEnchantments().containsAll(card2.getEnchantments());
+        ItemEnchantmentsComponent enchants1 = card1.getEnchantments();
+        ItemEnchantmentsComponent enchants2 = card2.getEnchantments();
+
+        if (enchants1.getEnchantments().size() != enchants2.getEnchantments().size()) {
+            return false;
+        }
+
+        return enchants1.getEnchantments().stream().allMatch(entry -> {
+            int level1 = enchants1.getLevel(entry);
+            int level2 = enchants2.getLevel(entry);
+            return level1 > 0 && level1 == level2;
+        });
     }
 }

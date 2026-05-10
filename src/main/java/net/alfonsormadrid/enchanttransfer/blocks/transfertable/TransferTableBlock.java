@@ -1,10 +1,8 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
-import net.fabricmc.fabric.api.tool.attribute.v1.FabricToolTags;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.mob.PiglinBrain;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
@@ -13,7 +11,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stat;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +34,6 @@ public class TransferTableBlock extends BlockWithEntity {
                         SoundEvents.BLOCK_CHAIN_HIT,
                         SoundEvents.BLOCK_SLIME_BLOCK_FALL)
                 )
-                .breakByTool(FabricToolTags.PICKAXES, 2)
                 .requiresTool()
                 .strength(5.0f, 30.0f)
                 .luminance(10)
@@ -45,18 +41,17 @@ public class TransferTableBlock extends BlockWithEntity {
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockView blockView) {
-        return new TransferTableBlockEntity();
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TransferTableBlockEntity(pos, state);
     }
 
     @Override
     public BlockRenderType getRenderType(BlockState state) {
-        //With inheriting from BlockWithEntity this defaults to INVISIBLE, so we need to change that!
         return BlockRenderType.MODEL;
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
         if (world.isClient) {
             return ActionResult.SUCCESS;
         } else {
@@ -64,7 +59,6 @@ public class TransferTableBlock extends BlockWithEntity {
             if (namedScreenHandlerFactory != null) {
                 player.openHandledScreen(namedScreenHandlerFactory);
                 player.incrementStat(this.getOpenStat());
-                PiglinBrain.onGuardedBlockInteracted(player, true);
             }
 
             return ActionResult.CONSUME;
