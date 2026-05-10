@@ -66,10 +66,10 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
-        this.dropInventory(player, player.getWorld(), this.combineCardsInput);
-        this.dropInventory(player, player.getWorld(), this.transferItem);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
+        this.dropInventory(player, this.combineCardsInput);
+        this.dropInventory(player, this.transferItem);
     }
 
     private void updateCombineCardsOutput() {

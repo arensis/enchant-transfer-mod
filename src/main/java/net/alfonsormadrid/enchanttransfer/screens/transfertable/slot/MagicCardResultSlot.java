@@ -22,9 +22,9 @@ public class MagicCardResultSlot extends Slot {
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+    public void onTakeItem(PlayerEntity player, ItemStack stack) {
         removeCombineCardsInputStack();
-        return super.onTakeItem(player, stack);
+        super.onTakeItem(player, stack);
     }
 
     private void removeCombineCardsInputStack() {

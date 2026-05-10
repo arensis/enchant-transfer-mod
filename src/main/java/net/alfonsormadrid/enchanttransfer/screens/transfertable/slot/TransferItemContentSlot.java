@@ -1,6 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
 import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -15,6 +16,7 @@ import net.minecraft.text.Text;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -36,9 +38,9 @@ public class TransferItemContentSlot extends TransferSlot {
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+    public void onTakeItem(PlayerEntity player, ItemStack stack) {
         removeEnchantFromItemInventory(stack);
-        return super.onTakeItem(player, stack);
+        super.onTakeItem(player, stack);
     }
 
     @Override
@@ -62,13 +64,10 @@ public class TransferItemContentSlot extends TransferSlot {
         ItemStack itemInventoryStack = this.itemInventory.getStack(0);
 
         if (!isBook(itemInventoryStack.getItem())) {
-            ItemEnchantmentsComponent existingEnchants = itemInventoryStack.getEnchantments();
-            return !stack.getEnchantments().getEnchantments()
+            Set<RegistryEntry<Enchantment>> existingEnchants = itemInventoryStack.getEnchantments().getEnchantments();
+            return stack.getEnchantments().getEnchantments()
                     .stream()
-                    .allMatch(entry -> existingEnchants.getEnchantments()
-                            .stream()
-                            .allMatch(existing -> Enchantment.canCombine(entry, existing))
-                    );
+                    .anyMatch(entry -> !EnchantmentHelper.isCompatible(existingEnchants, entry));
         }
 
         return false;
@@ -114,13 +113,15 @@ public class TransferItemContentSlot extends TransferSlot {
         ItemStack newItemStack = new ItemStack(itemInventoryType);
 
         if (!isBook(itemInventoryType)) {
-            Text originalItemName = this.itemInventory.getStack(0).getName();
+            Text customName = this.itemInventory.getStack(0).get(DataComponentTypes.CUSTOM_NAME);
             int originalItemDamage = this.itemInventory.getStack(0).getDamage();
-            newItemStack.setCustomName(originalItemName);
+            if (customName != null) {
+                newItemStack.set(DataComponentTypes.CUSTOM_NAME, customName);
+            }
             newItemStack.setDamage(originalItemDamage);
         }
 
-        EnchantmentHelper.set(newItemStack, builder -> enchants.forEach(builder::add));
+        enchants.forEach(newItemStack::addEnchantment);
         return newItemStack;
     }
 

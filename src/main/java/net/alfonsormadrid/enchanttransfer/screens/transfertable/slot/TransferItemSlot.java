@@ -25,9 +25,9 @@ public class TransferItemSlot extends TransferSlot {
     }
 
     @Override
-    public ItemStack onTakeItem(PlayerEntity player, ItemStack stack) {
+    public void onTakeItem(PlayerEntity player, ItemStack stack) {
         removeAllItemContentInventoryStacks();
-        return super.onTakeItem(player, stack);
+        super.onTakeItem(player, stack);
     }
 
     @Override
