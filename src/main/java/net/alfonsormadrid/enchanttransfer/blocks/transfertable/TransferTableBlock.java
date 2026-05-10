@@ -22,9 +22,6 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import static net.alfonsormadrid.enchanttransfer.EnchantTransferMod.TRANSFER_TABLE_BLOCK_IDENTIFIER;
-
-
 public class TransferTableBlock extends BlockWithEntity {
 
     public static final MapCodec<TransferTableBlock> CODEC = createCodec(TransferTableBlock::new);

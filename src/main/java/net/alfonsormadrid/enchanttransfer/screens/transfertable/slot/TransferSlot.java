@@ -24,8 +24,6 @@ public class TransferSlot extends Slot {
         return stack.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM;
     }
 
-    // Enchanted books store enchantments in STORED_ENCHANTMENTS, not ENCHANTMENTS.
-    // getEnchantments() returns empty for books; this method returns the correct component.
     protected ItemEnchantmentsComponent getEffectiveEnchantments(ItemStack stack) {
         if (isEnchantedBook(stack.getItem())) {
             ItemEnchantmentsComponent stored = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
