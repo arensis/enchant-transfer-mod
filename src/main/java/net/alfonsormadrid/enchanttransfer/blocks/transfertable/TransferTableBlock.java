@@ -3,12 +3,12 @@ package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
@@ -26,9 +26,10 @@ public class TransferTableBlock extends BlockWithEntity {
 
     public static final MapCodec<TransferTableBlock> CODEC = createCodec(TransferTableBlock::new);
 
-    public TransferTableBlock() {
+    public TransferTableBlock(RegistryKey<Block> registryKey) {
         this(
             AbstractBlock.Settings.copy(Blocks.CHEST)
+                .registryKey(registryKey)
                 .sounds(
                     new BlockSoundGroup(
                         5.0F,
@@ -56,8 +57,7 @@ public class TransferTableBlock extends BlockWithEntity {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if (!world.isClient) {
-            ServerWorld serverWorld = (ServerWorld) world;
+        if (world instanceof ServerWorld serverWorld) {
             Vec3d center = Vec3d.ofCenter(pos);
             serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK,
                     center.x, center.y + 0.5, center.z, 40, 0.45, 0.45, 0.45, 0.25);
@@ -67,16 +67,13 @@ public class TransferTableBlock extends BlockWithEntity {
     }
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        if (!newState.isOf(this) && !world.isClient) {
-            ServerWorld serverWorld = (ServerWorld) world;
-            Vec3d center = Vec3d.ofCenter(pos);
-            serverWorld.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING,
-                    center.x, center.y + 0.5, center.z, 25, 0.4, 0.4, 0.4, 0.3);
-            serverWorld.spawnParticles(ParticleTypes.REVERSE_PORTAL,
-                    center.x, center.y + 0.5, center.z, 50, 0.5, 0.5, 0.5, 0.6);
-        }
-        super.onStateReplaced(state, world, pos, newState, moved);
+    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
+        Vec3d center = Vec3d.ofCenter(pos);
+        world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING,
+                center.x, center.y + 0.5, center.z, 25, 0.4, 0.4, 0.4, 0.3);
+        world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+                center.x, center.y + 0.5, center.z, 50, 0.5, 0.5, 0.5, 0.6);
+        super.onStateReplaced(state, world, pos, moved);
     }
 
     @Override
@@ -91,7 +88,7 @@ public class TransferTableBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
-        if (world.isClient) {
+        if (!(world instanceof ServerWorld)) {
             return ActionResult.SUCCESS;
         } else {
             NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
@@ -108,13 +105,4 @@ public class TransferTableBlock extends BlockWithEntity {
         return Stats.CUSTOM.getOrCreateStat(Stats.OPEN_CHEST);
     }
 
-    @Override
-    public boolean hasComparatorOutput(BlockState state) {
-        return true;
-    }
-
-    @Override
-    public int getComparatorOutput(BlockState state, World world, BlockPos pos) {
-        return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
-    }
 }

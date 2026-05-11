@@ -8,7 +8,10 @@ import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScr
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.Block;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
@@ -24,7 +27,16 @@ public class EnchantTransferMod implements ModInitializer {
 	public static final String MOD_ID = "enchanttransfer";
 	public static final Identifier TRANSFER_TABLE_BLOCK_IDENTIFIER = Identifier.of(MOD_ID, "transfer_table_block");
 
-	public static final TransferTableBlock TRANSFER_TABLE_BLOCK = new TransferTableBlock();
+	public static final RegistryKey<Block> TRANSFER_TABLE_BLOCK_KEY =
+			RegistryKey.of(RegistryKeys.BLOCK, TRANSFER_TABLE_BLOCK_IDENTIFIER);
+	public static final RegistryKey<Item> TRANSFER_TABLE_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, TRANSFER_TABLE_BLOCK_IDENTIFIER);
+	public static final RegistryKey<Item> MAGIC_CARD_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "magic_card_item"));
+	public static final RegistryKey<BlockEntityType<?>> TRANSFER_TABLE_BLOCK_ENTITY_KEY =
+			RegistryKey.of(RegistryKeys.BLOCK_ENTITY_TYPE, TRANSFER_TABLE_BLOCK_IDENTIFIER);
+
+	public static final TransferTableBlock TRANSFER_TABLE_BLOCK = new TransferTableBlock(TRANSFER_TABLE_BLOCK_KEY);
 
 	public static final RegistryKey<ItemGroup> ITEM_GROUP_KEY =
 			RegistryKey.of(RegistryKeys.ITEM_GROUP, Identifier.of(MOD_ID, "general"));
@@ -33,11 +45,11 @@ public class EnchantTransferMod implements ModInitializer {
 			Registry.register(Registries.SCREEN_HANDLER, TRANSFER_TABLE_BLOCK_IDENTIFIER,
 					new ScreenHandlerType<TransferTableScreenHandler>((syncId, inv) -> new TransferTableScreenHandler(syncId, inv), FeatureFlags.VANILLA_FEATURES));
 
-	public static final TransferTableItem TRANSFER_TABLE_ITEM = new TransferTableItem(TRANSFER_TABLE_BLOCK);
+	public static final TransferTableItem TRANSFER_TABLE_ITEM = new TransferTableItem(TRANSFER_TABLE_BLOCK, TRANSFER_TABLE_ITEM_KEY);
 	public static BlockEntityType<TransferTableBlockEntity> TRANSFER_TABLE_BLOCK_ENTITY =
-			BlockEntityType.Builder.create(TransferTableBlockEntity::new, TRANSFER_TABLE_BLOCK).build();
+			FabricBlockEntityTypeBuilder.create(TransferTableBlockEntity::new, TRANSFER_TABLE_BLOCK).build();
 
-	public static final MagicCardItem MAGIC_CARD_ITEM = new MagicCardItem();
+	public static final MagicCardItem MAGIC_CARD_ITEM = new MagicCardItem(MAGIC_CARD_ITEM_KEY);
 
 	@Override
 	public void onInitialize() {
