@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "enchanttransfer:item/magic_card_item"
+  }
+}
