@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GGG",
+    "RRR",
+    "CDC"
+  ],
+  "key": {
+    "G": "minecraft:gold_ingot",
+    "R": "minecraft:redstone",
+    "C": "#minecraft:coals",
+    "D": "minecraft:diamond"
+  },
+  "result": {
+    "id": "enchanttransfer:transfer_table_block",
+    "count": 1
+  }
+}
