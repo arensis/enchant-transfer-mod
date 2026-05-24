@@ -1,5 +1,6 @@
 {
   "values": [
-    "enchanttransfer:transfer_table_block"
+    "enchanttransfer:transfer_table_block",
+    "enchanttransfer:infusion_coil_block"
   ]
 }

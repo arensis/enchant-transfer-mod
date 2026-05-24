@@ -3,5 +3,8 @@
   "item.enchanttransfer.magic_card_item": "Carta de transferencia mágica",
   "block.enchanttransfer.transfer_table_block": "Mesa de transferencia",
   "item.enchanttransfer.transfer_table_block": "Mesa de transferencia",
+  "block.enchanttransfer.infusion_coil_block": "Bobina de infusión",
+  "item.enchanttransfer.infusion_coil_block": "Bobina de infusión",
+  "module.enchanttransfer.infusion_coil": "Bobina de infusión",
   "enchanttransfer.container.inventory": "Inventario"
 }

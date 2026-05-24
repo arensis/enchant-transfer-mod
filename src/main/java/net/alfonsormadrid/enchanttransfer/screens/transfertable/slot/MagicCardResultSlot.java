@@ -1,6 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
-import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;

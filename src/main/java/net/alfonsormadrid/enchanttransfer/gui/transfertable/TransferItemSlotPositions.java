@@ -1,5 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.gui.transfertable;
 
+import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
+
 import java.util.Arrays;
 import java.util.List;
 

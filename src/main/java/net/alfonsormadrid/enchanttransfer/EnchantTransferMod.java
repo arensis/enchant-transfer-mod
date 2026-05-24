@@ -1,6 +1,10 @@
 package net.alfonsormadrid.enchanttransfer;
 
+import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlock;
+import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
+import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilItem;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlockEntity;
+import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreenHandler;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableItem;
@@ -25,6 +29,8 @@ import net.minecraft.util.Identifier;
 
 public class EnchantTransferMod implements ModInitializer {
 	public static final String MOD_ID = "enchanttransfer";
+
+	// ── Transfer Table ─────────────────────────────────────────────────────
 	public static final Identifier TRANSFER_TABLE_BLOCK_IDENTIFIER = Identifier.of(MOD_ID, "transfer_table_block");
 
 	public static final RegistryKey<Block> TRANSFER_TABLE_BLOCK_KEY =
@@ -51,12 +57,35 @@ public class EnchantTransferMod implements ModInitializer {
 
 	public static final MagicCardItem MAGIC_CARD_ITEM = new MagicCardItem(MAGIC_CARD_ITEM_KEY);
 
+	// ── Infusion Coil ──────────────────────────────────────────────────────
+	public static final Identifier INFUSION_COIL_BLOCK_IDENTIFIER = Identifier.of(MOD_ID, "infusion_coil_block");
+
+	public static final RegistryKey<Block> INFUSION_COIL_BLOCK_KEY =
+			RegistryKey.of(RegistryKeys.BLOCK, INFUSION_COIL_BLOCK_IDENTIFIER);
+	public static final RegistryKey<Item> INFUSION_COIL_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, INFUSION_COIL_BLOCK_IDENTIFIER);
+	public static final RegistryKey<BlockEntityType<?>> INFUSION_COIL_BLOCK_ENTITY_KEY =
+			RegistryKey.of(RegistryKeys.BLOCK_ENTITY_TYPE, INFUSION_COIL_BLOCK_IDENTIFIER);
+
+	public static final InfusionCoilBlock INFUSION_COIL_BLOCK = new InfusionCoilBlock(INFUSION_COIL_BLOCK_KEY);
+	public static final InfusionCoilItem INFUSION_COIL_ITEM = new InfusionCoilItem(INFUSION_COIL_BLOCK, INFUSION_COIL_ITEM_KEY);
+	public static BlockEntityType<InfusionCoilBlockEntity> INFUSION_COIL_BLOCK_ENTITY =
+			FabricBlockEntityTypeBuilder.create(InfusionCoilBlockEntity::new, INFUSION_COIL_BLOCK).build();
+
+	public static final ScreenHandlerType<InfusionCoilScreenHandler> INFUSION_COIL_SCREEN_HANDLER =
+			Registry.register(Registries.SCREEN_HANDLER, INFUSION_COIL_BLOCK_IDENTIFIER,
+					new ScreenHandlerType<InfusionCoilScreenHandler>(InfusionCoilScreenHandler::new, FeatureFlags.VANILLA_FEATURES));
+
 	@Override
 	public void onInitialize() {
 		Registry.register(Registries.BLOCK, TRANSFER_TABLE_BLOCK_IDENTIFIER, TRANSFER_TABLE_BLOCK);
 		Registry.register(Registries.ITEM, TRANSFER_TABLE_BLOCK_IDENTIFIER, TRANSFER_TABLE_ITEM);
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, TRANSFER_TABLE_BLOCK_IDENTIFIER, TRANSFER_TABLE_BLOCK_ENTITY);
 		Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "magic_card_item"), MAGIC_CARD_ITEM);
+
+		Registry.register(Registries.BLOCK, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_BLOCK);
+		Registry.register(Registries.ITEM, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_ITEM);
+		Registry.register(Registries.BLOCK_ENTITY_TYPE, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_BLOCK_ENTITY);
 
 		Registry.register(Registries.ITEM_GROUP, ITEM_GROUP_KEY, FabricItemGroup.builder()
 				.icon(() -> new ItemStack(TRANSFER_TABLE_BLOCK))
@@ -65,6 +94,7 @@ public class EnchantTransferMod implements ModInitializer {
 
 		ItemGroupEvents.modifyEntriesEvent(ITEM_GROUP_KEY).register(entries -> {
 			entries.add(TRANSFER_TABLE_ITEM);
+			entries.add(INFUSION_COIL_ITEM);
 			entries.add(MAGIC_CARD_ITEM);
 		});
 	}
