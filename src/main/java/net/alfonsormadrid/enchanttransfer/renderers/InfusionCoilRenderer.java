@@ -259,9 +259,13 @@ public class InfusionCoilRenderer
     //   • flange at the neighbour face   (bright copper, 5-px cross)
     //   • central pipe                   (darker copper, 3-px cross)
     //   • flange at the coil-interior end (bright copper, 5-px cross)
-    // All segments emitted in a single submitCustom call so they share one
-    // buffer flush.
-    if (state.dirToTable != null) {
+    //
+    // Only emitted for HORIZONTAL connections: the coil's centre column is
+    // occupied by the flask geometry (rim_bottom, body, neck, collars, cap,
+    // knob), so a vertical tube would unavoidably cut through the bottle.
+    // For vertical neighbours we let the table render a small brida on its
+    // side of the boundary instead — see TransferTableRenderer.
+    if (state.dirToTable != null && state.dirToTable.getAxis().isHorizontal()) {
       final Direction dir = state.dirToTable;
       final float[] flangeNear =
         tubeSegment(dir, TUBE_FLANGE_MIN, TUBE_FLANGE_MAX, 0f, TUBE_FLANGE_DEPTH);

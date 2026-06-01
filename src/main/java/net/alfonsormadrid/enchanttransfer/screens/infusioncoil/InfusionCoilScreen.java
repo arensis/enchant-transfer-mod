@@ -2,6 +2,7 @@ package net.alfonsormadrid.enchanttransfer.screens.infusioncoil;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
+import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilSlotPositions;
 import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilGuiMetrics;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
@@ -51,11 +52,16 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     private static final int NAV_DOT     = 3;    // half-size of filled dot
     private static final int NAV_RING    = 5;    // half-size of active ring
 
-    private static final int COL_MODULE          = 0xFF44FF88; // green  — idle coil
-    private static final int COL_MODULE_ACTIVE   = 0xFFFFCC44; // amber  — processing coil
-    private static final int COL_ACTIVE          = 0xFFFFFFFF; // white  — this coil (current screen)
-    private static final int COL_RING_CYAN       = 0xFF00FFEE; // cyan ring — active screen
-    private static final int COL_TANK_FILL       = 0xCC50F03C; // lime green @80% — live tank overlay
+    // Non-current-coil palette — matches the Selector and TransferTable navbars
+    private static final int COL_MODULE_BORDER_IDLE   = 0xFF1F8044;
+    private static final int COL_MODULE_BORDER_ACTIVE = 0xFF8B6914;
+    private static final int COL_TANK_EMPTY           = 0xFF3D2A52;
+    private static final int COL_FLUID                = 0xFF50F03C;
+    // Current-coil identity (this screen) keeps its solid-white dot so the
+    // player immediately spots which coil they're inside.
+    private static final int COL_ACTIVE               = 0xFFFFFFFF;
+    private static final int COL_TANK_FILL_ACTIVE     = 0xCC50F03C; // semi over white
+    private static final int COL_RING_CYAN            = 0xFF00FFEE;
 
     // Hub "target" colours, matching TransferTableScreen
     private static final int COL_HUB_GOLD  = 0xFFFFD700;
@@ -92,6 +98,17 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     /** Parchment-brown ink colour shared with the other screens. */
     private static final int TITLE_COL = 0xFF4A2811;
 
+    // Ghost-icon hint shown on empty input slots: a faded silhouette of the
+    // item the slot expects.  Replaced by the real item the moment the
+    // player drops one in.
+    private static final Identifier GHOST_CARD =
+            Identifier.of(EnchantTransferMod.MOD_ID, "textures/item/magic_card_item.png");
+    private static final Identifier GHOST_BOTTLE =
+            Identifier.of("minecraft", "textures/item/glass_bottle.png");
+    /** ARGB tint for ghost icons — 38 % white opacity preserves the silhouette
+     *  while clearly reading as a hint rather than an actual item. */
+    private static final int GHOST_TINT = 0x60FFFFFF;
+
     @Override
     protected void init() {
         super.init();
@@ -120,8 +137,35 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
                 TEXTURE, x, y, 0.0f, 0.0f,
                 backgroundWidth, backgroundHeight, 256, 256);
 
+        // Ghost icons hint what each input slot accepts.  Drawn before the
+        // progress / tank overlays so they sit behind everything dynamic
+        // and (most importantly) the real item the slot shows once filled.
+        drawGhostsForEmptyInputs(context, x, y);
+
         drawProgressArrow(context, x, y);
         drawXpTank(context, x, y);
+    }
+
+    /**
+     * Paints the faded card / glass-bottle hints over the empty card and
+     * glass-bottle input slots.  Output slot intentionally not touched.
+     */
+    private void drawGhostsForEmptyInputs(DrawContext ctx, int guiLeft, int guiTop) {
+        if (!handler.slots.get(InfusionCoilBlockEntity.SLOT_CARD_IN).hasStack()) {
+            drawGhostIcon(ctx, GHOST_CARD,
+                    guiLeft + InfusionCoilSlotPositions.cardIn.positionX,
+                    guiTop  + InfusionCoilSlotPositions.cardIn.positionY);
+        }
+        if (!handler.slots.get(InfusionCoilBlockEntity.SLOT_BOTTLE_IN).hasStack()) {
+            drawGhostIcon(ctx, GHOST_BOTTLE,
+                    guiLeft + InfusionCoilSlotPositions.glassIn.positionX,
+                    guiTop  + InfusionCoilSlotPositions.glassIn.positionY);
+        }
+    }
+
+    private static void drawGhostIcon(DrawContext ctx, Identifier texture, int x, int y) {
+        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, texture,
+                x, y, 0f, 0f, 16, 16, 16, 16, GHOST_TINT);
     }
 
     @Override
@@ -235,12 +279,14 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
                         processing = coil.isProcessing();
                     }
                     boolean isThisCoil = nb.equals(coilPos);
-                    int base;
-                    if (isThisCoil)      base = COL_ACTIVE;
-                    else if (processing) base = COL_MODULE_ACTIVE;
-                    else                 base = COL_MODULE;
-                    drawNavDot(ctx, cx, hy, base, isThisCoil, fillRatio,
-                            /*hoverable=*/!isThisCoil, mouseX, mouseY);
+                    // Border tone applies in both modes — the selected coil
+                    // also picks it up when the player hovers and the dot
+                    // swaps to the empty/full palette.
+                    int border = processing ? COL_MODULE_BORDER_ACTIVE : COL_MODULE_BORDER_IDLE;
+                    // Hover ring enabled even for THIS coil: visual feedback
+                    // only — the click handler still skips the current coil.
+                    drawNavDot(ctx, cx, hy, border, isThisCoil, fillRatio,
+                            /*hoverable=*/true, mouseX, mouseY);
                     rendered = true;
                 }
             }
@@ -250,20 +296,35 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     }
 
     /**
-     * Hub or module dot — disk + optional XP fill + optional active ring +
-     * optional hover ring when {@code hoverable} and the mouse is over the
-     * dot.  Empty sockets use {@link #drawNavEmptyDot} instead.
+     * Module dot.  Default state (any coil, selected or not): dark-purple
+     * interior + state-coloured border + opaque lime fluid fill.  Hovering
+     * swaps to a white disk + semi-translucent lime fill — the player can
+     * tell at a glance "this is the dot under my cursor".
+     *
+     * <p>The cyan identity ring marks the coil whose screen is currently
+     * open; it stays on top of whichever palette is active so the
+     * "you're here" signal never disappears.
      */
-    private void drawNavDot(DrawContext ctx, int cx, int cy, int color, boolean active,
+    private void drawNavDot(DrawContext ctx, int cx, int cy, int borderColor, boolean active,
                             float fillRatio, boolean hoverable, int mouseX, int mouseY) {
-        NavDotRenderer.disk(ctx, cx, cy, NAV_DOT, color);
-        if (fillRatio > 0f) {
-            NavDotRenderer.diskFillFromBottom(ctx, cx, cy, NAV_DOT, fillRatio, COL_TANK_FILL);
+        boolean isHovered = hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2);
+
+        if (isHovered) {
+            // Hover palette: white + lime
+            NavDotRenderer.disk(ctx, cx, cy, NAV_DOT, COL_ACTIVE);
+            if (fillRatio > 0f) {
+                NavDotRenderer.diskFillFromBottom(ctx, cx, cy, NAV_DOT, fillRatio, COL_TANK_FILL_ACTIVE);
+            }
+        } else {
+            // Default palette: dark purple + state border + lime
+            NavDotRenderer.diskWithBorder(ctx, cx, cy, NAV_DOT, COL_TANK_EMPTY, borderColor);
+            if (fillRatio > 0f) {
+                NavDotRenderer.diskFillFromBottom(ctx, cx, cy, NAV_DOT - 1, fillRatio, COL_FLUID);
+            }
         }
+
         if (active) NavDotRenderer.ring(ctx, cx, cy, NAV_RING, COL_RING_CYAN);
-        if (hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2)) {
-            NavDotRenderer.ring(ctx, cx, cy, NAV_RING + 1, HOVER_COL);
-        }
+        if (isHovered) NavDotRenderer.ring(ctx, cx, cy, NAV_RING + 1, HOVER_COL);
     }
 
     private void drawNavEmptyDot(DrawContext ctx, int cx, int cy) {

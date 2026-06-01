@@ -4,6 +4,8 @@ import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
+import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardSlot;
+import net.minecraft.screen.slot.Slot;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -47,10 +49,20 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
     private static final int NAV_RING    = 5;    // half-size of active ring border
 
     // colours
-    private static final int COL_MODULE          = 0xFF44FF88; // green  — idle coil
-    private static final int COL_MODULE_ACTIVE   = 0xFFFFCC44; // amber  — processing coil
-    private static final int COL_RING_CYAN       = 0xFF00FFEE; // cyan ring — active screen
-    private static final int COL_TANK_FILL       = 0xCC50F03C; // lime green @80% — live tank overlay
+    // Module dot palette — matches the Selector screen so the same coil is
+    // read identically in both GUIs:
+    //   • interior  = dark pastel purple (empty tank)
+    //   • fluid     = opaque lime (filled tank), bottom-up
+    //   • border    = darker green (idle) or darker amber (processing)
+    private static final int COL_MODULE_BORDER_IDLE   = 0xFF1F8044;
+    private static final int COL_MODULE_BORDER_ACTIVE = 0xFF8B6914;
+    private static final int COL_TANK_EMPTY           = 0xFF3D2A52; // dark pastel purple
+    private static final int COL_FLUID                = 0xFF50F03C; // opaque lime
+    private static final int COL_RING_CYAN            = 0xFF00FFEE; // cyan ring — active screen
+    // Hover palette — inverts the dot to white with a translucent lime fill.
+    // Matches InfusionCoilScreen so both navbars feel identical on hover.
+    private static final int COL_ACTIVE                = 0xFFFFFFFF;
+    private static final int COL_TANK_FILL_ACTIVE      = 0xCC50F03C;
 
     // Hub "target" colours — concentric rings (outermost → centre):
     //   gold border, then red, black, blue.  Differentiates the hub at a
@@ -108,12 +120,31 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
         ctx.drawText(textRenderer, title, titleX, titleY, TITLE_COL, false);
     }
 
+    /** Ghost-icon hint shown on empty MagicCard inputs (combine slots). */
+    private static final Identifier GHOST_CARD =
+            Identifier.of(EnchantTransferMod.MOD_ID, "textures/item/magic_card_item.png");
+    /** ARGB tint for ghost icons — 38 % white opacity, matches InfusionCoilScreen. */
+    private static final int GHOST_TINT = 0x60FFFFFF;
+
     @Override
     protected void drawBackground(DrawContext ctx, float delta, int mouseX, int mouseY) {
         int gx = (width  - backgroundWidth)  / 2;
         int gy = (height - backgroundHeight) / 2;
         ctx.drawTexture(RenderPipelines.GUI_TEXTURED,
                 TEXTURE, gx, gy, 0f, 0f, backgroundWidth, backgroundHeight, 256, 256);
+
+        // Faded card silhouettes on the empty combine inputs.  Done in
+        // drawBackground so super.render() can later paint a real card on
+        // top once the player drops one in.  Iterating handler.slots and
+        // filtering by class avoids hardcoded slot indices — adding more
+        // MagicCardSlot inputs in the future is automatic.
+        for (Slot slot : handler.slots) {
+            if (slot instanceof MagicCardSlot && !slot.hasStack()) {
+                ctx.drawTexture(RenderPipelines.GUI_TEXTURED, GHOST_CARD,
+                        gx + slot.x, gy + slot.y,
+                        0f, 0f, 16, 16, 16, 16, GHOST_TINT);
+            }
+        }
     }
 
     @Override
@@ -176,28 +207,38 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
                         processing = coil.isProcessing();
                     }
                 }
-                int base = processing ? COL_MODULE_ACTIVE : COL_MODULE;
-                drawNavDot(ctx, cx, hy, base, false, fillRatio, /*hoverable=*/true, mouseX, mouseY);
+                int border = processing ? COL_MODULE_BORDER_ACTIVE : COL_MODULE_BORDER_IDLE;
+                drawNavDot(ctx, cx, hy, border, false, fillRatio, /*hoverable=*/true, mouseX, mouseY);
             }
             drawDirLabel(ctx, cx, hy, dir);
         }
     }
 
     /**
-     * Hub or module dot — coloured disk + optional XP-fill + optional cyan
-     * active ring + optional hover halo when the mouse is over a clickable
-     * dot.  Empty sockets render via {@link #drawNavEmptyDot}.
+     * Module dot — dark-purple interior with a state-coloured border and an
+     * opaque lime fluid-fill clipped to the disk shape.  Matches the
+     * Selector screen vocabulary, so the same coil reads identically in
+     * both GUIs (empty bit clearly dark, filled bit clearly green).
+     * Adds the hover halo when the mouse is over a clickable dot.
      */
-    private void drawNavDot(DrawContext ctx, int cx, int cy, int color, boolean active,
+    private void drawNavDot(DrawContext ctx, int cx, int cy, int borderColor, boolean active,
                             float fillRatio, boolean hoverable, int mouseX, int mouseY) {
-        NavDotRenderer.disk(ctx, cx, cy, NAV_DOT, color);
-        if (fillRatio > 0f) {
-            NavDotRenderer.diskFillFromBottom(ctx, cx, cy, NAV_DOT, fillRatio, COL_TANK_FILL);
+        boolean isHovered = hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2);
+        // Hover → white + translucent lime.  Default (selected or not) →
+        // dark purple + state-coloured border + opaque lime fluid.
+        if (isHovered) {
+            NavDotRenderer.disk(ctx, cx, cy, NAV_DOT, COL_ACTIVE);
+            if (fillRatio > 0f) {
+                NavDotRenderer.diskFillFromBottom(ctx, cx, cy, NAV_DOT, fillRatio, COL_TANK_FILL_ACTIVE);
+            }
+        } else {
+            NavDotRenderer.diskWithBorder(ctx, cx, cy, NAV_DOT, COL_TANK_EMPTY, borderColor);
+            if (fillRatio > 0f) {
+                NavDotRenderer.diskFillFromBottom(ctx, cx, cy, NAV_DOT - 1, fillRatio, COL_FLUID);
+            }
         }
         if (active) NavDotRenderer.ring(ctx, cx, cy, NAV_RING, COL_RING_CYAN);
-        if (hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2)) {
-            NavDotRenderer.ring(ctx, cx, cy, NAV_RING + 1, HOVER_COL);
-        }
+        if (isHovered) NavDotRenderer.ring(ctx, cx, cy, NAV_RING + 1, HOVER_COL);
     }
 
     /**

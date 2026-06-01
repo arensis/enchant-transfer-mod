@@ -139,8 +139,10 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
                 return ItemStack.EMPTY;
             }
         } else {
-            // From the player to the coil — pick the right slot based on the item
-            if (original.isOf(EnchantTransferMod.MAGIC_CARD_ITEM)) {
+            // From the player to the coil — pick the right slot based on the item.
+            // Any MagicCardItem (base or coloured) routes to the card slot;
+            // glass bottles go to the bottle slot.
+            if (original.getItem() instanceof net.alfonsormadrid.enchanttransfer.item.MagicCardItem) {
                 if (!insertItem(original, InfusionCoilBlockEntity.SLOT_CARD_IN, InfusionCoilBlockEntity.SLOT_CARD_IN + 1, false)) {
                     return ItemStack.EMPTY;
                 }

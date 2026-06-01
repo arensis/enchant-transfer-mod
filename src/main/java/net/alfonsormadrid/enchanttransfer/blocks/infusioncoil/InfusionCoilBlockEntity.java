@@ -4,6 +4,7 @@ import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlockEntity;
 import net.alfonsormadrid.enchanttransfer.energy.ExperienceStorage;
 import net.alfonsormadrid.enchanttransfer.energy.SimpleExperienceTank;
+import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.alfonsormadrid.enchanttransfer.modules.ModulePreview;
 import net.alfonsormadrid.enchanttransfer.modules.ModuleType;
 import net.alfonsormadrid.enchanttransfer.modules.ProcessingModule;
@@ -396,10 +397,14 @@ public class InfusionCoilBlockEntity extends BlockEntity
     @Override
     public boolean isValid(int slot, ItemStack stack) {
         return switch (slot) {
-            case SLOT_CARD_IN -> stack.isOf(EnchantTransferMod.MAGIC_CARD_ITEM);
-            case SLOT_BOTTLE_IN -> stack.isOf(Items.GLASS_BOTTLE);
+            // Any MagicCardItem instance — base or any of the 6 coloured
+            // variants — is valid input.  Checking the class instead of a
+            // specific instance means new card types added in the future
+            // are accepted automatically without touching this validation.
+            case SLOT_CARD_IN    -> stack.getItem() instanceof MagicCardItem;
+            case SLOT_BOTTLE_IN  -> stack.isOf(Items.GLASS_BOTTLE);
             case SLOT_BOTTLE_OUT -> false;
-            default -> false;
+            default              -> false;
         };
     }
 

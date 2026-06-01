@@ -50,7 +50,14 @@ public class TransferTableRenderer
     private static final float TUBE_PIPE_MAX     = 9.5f  / 16f;
     private static final float TUBE_FLANGE_MIN   = 5.5f  / 16f;  // 5-px cross
     private static final float TUBE_FLANGE_MAX   = 10.5f / 16f;
-    private static final float TUBE_LENGTH       = 5.0f  / 16f;
+    // 4.85 (not 5) so the far brida sits 0.15/16 away from the core face,
+    // never sharing the z=5/16 (or y=5/16, etc.) plane.  The previous
+    // 0.05/16 gap was getting overpowered by the polygon offset of the
+    // pulse — when the coil ends up on a vertical neighbour the user
+    // reported the cyan glow bleeding through the brida again.  0.15/16
+    // is still sub-pixel at default texture-pack scale (invisible visually)
+    // but well over any reasonable polygon-offset magnitude.
+    private static final float TUBE_LENGTH       = 4.85f / 16f;
     private static final float TUBE_FLANGE_DEPTH = 0.8f  / 16f;
 
     // Same two-tone copper as the coil tube
@@ -103,29 +110,33 @@ public class TransferTableRenderer
                        MatrixStack matrices,
                        OrderedRenderCommandQueue queue,
                        CameraRenderState cameraState) {
-        // Both the core pulse and the tubes go on entityTranslucentEmissive
-        // so we have a single uniform depth/blend behaviour.  The previous
-        // setup put the core on debugFilledBox, whose VIEW_OFFSET_Z_LAYERING
-        // pulled the core toward the camera and made it win the depth test
-        // against the brida's coplanar face at z = 5/16 — the user could
-        // see the cyan core bleeding through the copper connector.  Without
-        // polygon offset and with the core rendered FIRST + the tube SECOND
-        // on the same translucent layer, the tube's alpha-1.0 pixels paint
-        // over the core where they overlap, exactly as expected.
-        RenderLayer layer = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
         float alpha = 0.40f + 0.40f * (0.5f + 0.5f * (float) Math.sin(state.animTime));
 
-        // 1 — Core pulse
-        queue.submitCustom(matrices, layer, (entry, vc) ->
-                drawEntityBox(entry, vc,
+        // 1 — Core pulse on debugFilledBox.  Its VIEW_OFFSET_Z_LAYERING
+        //     polygon offset is what makes the pulse visible OVER the baked
+        //     diamond cube of the block model — without it the two
+        //     coplanar surfaces at [5..11]/16 z-fight and flicker.  The
+        //     conflict with the connector that this offset used to cause is
+        //     now avoided geometrically: the tube brida is shortened by
+        //     0.05/16 (see TUBE_LENGTH) so it never shares the z=5/16 plane
+        //     with the core face.
+        queue.submitCustom(matrices, RenderLayers.debugFilledBox(), (entry, vc) ->
+                colorBox(entry, vc,
                         CORE_MIN, CORE_MIN, CORE_MIN,
                         CORE_MAX, CORE_MAX, CORE_MAX,
                         CR, CG, CB, alpha));
 
-        // 2 — Tubes for every face that has a connected Infusion Coil
+        // 2 — Full brida-pipe-brida tube for every connected face, vertical
+        //     included.  On the vertical case the table-side near brida sits
+        //     right at the boundary, visually docking with the coil's base
+        //     (when the coil is above) or its cap (when the coil is below).
+        //     The coil renderer doesn't add a tube for vertical because its
+        //     centre column is occupied by the flask geometry — the docking
+        //     brida is enough to read the connection cleanly.
+        RenderLayer tubeLayer = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
         for (Direction dir : Direction.values()) {
             if (!state.connectedFaces[dir.ordinal()]) continue;
-            drawTube(matrices, queue, layer, dir);
+            drawTube(matrices, queue, tubeLayer, dir);
         }
     }
 
@@ -177,6 +188,33 @@ public class TransferTableRenderer
             case DOWN  -> new float[]{ cmin, axisStart,     cmin, cmax, axisEnd,      cmax };
             case UP    -> new float[]{ cmin, 1f - axisEnd,  cmin, cmax, 1f - axisStart, cmax };
         };
+    }
+
+    // ── POSITION_COLOR box (debugFilledBox) ─────────────────────────────────
+
+    /** Solid-colour box, 6 quads, POSITION_COLOR vertex format. */
+    private static void colorBox(MatrixStack.Entry entry, VertexConsumer vc,
+                                  float x0, float y0, float z0,
+                                  float x1, float y1, float z1,
+                                  float r, float g, float b, float a) {
+        cq(entry, vc, x0,y0,z0,  x1,y0,z0,  x1,y0,z1,  x0,y0,z1,  r,g,b,a); // -Y
+        cq(entry, vc, x0,y1,z1,  x1,y1,z1,  x1,y1,z0,  x0,y1,z0,  r,g,b,a); // +Y
+        cq(entry, vc, x0,y1,z0,  x1,y1,z0,  x1,y0,z0,  x0,y0,z0,  r,g,b,a); // -Z
+        cq(entry, vc, x1,y1,z1,  x0,y1,z1,  x0,y0,z1,  x1,y0,z1,  r,g,b,a); // +Z
+        cq(entry, vc, x0,y1,z1,  x0,y1,z0,  x0,y0,z0,  x0,y0,z1,  r,g,b,a); // -X
+        cq(entry, vc, x1,y1,z0,  x1,y1,z1,  x1,y0,z1,  x1,y0,z0,  r,g,b,a); // +X
+    }
+
+    private static void cq(MatrixStack.Entry entry, VertexConsumer vc,
+                            float ax, float ay, float az,
+                            float bx, float by, float bz,
+                            float cx, float cy, float cz,
+                            float dx, float dy, float dz,
+                            float r, float g, float b, float a) {
+        vc.vertex(entry, ax, ay, az).color(r, g, b, a);
+        vc.vertex(entry, bx, by, bz).color(r, g, b, a);
+        vc.vertex(entry, cx, cy, cz).color(r, g, b, a);
+        vc.vertex(entry, dx, dy, dz).color(r, g, b, a);
     }
 
     // ── ENTITY-format box (entityTranslucentEmissive) ───────────────────────

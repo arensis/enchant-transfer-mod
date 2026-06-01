@@ -1,6 +1,5 @@
 package net.alfonsormadrid.enchanttransfer.services;
 
-import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.item.ItemStack;
@@ -24,7 +23,10 @@ public class CombineCardService {
         if (enchantmentEntry.isPresent()) {
             int currentLevel = enchants1.getLevel(enchantmentEntry.get());
             int resultCount = Math.min(card1.getCount(), card2.getCount());
-            ItemStack outputCard = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM, resultCount);
+            // Preserve the input cards' colour: both inputs must share the
+            // same enchantment to be combinable, so they're already the same
+            // CardType — reusing card1.getItem() avoids a separate lookup.
+            ItemStack outputCard = new ItemStack(card1.getItem(), resultCount);
             outputCard.addEnchantment(enchantmentEntry.get(), currentLevel + 1);
             return outputCard;
         } else {
