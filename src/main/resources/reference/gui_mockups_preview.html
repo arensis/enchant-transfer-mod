@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>GUIs — Selector · Core · Infusor</title>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #f3eee3; --ink: #1f1a14; --ink-soft: #5a5145; --ink-faint: #8a7f6f; --rule: #d9cfb8;
+          --panel: #140a22; --panel2: #1c1030; --border-o: #6a4a96; --border-i: #3a2456;
+          --tan: #e8d4a8; --gold: #d8a23a; --cyan: #4dd4ff; --slot: #2a1a40; --slot-line: #5a3a8a; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.55; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 60px 40px 120px; }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 32px; margin-bottom: 48px; }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-faint); margin-bottom: 14px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 42px; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .lede { font-size: 17px; color: var(--ink-soft); max-width: 720px; margin: 0; }
+  h2 { font-family: 'Silkscreen', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-faint); margin: 0 0 6px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+  section { margin-bottom: 80px; }
+  .row { display: grid; grid-template-columns: auto 1fr; gap: 48px; align-items: start; }
+  @media (max-width: 900px) { .row { grid-template-columns: 1fr; } }
+  .gui-title { font-family: 'Fraunces', serif; font-weight: 600; font-size: 22px; margin: 0 0 4px; }
+  .gui-sub { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-faint); margin: 0 0 20px; }
+  .notes { font-size: 14px; color: var(--ink-soft); }
+  .notes h4 { font-family: 'Silkscreen', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin: 22px 0 8px; }
+  .notes ul { margin: 0; padding-left: 18px; }
+  .notes li { margin-bottom: 6px; }
+  .notes code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: #efe8da; padding: 1px 5px; border-radius: 3px; }
+
+  /* ===== GUI panel base ===== */
+  .gui {
+    position: relative; background: var(--panel);
+    border: 4px solid var(--border-o); outline: 3px solid var(--border-i); outline-offset: -7px;
+    image-rendering: pixelated; box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .gui .stars { position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 20% 30%, #6fc8e8 99%, transparent),
+      radial-gradient(1px 1px at 70% 18%, #ffffff 99%, transparent),
+      radial-gradient(1px 1px at 44% 62%, #8a7fd0 99%, transparent),
+      radial-gradient(1px 1px at 84% 54%, #6fc8e8 99%, transparent),
+      radial-gradient(1px 1px at 12% 78%, #ffffff 99%, transparent),
+      radial-gradient(1px 1px at 60% 84%, #8a7fd0 99%, transparent),
+      radial-gradient(1px 1px at 32% 44%, #ffffff 99%, transparent),
+      radial-gradient(1px 1px at 90% 80%, #6fc8e8 99%, transparent);
+  }
+  .gui .titlebar { position: absolute; top: 14px; left: 22px; width: 180px; height: 16px; background: var(--tan); border-radius: 1px; }
+  .gui .titlebar.wide { width: 300px; }
+
+  /* slots */
+  .slot { position: absolute; background: var(--slot); border: 2px solid var(--slot-line); }
+  .slot.cyan { border-color: var(--cyan); box-shadow: inset 0 0 6px rgba(77,212,255,0.25); }
+  .slot.gold { border-color: var(--gold); }
+  .slot .corner { position: absolute; bottom: 2px; right: 2px; width: 6px; height: 6px; background: var(--gold); opacity: 0.6; }
+
+  /* hub + sockets (selector) */
+  .hub { position: absolute; border-radius: 50%; border: 4px solid var(--gold);
+    box-shadow: 0 0 16px rgba(216,162,58,0.5), inset 0 0 20px rgba(0,0,0,0.6); }
+  .hub .core { position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; transform: translate(-50%,-50%);
+    background: radial-gradient(circle, #eafaff, #4dd4ff 70%); border-radius: 2px; box-shadow: 0 0 14px #4dd4ff, 0 0 28px #1a90ff; }
+  .socket { position: absolute; width: 46px; height: 46px; transform: translate(-50%,-50%);
+    border-radius: 50%; border: 3px solid #4a2f72; background: radial-gradient(circle, #1c1030, #0e0820);
+    display: flex; align-items: center; justify-content: center; }
+  .socket .plus { color: #6a4a96; font-family: 'JetBrains Mono', monospace; font-size: 20px; }
+  .socket.filled { border-color: var(--gold); box-shadow: 0 0 14px rgba(216,162,58,0.4); }
+  /* infusor flask icon */
+  .flask { width: 30px; height: 30px; border-radius: 50%;
+    background: radial-gradient(circle at 50% 60%, #c8f000 0%, #8ab800 55%, #3a5000 100%);
+    position: relative; box-shadow: 0 0 12px rgba(168,224,48,0.7); }
+  .flask::before { content:''; position: absolute; top: -5px; left: 50%; transform: translateX(-50%);
+    width: 8px; height: 7px; background: #7a4a1e; border-radius: 1px; }
+  .link-line { position: absolute; height: 3px; background: linear-gradient(90deg, var(--gold), rgba(216,162,58,0.2)); transform-origin: left center; }
+
+  /* nav row */
+  .navrow { position: absolute; height: 0; border-top: 2px dashed #6a4a96; }
+  .navrow .marker { position: absolute; top: -5px; width: 10px; height: 10px; background: #c8f000; box-shadow: 0 0 8px #c8f000; }
+
+  /* inventory grid */
+  .invgrid { position: absolute; display: grid; gap: 2px; }
+  .invgrid .cell { width: 30px; height: 30px; background: var(--slot); border: 2px solid var(--slot-line); }
+  .hotbar { position: absolute; display: grid; grid-auto-flow: column; gap: 2px; }
+  .hotbar .cell { width: 30px; height: 30px; background: var(--slot); border: 2px solid var(--gold); }
+
+  .tank { position: absolute; border: 3px solid var(--cyan); background: linear-gradient(0deg, #2a8a30 0%, #2a8a30 55%, #0e1a14 55%, #0e1a14 100%);
+    box-shadow: inset 0 0 8px rgba(77,212,255,0.3); }
+  .arrow { position: absolute; color: #c8f000; font-size: 22px; font-family: 'JetBrains Mono', monospace; }
+  .tag { position: absolute; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); white-space: nowrap; }
+  .tag.cy { color: var(--cyan); }
+  .tag.dim { color: var(--ink-faint); }
+  .tag::before { content:''; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Hub & Spoke — GUIs</div>
+      <h1>Selector · Core · Infusor</h1>
+      <p class="lede">Cómo se ven las tres interfaces del sistema. Estética: panel espacial morado con estrellas, barra de título beige, sockets de borde cian/oro, hub dorado con núcleo de cristal. Escala ~2× para legibilidad.</p>
+    </header>
+
+    <!-- ===== SELECTOR (L1) ===== -->
+    <section>
+      <h2>01 · Selector (L1)</h2>
+      <div class="row">
+        <div>
+          <p class="gui-title">Selector de módulos</p>
+          <p class="gui-sub">256 × 256 · clic derecho en la mesa</p>
+          <div class="gui" id="selector" style="width:440px;height:440px;">
+            <div class="stars"></div>
+            <div class="titlebar"></div>
+          </div>
+        </div>
+        <div class="notes">
+          <p>Vista orbital de la mesa: el <strong>hub dorado</strong> (núcleo de cristal) en el centro y <strong>6 sockets</strong> alrededor, uno por cada cara física del bloque (N·S·E·O·Arriba·Abajo).</p>
+          <h4>Comportamiento</h4>
+          <ul>
+            <li>Cada socket aparece <strong>vacío</strong> (círculo con <code>+</code>) salvo que haya un módulo acoplado en esa cara.</li>
+            <li>El módulo se dibuja <strong>solo en el socket que corresponde a su posición física</strong> — aquí el Infusor está al Este.</li>
+            <li>El icono usa <code>module_infusor.png</code> y muestra su estado en vivo: desconectado / idle / infusing.</li>
+            <li>Clic en un socket con módulo → abre su GUI (equivale a clic derecho en el bloque).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CORE (L2) ===== -->
+    <section>
+      <h2>02 · Core / Transfer Table (L2)</h2>
+      <div class="row">
+        <div>
+          <p class="gui-title">Core de la mesa</p>
+          <p class="gui-sub">256 × 256 · pestaña principal</p>
+          <div class="gui" id="core" style="width:440px;height:440px;">
+            <div class="stars"></div>
+            <div class="titlebar wide"></div>
+          </div>
+        </div>
+        <div class="notes">
+          <p>Panel principal de la mesa. Arriba, una fila de <strong>sockets de módulo</strong> (estado de cada cara); en medio, la <strong>nav row</strong> punteada para cambiar de pestaña; abajo, el <strong>inventario del jugador</strong> + hotbar.</p>
+          <h4>Zonas</h4>
+          <ul>
+            <li><strong>Sockets de módulo</strong> (fila superior): reflejan qué hay acoplado, con borde cian (activo) u oro.</li>
+            <li><strong>Nav row</strong> (línea punteada): marcador verde = pestaña actual; navega entre Core / módulos.</li>
+            <li><strong>Inventario</strong> 3×9 + hotbar 1×9, estándar.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INFUSOR ===== -->
+    <section>
+      <h2>03 · Infusor Coil</h2>
+      <div class="row">
+        <div>
+          <p class="gui-title">Infusor Coil</p>
+          <p class="gui-sub">256 × 256 · módulo</p>
+          <div class="gui" id="infusor" style="width:440px;height:440px;">
+            <div class="stars"></div>
+            <div class="titlebar"></div>
+          </div>
+        </div>
+        <div class="notes">
+          <p>Convierte Magic Cards en XP almacenado y rellena botellas. Tres slots, una flecha de progreso y el <strong>tanque de XP</strong> vertical.</p>
+          <h4>Slots</h4>
+          <ul>
+            <li><strong>card-in</strong> — Magic Card (entrada)</li>
+            <li><strong>glass-in</strong> — botella de cristal vacía</li>
+            <li><strong>xp-out</strong> — salida (Bottle o' Enchanting)</li>
+          </ul>
+          <h4>Indicadores</h4>
+          <ul>
+            <li><strong>Flecha de progreso</strong> entre card-in y el tanque.</li>
+            <li><strong>Tanque de XP</strong> (derecha): nivel real <code>storedXp / 1000</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+// ===== SELECTOR: hub + 6 sockets hexagonales =====
+(function(){
+  const g = document.getElementById('selector');
+  const cx = 220, cy = 232, R = 130;
+  // hub
+  const hub = document.createElement('div');
+  hub.className = 'hub';
+  const hs = 92;
+  hub.style.width = hs+'px'; hub.style.height = hs+'px';
+  hub.style.left = (cx-hs/2)+'px'; hub.style.top = (cy-hs/2)+'px';
+  hub.innerHTML = '<div class="core"></div>';
+  g.appendChild(hub);
+  // 6 sockets (N, NE, SE, S, SW, NW) — empezar arriba
+  const faces = [
+    {a:-90, label:'Arriba'}, {a:-30, label:'Este', infusor:true}, {a:30, label:'Abajo'},
+    {a:90, label:'Sur'}, {a:150, label:'Oeste'}, {a:210, label:'Norte'}
+  ];
+  faces.forEach(f => {
+    const rad = f.a*Math.PI/180;
+    const sx = cx + R*Math.cos(rad), sy = cy + R*Math.sin(rad);
+    // link line from hub edge to socket
+    const line = document.createElement('div');
+    line.className = 'link-line';
+    const len = R - 46;
+    line.style.left = cx+'px'; line.style.top = cy+'px';
+    line.style.width = len+'px';
+    line.style.transform = `rotate(${f.a}deg)`;
+    if (f.infusor) line.style.opacity = '1'; else line.style.opacity = '0.25';
+    g.appendChild(line);
+    const s = document.createElement('div');
+    s.className = 'socket' + (f.infusor ? ' filled' : '');
+    s.style.left = sx+'px'; s.style.top = sy+'px';
+    s.innerHTML = f.infusor ? '<div class="flask"></div>' : '<span class="plus">+</span>';
+    g.appendChild(s);
+    const tag = document.createElement('div');
+    tag.className = 'tag ' + (f.infusor ? '' : 'dim');
+    tag.textContent = f.infusor ? 'Infusor' : f.label;
+    tag.style.left = (sx-24)+'px'; tag.style.top = (sy+28)+'px';
+    g.appendChild(tag);
+  });
+})();
+
+// ===== CORE: sockets fila + nav + inventario =====
+(function(){
+  const g = document.getElementById('core');
+  // módulos fila superior (6 sockets pequeños)
+  const sockX = [30, 70, 110, 150, 190, 230], sy0 = 60;
+  const states = ['gold','cyan','line','line','line','line'];
+  sockX.forEach((x,i)=>{
+    if (states[i]==='line') {
+      const sl=document.createElement('div'); sl.className='slot'; sl.style.left=x+'px'; sl.style.top=sy0+'px'; sl.style.width='34px'; sl.style.height='34px'; g.appendChild(sl);
+    } else {
+      const sl=document.createElement('div'); sl.className='slot '+states[i]; sl.style.left=x+'px'; sl.style.top=sy0+'px'; sl.style.width='34px'; sl.style.height='34px';
+      if(states[i]==='gold'){ const fk=document.createElement('div'); fk.className='flask'; fk.style.width='22px'; fk.style.height='22px'; fk.style.margin='4px'; sl.appendChild(fk); }
+      g.appendChild(sl);
+    }
+  });
+  // segunda fila de módulos
+  [30,70].forEach((x)=>{ const sl=document.createElement('div'); sl.className='slot'; sl.style.left=x+'px'; sl.style.top=(sy0+44)+'px'; sl.style.width='34px'; sl.style.height='34px'; g.appendChild(sl); });
+  const tagM=document.createElement('div'); tagM.className='tag'; tagM.textContent='módulos acoplados'; tagM.style.left='30px'; tagM.style.top='42px'; g.appendChild(tagM);
+  // nav row
+  const nav=document.createElement('div'); nav.className='navrow'; nav.style.left='24px'; nav.style.top='190px'; nav.style.width='392px';
+  const mk=document.createElement('div'); mk.className='marker'; mk.style.left='180px'; nav.appendChild(mk); g.appendChild(nav);
+  const tagN=document.createElement('div'); tagN.className='tag dim'; tagN.textContent='nav row (pestañas)'; tagN.style.left='150px'; tagN.style.top='198px'; g.appendChild(tagN);
+  // inventario 3×9
+  const inv=document.createElement('div'); inv.className='invgrid'; inv.style.left='24px'; inv.style.top='220px'; inv.style.gridTemplateColumns='repeat(9, 30px)';
+  for(let i=0;i<27;i++){ const c=document.createElement('div'); c.className='cell'; inv.appendChild(c); } g.appendChild(inv);
+  // hotbar
+  const hb=document.createElement('div'); hb.className='hotbar'; hb.style.left='24px'; hb.style.top='322px';
+  for(let i=0;i<9;i++){ const c=document.createElement('div'); c.className='cell'; hb.appendChild(c); } g.appendChild(hb);
+})();
+
+// ===== INFUSOR: slots + flecha + tanque + inventario =====
+(function(){
+  const g = document.getElementById('infusor');
+  // card-in
+  const s1=document.createElement('div'); s1.className='slot cyan'; s1.style.left='44px'; s1.style.top='62px'; s1.style.width='38px'; s1.style.height='38px'; g.appendChild(s1);
+  const t1=document.createElement('div'); t1.className='tag cy'; t1.textContent='card-in'; t1.style.left='44px'; t1.style.top='46px'; g.appendChild(t1);
+  // glass-in
+  const s2=document.createElement('div'); s2.className='slot cyan'; s2.style.left='44px'; s2.style.top='118px'; s2.style.width='38px'; s2.style.height='38px'; g.appendChild(s2);
+  const t2=document.createElement('div'); t2.className='tag cy'; t2.textContent='glass-in'; t2.style.left='44px'; t2.style.top='160px'; g.appendChild(t2);
+  // xp-out
+  const s3=document.createElement('div'); s3.className='slot cyan'; s3.style.left='118px'; s3.style.top='118px'; s3.style.width='38px'; s3.style.height='38px'; g.appendChild(s3);
+  const t3=document.createElement('div'); t3.className='tag cy'; t3.textContent='xp-out'; t3.style.left='116px'; t3.style.top='160px'; g.appendChild(t3);
+  // progress arrow
+  const ar=document.createElement('div'); ar.className='arrow'; ar.textContent='▶'; ar.style.left='92px'; ar.style.top='70px'; g.appendChild(ar);
+  // tank
+  const tk=document.createElement('div'); tk.className='tank'; tk.style.left='220px'; tk.style.top='56px'; tk.style.width='34px'; tk.style.height='100px'; g.appendChild(tk);
+  const tt=document.createElement('div'); tt.className='tag cy'; tt.textContent='tanque XP'; tt.style.left='200px'; tt.style.top='40px'; g.appendChild(tt);
+  // nav row
+  const nav=document.createElement('div'); nav.className='navrow'; nav.style.left='24px'; nav.style.top='190px'; nav.style.width='392px';
+  const mk=document.createElement('div'); mk.className='marker'; mk.style.left='130px'; nav.appendChild(mk); g.appendChild(nav);
+  // inventario
+  const inv=document.createElement('div'); inv.className='invgrid'; inv.style.left='24px'; inv.style.top='220px'; inv.style.gridTemplateColumns='repeat(9, 30px)';
+  for(let i=0;i<27;i++){ const c=document.createElement('div'); c.className='cell'; inv.appendChild(c); } g.appendChild(inv);
+  const hb=document.createElement('div'); hb.className='hotbar'; hb.style.left='24px'; hb.style.top='322px';
+  for(let i=0;i<9;i++){ const c=document.createElement('div'); c.className='cell'; hb.appendChild(c); } g.appendChild(hb);
+})();
+</script>
+</body>
+</html>

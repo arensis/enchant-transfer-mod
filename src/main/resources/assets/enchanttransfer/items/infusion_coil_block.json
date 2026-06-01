@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "enchanttransfer:block/infusion_coil_block"
+    "model": "enchanttransfer:block/infusor_coil"
   }
 }

@@ -1,0 +1,215 @@
+package net.alfonsormadrid.enchanttransfer.renderers;
+
+import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
+import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlockEntity;
+import net.alfonsormadrid.enchanttransfer.renderers.state.TransferTableRenderState;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.render.command.ModelCommandRenderer;
+import net.minecraft.client.render.command.OrderedRenderCommandQueue;
+import net.minecraft.client.render.state.CameraRenderState;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+
+/**
+ * Block entity renderer for the Transfer Table.
+ *
+ * <p>Two responsibilities:
+ * <ol>
+ *   <li>The pulsing emissive cube on the diamond core
+ *       ({@code [5,5,5]→[11,11,11]} in model space).</li>
+ *   <li>One copper {@link #drawTube tube} per connected Infusion Coil
+ *       neighbour, going from the corresponding block face inward toward
+ *       the core.  Each tube uses the same brida-pipe-brida pattern as
+ *       the coil's matching tube, so when both blocks render the two
+ *       halves meet at the block boundary and read as a single continuous
+ *       industrial run.</li>
+ * </ol>
+ */
+public class TransferTableRenderer
+        implements BlockEntityRenderer<TransferTableBlockEntity, TransferTableRenderState> {
+
+    // ── Core cube ────────────────────────────────────────────────────────────
+    private static final float CORE_MIN = 5f  / 16f;
+    private static final float CORE_MAX = 11f / 16f;
+    // Core glow colour (#46AFEB — blue/cyan)
+    private static final float CR = 0.27f, CG = 0.69f, CB = 0.92f;
+
+    // ── Tube geometry ────────────────────────────────────────────────────────
+    // Tube length from the block face to the core boundary = 5 px.  Same
+    // brida-pipe-brida pattern as the coil so the visual reads as one
+    // continuous tube spanning both blocks.
+    private static final float TUBE_PIPE_MIN     = 6.5f  / 16f;  // 3-px cross
+    private static final float TUBE_PIPE_MAX     = 9.5f  / 16f;
+    private static final float TUBE_FLANGE_MIN   = 5.5f  / 16f;  // 5-px cross
+    private static final float TUBE_FLANGE_MAX   = 10.5f / 16f;
+    private static final float TUBE_LENGTH       = 5.0f  / 16f;
+    private static final float TUBE_FLANGE_DEPTH = 0.8f  / 16f;
+
+    // Same two-tone copper as the coil tube
+    private static final float TUBE_PIPE_R   = 0.62f, TUBE_PIPE_G   = 0.36f, TUBE_PIPE_B   = 0.12f;
+    private static final float TUBE_FLANGE_R = 0.92f, TUBE_FLANGE_G = 0.60f, TUBE_FLANGE_B = 0.22f;
+
+    // Mod-owned 1×1 white texture (also used by InfusionCoilRenderer) — keeps
+    // the tube on the entityTranslucentEmissive layer so the two halves at the
+    // block boundary are lit identically.
+    private static final Identifier WHITE_TEXTURE =
+            Identifier.of(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
+    private static final int FULL_LIGHT = 0xF000F0;
+
+    public TransferTableRenderer(BlockEntityRendererFactory.Context ctx) {}
+
+    @Override
+    public TransferTableRenderState createRenderState() {
+        return new TransferTableRenderState();
+    }
+
+    @Override
+    public void updateRenderState(TransferTableBlockEntity entity,
+                                  TransferTableRenderState state,
+                                  float tickDelta,
+                                  Vec3d cameraPos,
+                                  ModelCommandRenderer.CrumblingOverlayCommand crumbling) {
+        BlockEntityRenderer.super.updateRenderState(entity, state, tickDelta, cameraPos, crumbling);
+        long worldTime = entity.getWorld() != null ? entity.getWorld().getTime() : 0L;
+        state.animTime = (worldTime + tickDelta) * 0.05f;
+
+        // Scan the 6 neighbours.  We can't trust the server-only
+        // ModuleConnectionRegistry on the client, so we check block states
+        // directly — same pattern the coil renderer uses to find its table.
+        if (entity.getWorld() != null) {
+            BlockPos pos = entity.getPos();
+            for (Direction dir : Direction.values()) {
+                state.connectedFaces[dir.ordinal()] =
+                        entity.getWorld().getBlockState(pos.offset(dir))
+                                .isOf(EnchantTransferMod.INFUSION_COIL_BLOCK);
+            }
+        } else {
+            for (int i = 0; i < state.connectedFaces.length; i++) {
+                state.connectedFaces[i] = false;
+            }
+        }
+    }
+
+    @Override
+    public void render(TransferTableRenderState state,
+                       MatrixStack matrices,
+                       OrderedRenderCommandQueue queue,
+                       CameraRenderState cameraState) {
+        // Both the core pulse and the tubes go on entityTranslucentEmissive
+        // so we have a single uniform depth/blend behaviour.  The previous
+        // setup put the core on debugFilledBox, whose VIEW_OFFSET_Z_LAYERING
+        // pulled the core toward the camera and made it win the depth test
+        // against the brida's coplanar face at z = 5/16 — the user could
+        // see the cyan core bleeding through the copper connector.  Without
+        // polygon offset and with the core rendered FIRST + the tube SECOND
+        // on the same translucent layer, the tube's alpha-1.0 pixels paint
+        // over the core where they overlap, exactly as expected.
+        RenderLayer layer = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
+        float alpha = 0.40f + 0.40f * (0.5f + 0.5f * (float) Math.sin(state.animTime));
+
+        // 1 — Core pulse
+        queue.submitCustom(matrices, layer, (entry, vc) ->
+                drawEntityBox(entry, vc,
+                        CORE_MIN, CORE_MIN, CORE_MIN,
+                        CORE_MAX, CORE_MAX, CORE_MAX,
+                        CR, CG, CB, alpha));
+
+        // 2 — Tubes for every face that has a connected Infusion Coil
+        for (Direction dir : Direction.values()) {
+            if (!state.connectedFaces[dir.ordinal()]) continue;
+            drawTube(matrices, queue, layer, dir);
+        }
+    }
+
+    /**
+     * Emits the three segments of one tube (near flange → pipe → far flange)
+     * going from the {@code dir} face of the table inward toward the core.
+     */
+    private void drawTube(MatrixStack matrices, OrderedRenderCommandQueue queue,
+                          RenderLayer layer, Direction dir) {
+        final float[] flangeNear =
+                tubeSegment(dir, TUBE_FLANGE_MIN, TUBE_FLANGE_MAX, 0f, TUBE_FLANGE_DEPTH);
+        final float[] pipe =
+                tubeSegment(dir, TUBE_PIPE_MIN, TUBE_PIPE_MAX,
+                            TUBE_FLANGE_DEPTH, TUBE_LENGTH - TUBE_FLANGE_DEPTH);
+        final float[] flangeFar =
+                tubeSegment(dir, TUBE_FLANGE_MIN, TUBE_FLANGE_MAX,
+                            TUBE_LENGTH - TUBE_FLANGE_DEPTH, TUBE_LENGTH);
+
+        queue.submitCustom(matrices, layer, (entry, vc) -> {
+            drawEntityBox(entry, vc,
+                    flangeNear[0], flangeNear[1], flangeNear[2],
+                    flangeNear[3], flangeNear[4], flangeNear[5],
+                    TUBE_FLANGE_R, TUBE_FLANGE_G, TUBE_FLANGE_B, 1.0f);
+            drawEntityBox(entry, vc,
+                    pipe[0], pipe[1], pipe[2],
+                    pipe[3], pipe[4], pipe[5],
+                    TUBE_PIPE_R, TUBE_PIPE_G, TUBE_PIPE_B, 1.0f);
+            drawEntityBox(entry, vc,
+                    flangeFar[0], flangeFar[1], flangeFar[2],
+                    flangeFar[3], flangeFar[4], flangeFar[5],
+                    TUBE_FLANGE_R, TUBE_FLANGE_G, TUBE_FLANGE_B, 1.0f);
+        });
+    }
+
+    // ── Geometry helpers ──────────────────────────────────────────────────────
+
+    /**
+     * Bounding box of one tube segment along the axis pointing from the
+     * given face toward the centre of the block.  Mirror of the helper in
+     * the coil renderer.
+     */
+    private static float[] tubeSegment(Direction dir, float cmin, float cmax,
+                                        float axisStart, float axisEnd) {
+        return switch (dir) {
+            case NORTH -> new float[]{ cmin, cmin, axisStart,     cmax, cmax, axisEnd      };
+            case SOUTH -> new float[]{ cmin, cmin, 1f - axisEnd,  cmax, cmax, 1f - axisStart };
+            case WEST  -> new float[]{ axisStart,     cmin, cmin, axisEnd,      cmax, cmax };
+            case EAST  -> new float[]{ 1f - axisEnd,  cmin, cmin, 1f - axisStart, cmax, cmax };
+            case DOWN  -> new float[]{ cmin, axisStart,     cmin, cmax, axisEnd,      cmax };
+            case UP    -> new float[]{ cmin, 1f - axisEnd,  cmin, cmax, 1f - axisStart, cmax };
+        };
+    }
+
+    // ── ENTITY-format box (entityTranslucentEmissive) ───────────────────────
+
+    /**
+     * Same 6-quad box but emitting the ENTITY vertex format expected by
+     * {@link RenderLayers#entityTranslucentEmissive}.  Pos + colour +
+     * tex(0,0) + overlay + full-bright light + normal — matches the helper
+     * used by the coil renderer so the boundary between table tube and
+     * coil tube is invisible.
+     */
+    private static void drawEntityBox(MatrixStack.Entry entry, VertexConsumer vc,
+                                       float x0, float y0, float z0,
+                                       float x1, float y1, float z1,
+                                       float r, float g, float b, float a) {
+        eq(entry, vc, x0,y0,z1, x1,y0,z1, x1,y0,z0, x0,y0,z0, r,g,b,a,  0f,-1f, 0f); // -Y
+        eq(entry, vc, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, r,g,b,a,  0f, 1f, 0f); // +Y
+        eq(entry, vc, x0,y1,z0, x0,y0,z0, x1,y0,z0, x1,y1,z0, r,g,b,a,  0f, 0f,-1f); // -Z
+        eq(entry, vc, x1,y1,z1, x1,y0,z1, x0,y0,z1, x0,y1,z1, r,g,b,a,  0f, 0f, 1f); // +Z
+        eq(entry, vc, x0,y1,z1, x0,y0,z1, x0,y0,z0, x0,y1,z0, r,g,b,a, -1f, 0f, 0f); // -X
+        eq(entry, vc, x1,y1,z0, x1,y0,z0, x1,y0,z1, x1,y1,z1, r,g,b,a,  1f, 0f, 0f); // +X
+    }
+
+    private static void eq(MatrixStack.Entry entry, VertexConsumer vc,
+                            float ax, float ay, float az,
+                            float bx, float by, float bz,
+                            float cx, float cy, float cz,
+                            float dx, float dy, float dz,
+                            float r, float g, float b, float a,
+                            float nx, float ny, float nz) {
+        vc.vertex(entry, ax, ay, az).color(r,g,b,a).texture(0f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
+        vc.vertex(entry, bx, by, bz).color(r,g,b,a).texture(1f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
+        vc.vertex(entry, cx, cy, cz).color(r,g,b,a).texture(1f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
+        vc.vertex(entry, dx, dy, dz).color(r,g,b,a).texture(0f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
+    }
+}

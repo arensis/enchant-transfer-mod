@@ -54,6 +54,11 @@ public class SimpleExperienceTank implements ExperienceStorage {
         return capacity;
     }
 
+    /** Directly overwrite the stored amount. Used for client-side sync via PropertyDelegate. */
+    public void setStored(int value) {
+        this.stored = Math.max(0, Math.min(value, capacity));
+    }
+
     public void writeData(WriteView view) {
         view.putInt(NBT_STORED, stored);
     }

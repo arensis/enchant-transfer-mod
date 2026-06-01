@@ -1,6 +1,8 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
 import com.mojang.serialization.MapCodec;
+import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.registry.RegistryKey;
@@ -8,14 +10,11 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stat;
-import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -86,23 +85,21 @@ public class TransferTableBlock extends BlockWithEntity {
         return BlockRenderType.MODEL;
     }
 
+    /**
+     * Right-click sends an S2C packet that opens the Selector screen on the
+     * client. From there the player can navigate to the core (Transfer Table)
+     * or any attached module.
+     */
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, BlockHitResult hit) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos,
+                              PlayerEntity player, BlockHitResult hit) {
         if (!(world instanceof ServerWorld)) {
             return ActionResult.SUCCESS;
-        } else {
-            NamedScreenHandlerFactory namedScreenHandlerFactory = this.createScreenHandlerFactory(state, world, pos);
-            if (namedScreenHandlerFactory != null) {
-                player.openHandledScreen(namedScreenHandlerFactory);
-                player.incrementStat(this.getOpenStat());
-            }
-
-            return ActionResult.CONSUME;
         }
-    }
-
-    protected Stat<Identifier> getOpenStat() {
-        return Stats.CUSTOM.getOrCreateStat(Stats.OPEN_CHEST);
+        if (player instanceof ServerPlayerEntity serverPlayer) {
+            ServerPlayNetworking.send(serverPlayer, new OpenSelectorPayload(pos));
+        }
+        return ActionResult.CONSUME;
     }
 
 }

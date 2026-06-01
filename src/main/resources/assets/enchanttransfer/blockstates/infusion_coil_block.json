@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "active=false": { "model": "enchanttransfer:block/infusor_coil" },
+    "active=true":  { "model": "enchanttransfer:block/infusor_coil_active" }
+  }
+}

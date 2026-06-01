@@ -1,0 +1,8 @@
+{
+  "__comment": "Flask upright for all faces. Bonded face lives in BlockEntity (not blockstate rotation), so the renderer can point the connector at any of the 6 faces while the flask stays upright.",
+  "variants": {
+    "": {
+      "model": "enchanttransfer:block/infusor_coil"
+    }
+  }
+}

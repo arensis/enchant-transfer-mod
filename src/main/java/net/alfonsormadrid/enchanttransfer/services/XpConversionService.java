@@ -33,7 +33,9 @@ public class XpConversionService {
 
         ItemEnchantmentsComponent enchants = card.getEnchantments();
         Optional<RegistryEntry<Enchantment>> first = enchants.getEnchantments().stream().findFirst();
-        if (first.isEmpty()) return 0;
+        // Unenchanted cards yield a flat base amount instead of 0 so they can
+        // always be infused (the enchanted-card path adds a rarity bonus on top).
+        if (first.isEmpty()) return MIN_POINTS_PER_CARD;
 
         RegistryEntry<Enchantment> entry = first.get();
         int level = enchants.getLevel(entry);

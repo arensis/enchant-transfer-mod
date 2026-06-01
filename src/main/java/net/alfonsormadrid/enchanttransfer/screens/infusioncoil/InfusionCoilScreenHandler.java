@@ -12,8 +12,10 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.stream.IntStream;
 
@@ -29,22 +31,66 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
     private static final int HOTBAR_END       = 39;
 
     private final Inventory inventory;
+    private final PropertyDelegate propertyDelegate;
+    /** Position of the Infusion Coil in the world — synced via ExtendedScreenHandlerType. */
+    private final BlockPos coilPos;
 
-    /** Client-side constructor: vanilla network sync fills the inventory. */
-    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(3));
+    /** Client-side constructor: called by ExtendedScreenHandlerType with the synced coil pos. */
+    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos coilPos) {
+        this(syncId, playerInventory,
+                new SimpleInventory(3),
+                new net.minecraft.screen.ArrayPropertyDelegate(InfusionCoilBlockEntity.PROPERTY_COUNT),
+                coilPos);
     }
 
-    /** Server-side constructor: bound to the live block entity inventory. */
-    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+    /** Fallback client-side constructor when position is not available. */
+    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, BlockPos.ORIGIN);
+    }
+
+    /** Server-side constructor: bound to the live block entity inventory and its PropertyDelegate. */
+    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
+        this(syncId, playerInventory, inventory, propertyDelegate, BlockPos.ORIGIN);
+    }
+
+    /** Master constructor — all other constructors delegate here. */
+    private InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory,
+                                      Inventory inventory, PropertyDelegate propertyDelegate,
+                                      BlockPos coilPos) {
         super(EnchantTransferMod.INFUSION_COIL_SCREEN_HANDLER, syncId);
         checkSize(inventory, 3);
         this.inventory = inventory;
+        this.propertyDelegate = propertyDelegate;
+        this.coilPos = coilPos;
         inventory.onOpen(playerInventory.player);
 
         buildModuleSlots();
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
+        addProperties(propertyDelegate);
+    }
+
+    /** Returns the world position of the Infusion Coil block (available client-side). */
+    public BlockPos getCoilPos() {
+        return coilPos;
+    }
+
+    // ── Property accessors (read by the screen) ──────────────────────────────
+
+    public int getProgress() {
+        return propertyDelegate.get(InfusionCoilBlockEntity.PROPERTY_PROGRESS);
+    }
+
+    public int getMaxProgress() {
+        return InfusionCoilBlockEntity.TICKS_PER_INFUSION;
+    }
+
+    public int getStoredXp() {
+        return propertyDelegate.get(InfusionCoilBlockEntity.PROPERTY_STORED_XP);
+    }
+
+    public int getTankCapacity() {
+        return InfusionCoilBlockEntity.TANK_CAPACITY;
     }
 
     private void buildModuleSlots() {

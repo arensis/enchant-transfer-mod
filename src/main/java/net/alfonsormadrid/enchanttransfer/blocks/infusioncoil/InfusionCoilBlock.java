@@ -15,6 +15,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -23,6 +25,13 @@ public class InfusionCoilBlock extends BlockWithEntity {
 
     public static final MapCodec<InfusionCoilBlock> CODEC = createCodec(InfusionCoilBlock::new);
 
+    /**
+     * True while the coil is actively processing a card.
+     * Drives the swap between the idle model (brass knob) and the active model
+     * (sea-lantern knob) and bumps the block's luminance so the knob looks lit.
+     */
+    public static final BooleanProperty ACTIVE = BooleanProperty.of("active");
+
     public InfusionCoilBlock(RegistryKey<Block> registryKey) {
         this(
             AbstractBlock.Settings.copy(Blocks.LODESTONE)
@@ -30,12 +39,25 @@ public class InfusionCoilBlock extends BlockWithEntity {
                 .sounds(BlockSoundGroup.AMETHYST_BLOCK)
                 .requiresTool()
                 .strength(4.0f, 25.0f)
-                .luminance(state -> 6)
+                // Idle: dim ambient glow (matches the molten-XP body).
+                // Active: full-bright so the knob convincingly reads as "lit".
+                .luminance(state -> state.get(ACTIVE) ? 15 : 6)
+                // Mark non-opaque so Minecraft does NOT cull the top face of the block
+                // below us.  Without this, the inset model geometry leaves black holes
+                // in the corners where there is no cuboid to cover the missing face.
+                .nonOpaque()
         );
     }
 
     private InfusionCoilBlock(AbstractBlock.Settings settings) {
         super(settings);
+        setDefaultState(getStateManager().getDefaultState().with(ACTIVE, false));
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        super.appendProperties(builder);
+        builder.add(ACTIVE);
     }
 
     @Override

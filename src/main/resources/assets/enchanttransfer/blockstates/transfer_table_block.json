@@ -1,5 +1,5 @@
 {
   "variants": {
-    "": { "model": "enchanttransfer:block/transfer_table_block" }
+    "": { "model": "enchanttransfer:block/transfer_table" }
   }
 }

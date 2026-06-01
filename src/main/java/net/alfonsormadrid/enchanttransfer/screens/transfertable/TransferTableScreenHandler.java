@@ -14,8 +14,8 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.*;
 import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.math.BlockPos;
 import java.util.stream.IntStream;
 
 public class TransferTableScreenHandler extends ScreenHandler {
@@ -23,20 +23,24 @@ public class TransferTableScreenHandler extends ScreenHandler {
     private final Inventory combineCardsOutput;
     private final Inventory transferItem;
     private final Inventory transferItemContent;
-    private final ScreenHandlerContext context;
+    /** Position of the Transfer Table block — synced from server via ExtendedScreenHandlerType. */
+    private final net.minecraft.util.math.BlockPos tablePos;
     private final CombineCardService combineCardService;
 
+    /** Fallback constructor — used when block-pos is unavailable (e.g. creative menus). */
     public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, ScreenHandlerContext.EMPTY);
+        this(syncId, playerInventory, BlockPos.ORIGIN);
     }
 
-    public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory, final ScreenHandlerContext context) {
+    /** Client-side constructor — called by ExtendedScreenHandlerType factory with the synced pos. */
+    public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory,
+                                      net.minecraft.util.math.BlockPos tablePos) {
         super(EnchantTransferMod.TRANSFER_TABLE_SCREEN_HANDLER, syncId);
         this.combineCardsInput = buildInitInventory(2);
         this.combineCardsOutput = buildInitInventory(1);
         this.transferItem = buildInitInventory(1);
         this.transferItemContent = buildInitInventory(12);
-        this.context = context;
+        this.tablePos = tablePos;
 
         this.combineCardService = new CombineCardService(
                 this.combineCardsInput.getStack(0),
@@ -47,8 +51,8 @@ public class TransferTableScreenHandler extends ScreenHandler {
         this.addSlot(new TransferItemSlot(this.transferItem, this.transferItemContent, TransferItemSlotPositions.transferItem));
         this.buildTransferItemContentSlots();
 
-        addSlotGrid(9, 3, 8, 84, playerInventory, 9);
-        addSlotGrid(9, 1, 8, 142, playerInventory, 0);
+        addSlotGrid(9, 3, 8, 118, playerInventory, 9);
+        addSlotGrid(9, 1, 8, 176, playerInventory, 0);
     }
 
     // Slot layout:
@@ -105,6 +109,11 @@ public class TransferTableScreenHandler extends ScreenHandler {
         }
 
         return copy;
+    }
+
+    /** Returns the position of the Transfer Table in the world. */
+    public BlockPos getTablePos() {
+        return tablePos;
     }
 
     @Override
