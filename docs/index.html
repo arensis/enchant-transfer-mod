@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enchant Transfer — Minecraft Fabric Mod</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+:root {
+  --ground: #0d0f1a;
+  --surface: #151829;
+  --surface-raised: #1c2038;
+  --gold: #d2962a;
+  --gold-dim: #a07020;
+  --cyan: #3ecfcf;
+  --purple: #8b5cf6;
+  --red: #e05555;
+  --green: #4caf50;
+  --yellow: #e0b040;
+  --blue-card: #5b8dd9;
+  --black-card: #555;
+  --text: #c8c0b0;
+  --text-dim: #887e70;
+  --text-bright: #eae4da;
+  --border: #2a2d44;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --ground: #f0ece4;
+    --surface: #e8e2d6;
+    --surface-raised: #ddd6c8;
+    --gold: #a07020;
+    --gold-dim: #8a6018;
+    --cyan: #1a8a8a;
+    --purple: #6d3fcf;
+    --red: #c03030;
+    --green: #2d8030;
+    --yellow: #9a7020;
+    --blue-card: #3a6ab8;
+    --black-card: #444;
+    --text: #3a3428;
+    --text-dim: #6a6050;
+    --text-bright: #1a1610;
+    --border: #c8c0b0;
+  }
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--ground);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 4rem;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.header-logo {
+  width: 96px;
+  height: 96px;
+  image-rendering: pixelated;
+  margin-bottom: 1rem;
+}
+
+h1, h2, h3 {
+  font-family: 'Cinzel', 'Georgia', serif;
+  color: var(--text-bright);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: var(--text-dim);
+  margin-bottom: 0.6rem;
+  max-width: 55ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.requires {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.requires strong {
+  color: var(--text);
+}
+
+.links {
+  margin-top: 0.8rem;
+  font-size: 0.85rem;
+}
+
+.links a {
+  color: var(--cyan);
+  text-decoration: none;
+}
+
+.links a:hover { text-decoration: underline; }
+
+.links .sep { color: var(--text-dim); margin: 0 0.5rem; }
+
+h2 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+h2 .accent { color: var(--gold); }
+
+h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+p { margin-bottom: 1rem; max-width: 65ch; }
+
+ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+ul li {
+  padding-left: 1.2rem;
+  position: relative;
+  max-width: 65ch;
+}
+
+ul li::before {
+  content: '◆';
+  position: absolute;
+  left: 0;
+  color: var(--gold-dim);
+  font-size: 0.6rem;
+  top: 0.45em;
+}
+
+/* Feature grid */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 600px) {
+  .feature-grid { grid-template-columns: 1fr; }
+}
+
+.feature-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem;
+}
+
+.feature-card h3 {
+  margin-top: 0;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.feature-card p {
+  font-size: 0.9rem;
+  margin-bottom: 0;
+  color: var(--text-dim);
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  vertical-align: middle;
+}
+
+.badge-new { background: var(--cyan); color: var(--ground); }
+.badge-updated { background: var(--purple); color: #fff; }
+
+/* Card sprites row */
+.card-sprites {
+  display: flex;
+  gap: 0.6rem;
+  margin: 1rem 0 1.5rem;
+  flex-wrap: wrap;
+}
+
+.card-sprite {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.card-sprite img {
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+}
+
+.card-sprite span {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Card type table */
+.card-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.card-table-wrap { overflow-x: auto; }
+
+.card-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-bright);
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--border);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.card-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.card-table tr:last-child td { border-bottom: none; }
+
+.card-table .card-icon {
+  width: 24px;
+  height: 24px;
+  image-rendering: pixelated;
+  vertical-align: middle;
+  margin-right: 0.4rem;
+}
+
+/* GUI showcase */
+.gui-showcase {
+  display: flex;
+  gap: 1rem;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.gui-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gui-item img {
+  width: 200px;
+  height: 200px;
+  image-rendering: pixelated;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.gui-item span {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.gui-caption {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.5rem;
+  max-width: 100%;
+}
+
+/* Recipe block */
+.recipe {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.recipe-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.6rem;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 3px;
+  margin-bottom: 0.7rem;
+  max-width: 240px;
+}
+
+.recipe-cell {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.recipe-result {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.recipe-result strong { color: var(--text); }
+
+/* Callout */
+.callout {
+  background: var(--surface);
+  border-left: 3px solid var(--cyan);
+  border-radius: 0 6px 6px 0;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.9rem;
+}
+
+.callout p { margin-bottom: 0.4rem; }
+.callout p:last-child { margin-bottom: 0; }
+
+.callout .label {
+  color: var(--cyan);
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Compatibility */
+.compat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0;
+}
+
+.compat h3 { margin-top: 0; color: var(--green); }
+.compat p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+.compat p:last-child { margin-bottom: 0; }
+
+/* Separator */
+hr.sep {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* Footer */
+.footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+.footer a { color: var(--cyan); text-decoration: none; }
+.footer a:hover { text-decoration: underline; }
+
+@media (max-width: 500px) {
+  .page { padding: 2rem 1rem 3rem; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.15rem; }
+  .gui-item img { width: 150px; height: 150px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <img class="header-logo" src="images/transfer_table_logo.png" alt="Transfer Table">
+    <h1>Enchant Transfer</h1>
+    <p class="subtitle">Extract, transfer, and combine enchantments through Magic Cards — now with colored cards, attachable modules, and an XP conversion system.</p>
+    <p class="requires"><strong>Requires:</strong> Fabric Loader and Fabric API · Minecraft 1.21.11</p>
+    <p class="links">
+      <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a>
+      <span class="sep">·</span>
+      <a href="https://github.com/arensis/enchant-transfer-mod">GitHub</a>
+      <span class="sep">·</span>
+      <a href="https://github.com/arensis/enchant-transfer-mod/issues">Issues</a>
+    </p>
+  </div>
+
+  <!-- OVERVIEW -->
+  <p><strong>Enchant Transfer</strong> adds a craftable block — the <strong>Transfer Table</strong> — that lets you extract enchantments from any item into individual <strong>Magic Cards</strong>, apply those cards to other compatible items, and combine two cards of the same enchantment and level to upgrade them. All operations are free (no XP cost), and vanilla enchantment compatibility rules are respected.</p>
+
+  <p>Version 2.0 introduces the <strong>Module System</strong>: specialized blocks that attach to the Transfer Table on any face, extending its capabilities. The first module — the <strong>Infusion Coil</strong> — converts Magic Cards into stored XP and fills glass bottles into Bottles o' Enchanting.</p>
+
+  <!-- FEATURES -->
+  <h2><span class="accent">Core</span> Features</h2>
+
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h3>Extract</h3>
+      <p>Remove enchantments from any enchanted item or book. Each enchantment becomes its own Magic Card, color-coded by category.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Apply</h3>
+      <p>Place a Magic Card and a target item in the Transfer Table. The enchantment transfers instantly, respecting vanilla incompatibility rules.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Combine</h3>
+      <p>Two cards of the same enchantment and level produce one card of the next level, up to vanilla maximum. Stacks work too — 5 + 6 cards yields 5 upgraded and 1 remainder.</p>
+    </div>
+    <div class="feature-card">
+      <h3>Zero cost</h3>
+      <p>All Transfer Table operations — extraction, application, and combination — are completely free. No XP, no materials consumed.</p>
+    </div>
+  </div>
+
+  <!-- TYPED CARDS -->
+  <h2><span class="accent">Typed</span> Magic Cards <span class="badge badge-new">New</span></h2>
+
+  <p>Magic Cards are now color-coded by enchantment category. When you extract an enchantment, the Transfer Table automatically produces a card of the matching color.</p>
+
+  <div class="card-sprites">
+    <div class="card-sprite">
+      <img src="images/magic_card_blue.png" alt="Blue Card">
+      <span>Protection</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/magic_card_green.png" alt="Green Card">
+      <span>Nature</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/magic_card_red.png" alt="Red Card">
+      <span>Combat</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/magic_card_yellow.png" alt="Yellow Card">
+      <span>Utility</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/magic_card_purple.png" alt="Purple Card">
+      <span>Arcane</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/magic_card_black.png" alt="Black Card">
+      <span>Curse</span>
+    </div>
+  </div>
+
+  <div class="card-table-wrap">
+    <table class="card-table">
+      <thead>
+        <tr>
+          <th>Card</th>
+          <th>Category</th>
+          <th>Enchantments</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><img class="card-icon" src="images/magic_card_blue.png" alt="">Blue</td>
+          <td>Protection</td>
+          <td>Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling</td>
+        </tr>
+        <tr>
+          <td><img class="card-icon" src="images/magic_card_green.png" alt="">Green</td>
+          <td>Nature</td>
+          <td>Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune</td>
+        </tr>
+        <tr>
+          <td><img class="card-icon" src="images/magic_card_red.png" alt="">Red</td>
+          <td>Combat</td>
+          <td>Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge</td>
+        </tr>
+        <tr>
+          <td><img class="card-icon" src="images/magic_card_yellow.png" alt="">Yellow</td>
+          <td>Utility</td>
+          <td>Efficiency, Unbreaking, Mending, Swift Sneak, Infinity, Power, Punch</td>
+        </tr>
+        <tr>
+          <td><img class="card-icon" src="images/magic_card_purple.png" alt="">Purple</td>
+          <td>Arcane</td>
+          <td>Channeling, Riptide, Loyalty, Frost Walker</td>
+        </tr>
+        <tr>
+          <td><img class="card-icon" src="images/magic_card_black.png" alt="">Black</td>
+          <td>Curse</td>
+          <td>Curse of Vanishing, Curse of Binding</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- MODULE SYSTEM -->
+  <h2><span class="accent">Module</span> System <span class="badge badge-new">New</span></h2>
+
+  <p>The Transfer Table now works as a <strong>hub</strong>. Specialized module blocks can be placed on any of its 6 faces. Right-click the Transfer Table to open the <strong>Selector Screen</strong> — a visual hub showing all connected modules with their real-time status.</p>
+
+  <ul>
+    <li>Up to 6 modules per Transfer Table (one per face)</li>
+    <li>Each module type adds different functionality</li>
+    <li>Navigate between the hub and any module using the dot navigation bar</li>
+    <li>Modules show live status in the Selector — processing progress, tank levels, and connection state</li>
+  </ul>
+
+  <h3>GUI Screens</h3>
+
+  <div class="gui-showcase">
+    <div class="gui-item">
+      <img src="images/gui_selector.png" alt="Selector Screen">
+      <span>Selector</span>
+    </div>
+    <div class="gui-item">
+      <img src="images/gui_core.png" alt="Core Screen">
+      <span>Transfer Table</span>
+    </div>
+    <div class="gui-item">
+      <img src="images/gui_infusor.png" alt="Infusor Screen">
+      <span>Infusion Coil</span>
+    </div>
+  </div>
+  <p class="gui-caption">Static GUI backgrounds — dynamic elements (wires, tank fills, module icons, progress) are drawn by code at runtime.</p>
+
+  <!-- INFUSION COIL -->
+  <h2><span class="accent">Infusion</span> Coil <span class="badge badge-new">New</span></h2>
+
+  <p>The first module for the Transfer Table. A vertical flask made of copper, brass, and glass that converts Magic Cards into XP.</p>
+
+  <h3>How it works</h3>
+  <ul>
+    <li>Insert a Magic Card into the card slot — the coil processes it over ~10 seconds</li>
+    <li>XP is stored in an internal tank (1,000 XP capacity)</li>
+    <li>Place glass bottles in the bottle slot to extract XP as Bottles o' Enchanting (7 XP per bottle)</li>
+    <li>Unenchanted cards yield a minimum of 5 XP; enchanted cards yield more based on their enchantment</li>
+  </ul>
+
+  <div class="callout">
+    <p class="label">Tip</p>
+    <p>The Infusion Coil stays vertical regardless of which face it's attached to. The copper connector stub always points toward the Transfer Table.</p>
+  </div>
+
+  <div class="recipe">
+    <div class="recipe-title">Crafting Recipe</div>
+    <div class="recipe-grid">
+      <div class="recipe-cell">Glass Bottle</div>
+      <div class="recipe-cell">XP Bottle</div>
+      <div class="recipe-cell">Glass Bottle</div>
+      <div class="recipe-cell">Emerald</div>
+      <div class="recipe-cell">Transfer Table</div>
+      <div class="recipe-cell">Emerald</div>
+      <div class="recipe-cell">Glass Bottle</div>
+      <div class="recipe-cell">Amethyst</div>
+      <div class="recipe-cell">Glass Bottle</div>
+    </div>
+    <p class="recipe-result">→ <strong>Infusion Coil</strong> × 1</p>
+  </div>
+
+  <hr class="sep">
+
+  <!-- TRANSFER TABLE -->
+  <h2><span class="accent">Transfer</span> Table</h2>
+
+  <div class="recipe">
+    <div class="recipe-title">Crafting Recipe</div>
+    <div class="recipe-grid">
+      <div class="recipe-cell">Gold Ingot</div>
+      <div class="recipe-cell">Gold Ingot</div>
+      <div class="recipe-cell">Gold Ingot</div>
+      <div class="recipe-cell">Redstone</div>
+      <div class="recipe-cell">Redstone</div>
+      <div class="recipe-cell">Redstone</div>
+      <div class="recipe-cell">Coal</div>
+      <div class="recipe-cell">Diamond</div>
+      <div class="recipe-cell">Coal</div>
+    </div>
+    <p class="recipe-result">→ <strong>Transfer Table</strong> × 1 · Requires an <strong>iron pickaxe</strong> or better to mine.</p>
+  </div>
+
+  <p>The 3D model reflects its recipe — gold on the outer edge, redstone in the middle ring, carbon-black inner layer, and a blue diamond core that glows from every angle.</p>
+
+  <hr class="sep">
+
+  <!-- COMPATIBILITY -->
+  <div class="compat">
+    <h3>Compatibility with 1.0.x worlds</h3>
+    <p>Worlds created with Enchant Transfer 1.0.x are <strong>fully compatible</strong>. Existing Transfer Tables keep working — the block ID hasn't changed.</p>
+    <p>Old Magic Cards stored in chests retain their enchantment data. They will appear as the generic (blank) card variant; their functionality is unchanged. New cards extracted after updating will automatically use the color-coded system.</p>
+  </div>
+
+  <!-- CHANGELOG -->
+  <h2><span class="accent">Changelog</span> — 2.0.0</h2>
+
+  <ul>
+    <li><strong>Module System</strong> — The Transfer Table is now a modular hub that accepts specialized blocks on any of its 6 faces</li>
+    <li><strong>Infusion Coil</strong> — First module: converts Magic Cards into XP, fills glass bottles into Bottles o' Enchanting</li>
+    <li><strong>Typed Magic Cards</strong> — 6 color-coded card variants by enchantment category (Protection, Nature, Combat, Utility, Arcane, Curse)</li>
+    <li><strong>Selector Screen</strong> — New hub GUI with live module status, wires, and processing indicators</li>
+    <li><strong>Redesigned GUIs</strong> — Dark starry aesthetic, golden/cyan accents, navigation dot bar, ghost input hints</li>
+    <li><strong>New 3D models</strong> — Custom Transfer Table model with stepped funnel and emissive diamond core; Infusion Coil flask with copper/brass/glass and fluid renderer</li>
+    <li><strong>Block Entity Renderers</strong> — Pulsing blue core for the Transfer Table; fluid fill animation, cap glow, and directional connector for the Infusion Coil</li>
+  </ul>
+
+  <div class="footer">
+    <p>If you enjoy the mod, consider supporting its development — any contribution is greatly appreciated!</p>
+    <p style="margin-top: 0.5rem;"><a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a> <span class="sep">·</span> <a href="https://github.com/arensis/enchant-transfer-mod">GitHub</a></p>
+  </div>
+
+</div>
+</body>
+</html>
