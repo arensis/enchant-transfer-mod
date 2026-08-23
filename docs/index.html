@@ -613,6 +613,74 @@ hr.sep {
     <p class="recipe-result">→ <strong>Infusion Coil</strong> × 1</p>
   </div>
 
+  <!-- ZINC SMELTER -->
+  <h2><span class="accent">Zinc</span> Smelter <span class="badge badge-new">New</span></h2>
+
+  <p>A standalone steampunk furnace for zinc processing and brass alloy creation. The <strong>Zinc Smelter</strong> is an ornate kiln made of copper, brass, and iron with a glass viewport, decorative bands, and a chimney that emits smoke and lava particles when lit.</p>
+
+  <h3>New Materials</h3>
+
+  <div class="card-sprites">
+    <div class="card-sprite">
+      <img src="images/zinc_oxide.png" alt="Zinc Oxide">
+      <span>Zinc Oxide</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/zinc_sheet.png" alt="Zinc Sheet">
+      <span>Zinc Sheet</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/brass_ingot.png" alt="Brass Ingot">
+      <span>Brass Ingot</span>
+    </div>
+  </div>
+
+  <h3>Processing Chain</h3>
+
+  <p>The Zinc Smelter accepts up to two inputs and one fuel source. Three smelting recipes form a material chain that produces <strong>Brass Ingots</strong> — required to craft the Infusion Coil.</p>
+
+  <div class="recipe">
+    <div class="recipe-title">1. Calcination</div>
+    <div class="recipe-grid" style="grid-template-columns: 1fr auto 1fr; max-width: 320px;">
+      <div class="recipe-cell">Calcite</div>
+      <div class="recipe-cell" style="background: none; border: none; color: var(--gold);">→</div>
+      <div class="recipe-cell">Zinc Oxide ×2</div>
+    </div>
+  </div>
+
+  <div class="recipe">
+    <div class="recipe-title">2. Reduction</div>
+    <div class="recipe-grid" style="grid-template-columns: 1fr 1fr auto 1fr; max-width: 380px;">
+      <div class="recipe-cell">Zinc Oxide</div>
+      <div class="recipe-cell">Coal</div>
+      <div class="recipe-cell" style="background: none; border: none; color: var(--gold);">→</div>
+      <div class="recipe-cell">Zinc Sheet</div>
+    </div>
+  </div>
+
+  <div class="recipe">
+    <div class="recipe-title">3. Alloying</div>
+    <div class="recipe-grid" style="grid-template-columns: 1fr 1fr auto 1fr; max-width: 380px;">
+      <div class="recipe-cell">Copper Ingot</div>
+      <div class="recipe-cell">Zinc Sheet</div>
+      <div class="recipe-cell" style="background: none; border: none; color: var(--gold);">→</div>
+      <div class="recipe-cell">Brass Ingot</div>
+    </div>
+  </div>
+
+  <h3>Fuel</h3>
+  <p>The Zinc Smelter only accepts <strong>Lava Buckets</strong> and <strong>Blaze Rods</strong> as fuel — no coal or wood. Lava Buckets return an empty bucket after consumption.</p>
+
+  <h3>GUI</h3>
+
+  <div class="gui-showcase">
+    <div class="gui-item">
+      <img src="images/gui_zinc_smelter.png" alt="Zinc Smelter GUI">
+      <span>Zinc Smelter</span>
+    </div>
+  </div>
+  <p class="gui-caption">Steampunk-themed interface with copper input slots, a lava-bordered fuel slot, and brass output slot. Fire indicator and progress arrow animate during smelting.</p>
+
   <hr class="sep">
 
   <!-- TRANSFER TABLE -->
@@ -651,6 +719,8 @@ hr.sep {
   <ul>
     <li><strong>Module System</strong> — The Transfer Table is now a modular hub that accepts specialized blocks on any of its 6 faces</li>
     <li><strong>Infusion Coil</strong> — First module: converts Magic Cards into XP, fills glass bottles into Bottles o' Enchanting</li>
+    <li><strong>Zinc Smelter</strong> — Steampunk furnace for zinc processing: Calcite → Zinc Oxide → Zinc Sheet → Brass Ingot</li>
+    <li><strong>New Materials</strong> — Zinc Oxide, Zinc Sheet, and Brass Ingot with custom textures and item models</li>
     <li><strong>Typed Magic Cards</strong> — 6 color-coded card variants by enchantment category (Protection, Nature, Combat, Utility, Arcane, Curse)</li>
     <li><strong>Selector Screen</strong> — New hub GUI with live module status, wires, and processing indicators</li>
     <li><strong>Redesigned GUIs</strong> — Dark starry aesthetic, golden/cyan accents, navigation dot bar, ghost input hints</li>

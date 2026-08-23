@@ -110,6 +110,36 @@ Unenchanted cards yield a minimum of 5 XP; enchanted cards yield more based on t
 
 ---
 
+## Zinc Smelter
+
+A standalone steampunk furnace for zinc processing and brass alloy creation. An ornate kiln made of copper, brass, and iron with a glass viewport and chimney.
+
+### New Materials
+
+<img src="docs/images/zinc_oxide.png" width="48" style="image-rendering: pixelated;" alt="Zinc Oxide"> <img src="docs/images/zinc_sheet.png" width="48" style="image-rendering: pixelated;" alt="Zinc Sheet"> <img src="docs/images/brass_ingot.png" width="48" style="image-rendering: pixelated;" alt="Brass Ingot">
+
+### Processing Chain
+
+Three smelting recipes form a material chain that produces **Brass Ingots** — required to craft the Infusion Coil.
+
+| Step | Input(s) | Output |
+|------|----------|--------|
+| 1. Calcination | Calcite | Zinc Oxide ×2 |
+| 2. Reduction | Zinc Oxide + Coal | Zinc Sheet |
+| 3. Alloying | Copper Ingot + Zinc Sheet | Brass Ingot |
+
+### Fuel
+
+The Zinc Smelter only accepts **Lava Buckets** and **Blaze Rods** as fuel — no coal or wood. Lava Buckets return an empty bucket after consumption.
+
+### GUI
+
+<img src="docs/images/gui_zinc_smelter.png" width="200" alt="Zinc Smelter GUI">
+
+*Steampunk-themed interface with copper input slots, a lava-bordered fuel slot, and brass output slot.*
+
+---
+
 ## Transfer Table
 
 ### Crafting Recipe
@@ -138,6 +168,8 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 - **Module System** — The Transfer Table is now a modular hub that accepts specialized blocks on any of its 6 faces
 - **Infusion Coil** — First module: converts Magic Cards into XP, fills glass bottles into Bottles o' Enchanting
+- **Zinc Smelter** — Steampunk furnace for zinc processing: Calcite → Zinc Oxide → Zinc Sheet → Brass Ingot
+- **New Materials** — Zinc Oxide, Zinc Sheet, and Brass Ingot with custom textures and item models
 - **Typed Magic Cards** — 6 color-coded card variants by enchantment category (Protection, Nature, Combat, Utility, Arcane, Curse)
 - **Selector Screen** — New hub GUI with live module status, wires, and processing indicators
 - **Redesigned GUIs** — Dark starry aesthetic, golden/cyan accents, navigation dot bar, ghost input hints
