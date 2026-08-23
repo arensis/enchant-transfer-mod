@@ -223,10 +223,14 @@ public class InfusionCoilRenderer
       float fluidSurfaceY = FLUID_Y_BASE + state.fillRatio * (FLUID_Y_MAX - FLUID_Y_BASE);
       float dropStartY    = 8.5f / 16f;  // just below the body/neck join
       if (dropStartY > fluidSurfaceY) {
-        // Centre of the drop falls linearly with dripProgress (0 → 1).
-        float dropCenterY = dropStartY + state.dripProgress * (fluidSurfaceY - dropStartY);
-        float dropY0 = dropCenterY - DRIP_HEIGHT * 0.5f;
-        float dropY1 = dropCenterY + DRIP_HEIGHT * 0.5f;
+        // The drop's BOTTOM (not its centre) ends on the fluid surface — a
+        // bead of liquid sits on top of the pool, it doesn't sink half-way
+        // through.  When the tank is empty (surface == FLUID_Y_BASE) this
+        // also stops the drop from clipping below the cavity floor, which
+        // made the animation read as off-centre / cut at the end.
+        float dropBottomY = dropStartY + state.dripProgress * (fluidSurfaceY - dropStartY);
+        float dropY0 = dropBottomY;
+        float dropY1 = dropBottomY + DRIP_HEIGHT;
         final float dy0 = dropY0, dy1 = dropY1;
         queue.submitCustom(matrices, layer, (entry, vc) ->
           drawBox(entry, vc,
@@ -276,7 +280,10 @@ public class InfusionCoilRenderer
         tubeSegment(dir, TUBE_FLANGE_MIN, TUBE_FLANGE_MAX,
                     TUBE_LENGTH - TUBE_FLANGE_DEPTH, TUBE_LENGTH);
 
-      queue.submitCustom(matrices, layer, (entry, vc) -> {
+      // entityCutout writes depth — prevents translucent-sorting glitches
+      // where back faces show through at oblique camera angles.
+      RenderLayer tubeLayer = RenderLayers.entityCutout(WHITE_TEXTURE);
+      queue.submitCustom(matrices, tubeLayer, (entry, vc) -> {
         drawBox(entry, vc,
           flangeNear[0], flangeNear[1], flangeNear[2],
           flangeNear[3], flangeNear[4], flangeNear[5],
@@ -322,12 +329,15 @@ public class InfusionCoilRenderer
                               float x0, float y0, float z0,
                               float x1, float y1, float z1,
                               float r,  float g,  float b,  float a) {
-    quad(entry, vc, x0,y0,z1, x1,y0,z1, x1,y0,z0, x0,y0,z0, r,g,b,a,  0f,-1f, 0f); // -Y
-    quad(entry, vc, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, r,g,b,a,  0f, 1f, 0f); // +Y
-    quad(entry, vc, x0,y1,z0, x0,y0,z0, x1,y0,z0, x1,y1,z0, r,g,b,a,  0f, 0f,-1f); // -Z
-    quad(entry, vc, x1,y1,z1, x1,y0,z1, x0,y0,z1, x0,y1,z1, r,g,b,a,  0f, 0f, 1f); // +Z
-    quad(entry, vc, x0,y1,z1, x0,y0,z1, x0,y0,z0, x0,y1,z0, r,g,b,a, -1f, 0f, 0f); // -X
-    quad(entry, vc, x1,y1,z0, x1,y0,z0, x1,y0,z1, x1,y1,z1, r,g,b,a,  1f, 0f, 0f); // +X
+    // Winding matches outward-facing for entityCutout backface culling.
+    // Directional shading so the box reads as 3D.
+    float sY0 = 0.35f, sY1 = 1.00f, sZ = 0.70f, sX = 0.50f;
+    quad(entry, vc, x0,y0,z0, x1,y0,z0, x1,y0,z1, x0,y0,z1, r*sY0,g*sY0,b*sY0,a,  0f,-1f, 0f); // -Y
+    quad(entry, vc, x0,y1,z1, x1,y1,z1, x1,y1,z0, x0,y1,z0, r*sY1,g*sY1,b*sY1,a,  0f, 1f, 0f); // +Y
+    quad(entry, vc, x0,y1,z0, x1,y1,z0, x1,y0,z0, x0,y0,z0, r*sZ, g*sZ, b*sZ, a,  0f, 0f,-1f); // -Z
+    quad(entry, vc, x1,y1,z1, x0,y1,z1, x0,y0,z1, x1,y0,z1, r*sZ, g*sZ, b*sZ, a,  0f, 0f, 1f); // +Z
+    quad(entry, vc, x0,y1,z1, x0,y1,z0, x0,y0,z0, x0,y0,z1, r*sX, g*sX, b*sX, a, -1f, 0f, 0f); // -X
+    quad(entry, vc, x1,y1,z0, x1,y1,z1, x1,y0,z1, x1,y0,z0, r*sX, g*sX, b*sX, a,  1f, 0f, 0f); // +X
   }
 
   private static void quad(MatrixStack.Entry entry, VertexConsumer vc,

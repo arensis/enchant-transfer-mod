@@ -39,8 +39,9 @@ public class TransferTableRenderer
     // ── Core cube ────────────────────────────────────────────────────────────
     private static final float CORE_MIN = 5f  / 16f;
     private static final float CORE_MAX = 11f / 16f;
-    // Core glow colour (#46AFEB — blue/cyan)
-    private static final float CR = 0.27f, CG = 0.69f, CB = 0.92f;
+    // Core glow colour — boosted from #46AFEB so it reads as a bright
+    // cyan even after world-lighting attenuation in debugFilledBox.
+    private static final float CR = 0.45f, CG = 0.85f, CB = 1.0f;
 
     // ── Tube geometry ────────────────────────────────────────────────────────
     // Tube length from the block face to the core boundary = 5 px.  Same
@@ -57,7 +58,7 @@ public class TransferTableRenderer
     // reported the cyan glow bleeding through the brida again.  0.15/16
     // is still sub-pixel at default texture-pack scale (invisible visually)
     // but well over any reasonable polygon-offset magnitude.
-    private static final float TUBE_LENGTH       = 4.85f / 16f;
+    private static final float TUBE_LENGTH       = 4.5f / 16f;
     private static final float TUBE_FLANGE_DEPTH = 0.8f  / 16f;
 
     // Same two-tone copper as the coil tube
@@ -110,16 +111,12 @@ public class TransferTableRenderer
                        MatrixStack matrices,
                        OrderedRenderCommandQueue queue,
                        CameraRenderState cameraState) {
-        float alpha = 0.40f + 0.40f * (0.5f + 0.5f * (float) Math.sin(state.animTime));
+        float alpha = 0.55f + 0.45f * (0.5f + 0.5f * (float) Math.sin(state.animTime));
 
-        // 1 — Core pulse on debugFilledBox.  Its VIEW_OFFSET_Z_LAYERING
-        //     polygon offset is what makes the pulse visible OVER the baked
-        //     diamond cube of the block model — without it the two
-        //     coplanar surfaces at [5..11]/16 z-fight and flicker.  The
-        //     conflict with the connector that this offset used to cause is
-        //     now avoided geometrically: the tube brida is shortened by
-        //     0.05/16 (see TUBE_LENGTH) so it never shares the z=5/16 plane
-        //     with the core face.
+        // 1 — Pulsing core overlay.  debugFilledBox (POSITION_COLOR) avoids
+        //     the polygon-offset and translucent-sorting artefacts that
+        //     entityTranslucentEmissive causes on this in-block geometry.
+        //     Brighter RGB values compensate for world-lighting attenuation.
         queue.submitCustom(matrices, RenderLayers.debugFilledBox(), (entry, vc) ->
                 colorBox(entry, vc,
                         CORE_MIN, CORE_MIN, CORE_MIN,
@@ -133,7 +130,10 @@ public class TransferTableRenderer
         //     The coil renderer doesn't add a tube for vertical because its
         //     centre column is occupied by the flask geometry — the docking
         //     brida is enough to read the connection cleanly.
-        RenderLayer tubeLayer = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
+        // entityCutout writes depth — prevents translucent-sorting glitches
+        // where back faces of the tube show through the core glow at
+        // oblique angles.
+        RenderLayer tubeLayer = RenderLayers.entityCutout(WHITE_TEXTURE);
         for (Direction dir : Direction.values()) {
             if (!state.connectedFaces[dir.ordinal()]) continue;
             drawTube(matrices, queue, tubeLayer, dir);
@@ -230,12 +230,15 @@ public class TransferTableRenderer
                                        float x0, float y0, float z0,
                                        float x1, float y1, float z1,
                                        float r, float g, float b, float a) {
-        eq(entry, vc, x0,y0,z1, x1,y0,z1, x1,y0,z0, x0,y0,z0, r,g,b,a,  0f,-1f, 0f); // -Y
-        eq(entry, vc, x0,y1,z0, x1,y1,z0, x1,y1,z1, x0,y1,z1, r,g,b,a,  0f, 1f, 0f); // +Y
-        eq(entry, vc, x0,y1,z0, x0,y0,z0, x1,y0,z0, x1,y1,z0, r,g,b,a,  0f, 0f,-1f); // -Z
-        eq(entry, vc, x1,y1,z1, x1,y0,z1, x0,y0,z1, x0,y1,z1, r,g,b,a,  0f, 0f, 1f); // +Z
-        eq(entry, vc, x0,y1,z1, x0,y0,z1, x0,y0,z0, x0,y1,z0, r,g,b,a, -1f, 0f, 0f); // -X
-        eq(entry, vc, x1,y1,z0, x1,y0,z0, x1,y0,z1, x1,y1,z1, r,g,b,a,  1f, 0f, 0f); // +X
+        // Winding matches colorBox (outward-facing for entityCutout culling).
+        // Directional shading so the box reads as 3D.
+        float sY0 = 0.35f, sY1 = 1.00f, sZ = 0.70f, sX = 0.50f;
+        eq(entry, vc, x0,y0,z0, x1,y0,z0, x1,y0,z1, x0,y0,z1, r*sY0,g*sY0,b*sY0,a,  0f,-1f, 0f); // -Y
+        eq(entry, vc, x0,y1,z1, x1,y1,z1, x1,y1,z0, x0,y1,z0, r*sY1,g*sY1,b*sY1,a,  0f, 1f, 0f); // +Y
+        eq(entry, vc, x0,y1,z0, x1,y1,z0, x1,y0,z0, x0,y0,z0, r*sZ, g*sZ, b*sZ, a,  0f, 0f,-1f); // -Z
+        eq(entry, vc, x1,y1,z1, x0,y1,z1, x0,y0,z1, x1,y0,z1, r*sZ, g*sZ, b*sZ, a,  0f, 0f, 1f); // +Z
+        eq(entry, vc, x0,y1,z1, x0,y1,z0, x0,y0,z0, x0,y0,z1, r*sX, g*sX, b*sX, a, -1f, 0f, 0f); // -X
+        eq(entry, vc, x1,y1,z0, x1,y1,z1, x1,y0,z1, x1,y0,z0, r*sX, g*sX, b*sX, a,  1f, 0f, 0f); // +X
     }
 
     private static void eq(MatrixStack.Entry entry, VertexConsumer vc,
