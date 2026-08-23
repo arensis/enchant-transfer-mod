@@ -103,8 +103,10 @@ public class InfusionCoilRenderer
   // than a clear liquid.  Pushing R down and G up gives a vivid XP green
   // that pops against any natural background and reads clearly even when
   // the column is short (low fillRatio).
-  private static final float FLUID_R =  80 / 255f, FLUID_G = 240 / 255f,
-                              FLUID_B =  60 / 255f, FLUID_A = 1.00f;
+  // Lighter, desaturated XP green — reads as translucent liquid when
+  // seen through the glass body, even though it renders opaque.
+  private static final float FLUID_R = 120 / 255f, FLUID_G = 230 / 255f,
+                              FLUID_B = 100 / 255f, FLUID_A = 1.00f;
   // Two-tone copper for visual depth: bright (polished) flanges + a darker
   // (oxidised) central pipe.
   private static final float TUBE_PIPE_R   = 0.62f, TUBE_PIPE_G   = 0.36f, TUBE_PIPE_B   = 0.12f;
@@ -157,9 +159,23 @@ public class InfusionCoilRenderer
       state.showDrip     = tickInCycle < DRIP_VISIBLE_TICKS;
       state.dripProgress = (tickInCycle + tickDelta) / DRIP_VISIBLE_TICKS;
       if (state.dripProgress > 1f) state.dripProgress = 1f;
+
+      // Fluid bump: after the drop hits (ticks DRIP_VISIBLE_TICKS..DRIP_CYCLE_TICKS),
+      // the fluid level rises momentarily then settles back.
+      if (tickInCycle >= DRIP_VISIBLE_TICKS) {
+        int rippleTicks = DRIP_CYCLE_TICKS - DRIP_VISIBLE_TICKS;
+        float t = (tickInCycle - DRIP_VISIBLE_TICKS + tickDelta) / rippleTicks;
+        state.fluidBump     = Math.max(0f, 1f - t);
+        state.rippleProgress = Math.min(1f, t);
+      } else {
+        state.fluidBump      = 0f;
+        state.rippleProgress = 0f;
+      }
     } else {
-      state.showDrip     = false;
-      state.dripProgress = 0f;
+      state.showDrip       = false;
+      state.dripProgress   = 0f;
+      state.fluidBump      = 0f;
+      state.rippleProgress = 0f;
     }
   }
 
@@ -183,9 +199,6 @@ public class InfusionCoilRenderer
     //   • layer (entityTranslucentEmissive) — translucent + always full-
     //     bright.  Used for the drip drop, the knob pulse skin, and the
     //     tube.  These are all overlay effects that should not occlude.
-    // DIAGNOSTIC: entityCutoutNoCull instead of entityCutout, so both front
-    // AND back faces of the fluid box render — eliminates any possibility
-    // that backface culling is hiding the camera-facing faces.
     RenderLayer fluidLayer = RenderLayers.entityCutoutNoCull(WHITE_TEXTURE);
     RenderLayer layer      = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
 
@@ -199,45 +212,61 @@ public class InfusionCoilRenderer
     if (state.fillRatio > 0f) {
       float linearTop = FLUID_Y_BASE + state.fillRatio * (FLUID_Y_MAX - FLUID_Y_BASE);
       float fluidTopY = Math.min(FLUID_Y_MAX, Math.max(linearTop, FLUID_Y_BASE + FLUID_MIN_VISIBLE_HEIGHT));
+      // Bump: fluid rises momentarily after the drip impacts the surface.
+      float bumpHeight = state.fluidBump * 1.2f / 16f;
+      float finalTopY = Math.min(FLUID_Y_MAX, fluidTopY + bumpHeight);
       queue.submitCustom(matrices, fluidLayer, (entry, vc) ->
         drawBox(entry, vc,
           FLUID_X_MIN, FLUID_Y_BASE, FLUID_Z_MIN,
-          FLUID_X_MAX, fluidTopY,    FLUID_Z_MAX,
+          FLUID_X_MAX, finalTopY,    FLUID_Z_MAX,
           FLUID_R, FLUID_G, FLUID_B, FLUID_A));
     }
 
     // ── 2. DRIP ANIMATION ────────────────────────────────────────────────
-    // A small green bead falls along the central axis of the jar.  It
-    // appears just under the neck (y = 8.5/16, where the neck meets the
-    // body cavity) and falls until it touches the current fluid surface
-    // (y = fluidTop).  Then the cycle restarts.  Skipped when the tank
-    // is essentially full (no fall distance left) or not processing
-    // (state.showDrip already gates that).
-    //
-    // Rendered on the entityTranslucentEmissive layer so the drop reads
-    // as a luminous XP bead instead of a dull cube.  Because that layer
-    // doesn't write depth, the visible portion of the bead naturally
-    // gets occluded by the opaque fluid column once it crosses the
-    // surface — the bead appears to "merge" into the liquid.
+    // A small green bead falls along the central axis of the jar, from
+    // the neck down to the current fluid surface.  Uses drawBoxFlat
+    // (no directional shading) so the tiny bead reads as a uniform
+    // luminous drop instead of looking asymmetric.
     if (state.showDrip && state.fillRatio < 1.0f) {
       float fluidSurfaceY = FLUID_Y_BASE + state.fillRatio * (FLUID_Y_MAX - FLUID_Y_BASE);
-      float dropStartY    = 8.5f / 16f;  // just below the body/neck join
+      float dropStartY    = 8.5f / 16f;
       if (dropStartY > fluidSurfaceY) {
-        // The drop's BOTTOM (not its centre) ends on the fluid surface — a
-        // bead of liquid sits on top of the pool, it doesn't sink half-way
-        // through.  When the tank is empty (surface == FLUID_Y_BASE) this
-        // also stops the drop from clipping below the cavity floor, which
-        // made the animation read as off-centre / cut at the end.
         float dropBottomY = dropStartY + state.dripProgress * (fluidSurfaceY - dropStartY);
         float dropY0 = dropBottomY;
         float dropY1 = dropBottomY + DRIP_HEIGHT;
         final float dy0 = dropY0, dy1 = dropY1;
         queue.submitCustom(matrices, layer, (entry, vc) ->
-          drawBox(entry, vc,
+          drawBoxFlat(entry, vc,
             0.5f - DRIP_HALF_WIDTH, dy0, 0.5f - DRIP_HALF_DEPTH,
             0.5f + DRIP_HALF_WIDTH, dy1, 0.5f + DRIP_HALF_DEPTH,
             FLUID_R, FLUID_G, FLUID_B, FLUID_A));
       }
+    }
+
+    // ── 2b. RIPPLE RING on fluid surface after drip impact ───────────────
+    // Expanding ring drawn well above the opaque fluid (0.5/16 offset)
+    // to avoid z-fighting with the depth-writing fluid layer.
+    if (state.rippleProgress > 0f && state.rippleProgress < 1f && state.fillRatio > 0f) {
+      float fluidSurfaceY = FLUID_Y_BASE + state.fillRatio * (FLUID_Y_MAX - FLUID_Y_BASE);
+      float bumpH = state.fluidBump * 1.2f / 16f;
+      float rippleY = Math.max(fluidSurfaceY + bumpH, FLUID_Y_BASE + FLUID_MIN_VISIBLE_HEIGHT) + 0.5f / 16f;
+      float maxRadius = 3.0f / 16f;
+      float radius = 0.5f / 16f + state.rippleProgress * maxRadius;
+      float rippleAlpha = 0.85f * (1f - state.rippleProgress);
+      float rippleH = 0.4f / 16f;
+
+      final float rY0 = rippleY, rY1 = rippleY + rippleH;
+      final float rOut = radius;
+      final float rA = rippleAlpha;
+      final float rR = Math.min(1f, FLUID_R * 1.5f);
+      final float rG = Math.min(1f, FLUID_G * 1.2f);
+      final float rB = Math.min(1f, FLUID_B * 1.3f);
+
+      queue.submitCustom(matrices, layer, (entry, vc) ->
+        drawBoxFlat(entry, vc,
+                0.5f - rOut, rY0, 0.5f - rOut,
+                0.5f + rOut, rY1, 0.5f + rOut,
+                rR, rG, rB, rA));
     }
 
     // ── 3. KNOB PULSE (only while processing) ────────────────────────────
@@ -338,6 +367,19 @@ public class InfusionCoilRenderer
     quad(entry, vc, x1,y1,z1, x0,y1,z1, x0,y0,z1, x1,y0,z1, r*sZ, g*sZ, b*sZ, a,  0f, 0f, 1f); // +Z
     quad(entry, vc, x0,y1,z1, x0,y1,z0, x0,y0,z0, x0,y0,z1, r*sX, g*sX, b*sX, a, -1f, 0f, 0f); // -X
     quad(entry, vc, x1,y1,z0, x1,y1,z1, x1,y0,z1, x1,y0,z0, r*sX, g*sX, b*sX, a,  1f, 0f, 0f); // +X
+  }
+
+  /** Uniform-colour box — no directional shading. Used for small emissive beads. */
+  private static void drawBoxFlat(MatrixStack.Entry entry, VertexConsumer vc,
+                                   float x0, float y0, float z0,
+                                   float x1, float y1, float z1,
+                                   float r,  float g,  float b,  float a) {
+    quad(entry, vc, x0,y0,z0, x1,y0,z0, x1,y0,z1, x0,y0,z1, r,g,b,a,  0f,-1f, 0f);
+    quad(entry, vc, x0,y1,z1, x1,y1,z1, x1,y1,z0, x0,y1,z0, r,g,b,a,  0f, 1f, 0f);
+    quad(entry, vc, x0,y1,z0, x1,y1,z0, x1,y0,z0, x0,y0,z0, r,g,b,a,  0f, 0f,-1f);
+    quad(entry, vc, x1,y1,z1, x0,y1,z1, x0,y0,z1, x1,y0,z1, r,g,b,a,  0f, 0f, 1f);
+    quad(entry, vc, x0,y1,z1, x0,y1,z0, x0,y0,z0, x0,y0,z1, r,g,b,a, -1f, 0f, 0f);
+    quad(entry, vc, x1,y1,z0, x1,y1,z1, x1,y0,z1, x1,y0,z0, r,g,b,a,  1f, 0f, 0f);
   }
 
   private static void quad(MatrixStack.Entry entry, VertexConsumer vc,

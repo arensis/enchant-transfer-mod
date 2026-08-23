@@ -33,6 +33,12 @@ public class InfusionCoilRenderState extends BlockEntityRenderState {
     /** Whether a drip drop should be drawn this frame. */
     public boolean showDrip = false;
 
+    /** 0..1 bump progress after drip impact (0 = peak, 1 = settled). */
+    public float fluidBump = 0f;
+
+    /** 0..1 ripple ring expansion after drip impact. */
+    public float rippleProgress = 0f;
+
     /**
      * Direction <em>from this coil toward the adjacent Transfer Table</em>,
      * or {@code null} when not connected. Populated by scanning adjacent
