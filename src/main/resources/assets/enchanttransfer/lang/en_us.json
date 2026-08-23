@@ -25,5 +25,10 @@
   "enchanttransfer.direction.east": "E",
   "enchanttransfer.direction.west": "W",
   "enchanttransfer.direction.up": "↑",
-  "enchanttransfer.direction.down": "↓"
+  "enchanttransfer.direction.down": "↓",
+  "block.enchanttransfer.zinc_smelter": "Zinc Smelter",
+  "item.enchanttransfer.zinc_smelter": "Zinc Smelter",
+  "item.enchanttransfer.zinc_oxide": "Zinc Oxide",
+  "item.enchanttransfer.zinc_sheet": "Zinc Sheet",
+  "item.enchanttransfer.brass_ingot": "Brass Ingot"
 }

@@ -4,9 +4,12 @@ import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilItem;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlockEntity;
+import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlock;
+import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlockEntity;
 import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreenHandler;
+import net.alfonsormadrid.enchanttransfer.screens.zincsmelter.ZincSmelterScreenHandler;
 import net.alfonsormadrid.enchanttransfer.item.CardType;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlock;
@@ -90,6 +93,39 @@ public class EnchantTransferMod implements ModInitializer {
 	public static final MagicCardItem MAGIC_CARD_PURPLE = new MagicCardItem(MAGIC_CARD_PURPLE_KEY, CardType.PURPLE);
 	public static final MagicCardItem MAGIC_CARD_BLACK  = new MagicCardItem(MAGIC_CARD_BLACK_KEY,  CardType.BLACK);
 
+	// ── Zinc Smelter ───────────────────────────────────────────────────────
+	public static final Identifier ZINC_SMELTER_BLOCK_IDENTIFIER = Identifier.of(MOD_ID, "zinc_smelter");
+
+	public static final RegistryKey<Block> ZINC_SMELTER_BLOCK_KEY =
+			RegistryKey.of(RegistryKeys.BLOCK, ZINC_SMELTER_BLOCK_IDENTIFIER);
+	public static final RegistryKey<Item> ZINC_SMELTER_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, ZINC_SMELTER_BLOCK_IDENTIFIER);
+	public static final RegistryKey<BlockEntityType<?>> ZINC_SMELTER_BLOCK_ENTITY_KEY =
+			RegistryKey.of(RegistryKeys.BLOCK_ENTITY_TYPE, ZINC_SMELTER_BLOCK_IDENTIFIER);
+
+	public static final ZincSmelterBlock ZINC_SMELTER_BLOCK = new ZincSmelterBlock(ZINC_SMELTER_BLOCK_KEY);
+	public static final Item ZINC_SMELTER_ITEM = new net.minecraft.item.BlockItem(
+			ZINC_SMELTER_BLOCK, new Item.Settings().registryKey(ZINC_SMELTER_ITEM_KEY).useBlockPrefixedTranslationKey());
+	public static BlockEntityType<ZincSmelterBlockEntity> ZINC_SMELTER_BLOCK_ENTITY =
+			FabricBlockEntityTypeBuilder.create(ZincSmelterBlockEntity::new, ZINC_SMELTER_BLOCK).build();
+
+	public static final net.minecraft.screen.ScreenHandlerType<ZincSmelterScreenHandler> ZINC_SMELTER_SCREEN_HANDLER =
+			Registry.register(Registries.SCREEN_HANDLER, ZINC_SMELTER_BLOCK_IDENTIFIER,
+					new net.minecraft.screen.ScreenHandlerType<>(ZincSmelterScreenHandler::new,
+							net.minecraft.resource.featuretoggle.FeatureFlags.VANILLA_FEATURES));
+
+	// ── Zinc Smelter items ─────────────────────────────────────────────────
+	public static final RegistryKey<Item> ZINC_OXIDE_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "zinc_oxide"));
+	public static final RegistryKey<Item> ZINC_SHEET_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "zinc_sheet"));
+	public static final RegistryKey<Item> BRASS_INGOT_ITEM_KEY =
+			RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, "brass_ingot"));
+
+	public static final Item ZINC_OXIDE_ITEM  = new Item(new Item.Settings().registryKey(ZINC_OXIDE_ITEM_KEY));
+	public static final Item ZINC_SHEET_ITEM  = new Item(new Item.Settings().registryKey(ZINC_SHEET_ITEM_KEY));
+	public static final Item BRASS_INGOT_ITEM = new Item(new Item.Settings().registryKey(BRASS_INGOT_ITEM_KEY));
+
 	// ── Infusion Coil ──────────────────────────────────────────────────────
 	public static final Identifier INFUSION_COIL_BLOCK_IDENTIFIER = Identifier.of(MOD_ID, "infusion_coil_block");
 
@@ -127,6 +163,13 @@ public class EnchantTransferMod implements ModInitializer {
 		Registry.register(Registries.ITEM, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_ITEM);
 		Registry.register(Registries.BLOCK_ENTITY_TYPE, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_BLOCK_ENTITY);
 
+		Registry.register(Registries.BLOCK, ZINC_SMELTER_BLOCK_IDENTIFIER, ZINC_SMELTER_BLOCK);
+		Registry.register(Registries.ITEM, ZINC_SMELTER_BLOCK_IDENTIFIER, ZINC_SMELTER_ITEM);
+		Registry.register(Registries.BLOCK_ENTITY_TYPE, ZINC_SMELTER_BLOCK_IDENTIFIER, ZINC_SMELTER_BLOCK_ENTITY);
+		Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "zinc_oxide"),  ZINC_OXIDE_ITEM);
+		Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "zinc_sheet"),  ZINC_SHEET_ITEM);
+		Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "brass_ingot"), BRASS_INGOT_ITEM);
+
 		Registry.register(Registries.ITEM_GROUP, ITEM_GROUP_KEY, FabricItemGroup.builder()
 				.icon(() -> new ItemStack(TRANSFER_TABLE_BLOCK))
 				.displayName(Text.translatable("itemGroup.enchanttransfer.general"))
@@ -142,6 +185,10 @@ public class EnchantTransferMod implements ModInitializer {
 			entries.add(MAGIC_CARD_YELLOW);
 			entries.add(MAGIC_CARD_PURPLE);
 			entries.add(MAGIC_CARD_BLACK);
+			entries.add(ZINC_SMELTER_ITEM);
+			entries.add(ZINC_OXIDE_ITEM);
+			entries.add(ZINC_SHEET_ITEM);
+			entries.add(BRASS_INGOT_ITEM);
 		});
 
 		// ── Custom networking ──────────────────────────────────────────────────

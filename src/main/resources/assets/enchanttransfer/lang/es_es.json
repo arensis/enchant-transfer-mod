@@ -25,5 +25,10 @@
   "enchanttransfer.direction.east": "E",
   "enchanttransfer.direction.west": "O",
   "enchanttransfer.direction.up": "↑",
-  "enchanttransfer.direction.down": "↓"
+  "enchanttransfer.direction.down": "↓",
+  "block.enchanttransfer.zinc_smelter": "Horno de Zinc",
+  "item.enchanttransfer.zinc_smelter": "Horno de Zinc",
+  "item.enchanttransfer.zinc_oxide": "Óxido de Zinc",
+  "item.enchanttransfer.zinc_sheet": "Lámina de Zinc",
+  "item.enchanttransfer.brass_ingot": "Lingote de Latón"
 }

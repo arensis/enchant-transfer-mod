@@ -6,6 +6,8 @@ import net.alfonsormadrid.enchanttransfer.renderers.TransferTableRenderer;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreen;
 import net.alfonsormadrid.enchanttransfer.screens.selector.SelectorScreen;
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScreen;
+import net.alfonsormadrid.enchanttransfer.renderers.ZincSmelterRenderer;
+import net.alfonsormadrid.enchanttransfer.screens.zincsmelter.ZincSmelterScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -29,6 +31,10 @@ public class EnchantTransferClientMod implements ClientModInitializer {
                 EnchantTransferMod.INFUSION_COIL_SCREEN_HANDLER,
                 InfusionCoilScreen::new);
 
+        HandledScreens.register(
+                EnchantTransferMod.ZINC_SMELTER_SCREEN_HANDLER,
+                ZincSmelterScreen::new);
+
         // ── Block entity renderers ────────────────────────────────────────────
         BlockEntityRendererFactories.register(
                 EnchantTransferMod.TRANSFER_TABLE_BLOCK_ENTITY,
@@ -37,6 +43,10 @@ public class EnchantTransferClientMod implements ClientModInitializer {
         BlockEntityRendererFactories.register(
                 EnchantTransferMod.INFUSION_COIL_BLOCK_ENTITY,
                 ctx -> new InfusionCoilRenderer(ctx));
+
+        BlockEntityRendererFactories.register(
+                EnchantTransferMod.ZINC_SMELTER_BLOCK_ENTITY,
+                ctx -> new ZincSmelterRenderer(ctx));
 
         // ── Render layers ─────────────────────────────────────────────────────
         // TRANSLUCENT: the infusor_glass.png texture has 196 semi-transparent
@@ -48,6 +58,12 @@ public class EnchantTransferClientMod implements ClientModInitializer {
         // the debugFilledBox render layer.
         BlockRenderLayerMap.putBlock(
                 EnchantTransferMod.INFUSION_COIL_BLOCK,
+                BlockRenderLayer.TRANSLUCENT);
+
+        // The smelter_glass.png mirilla texture has alpha — TRANSLUCENT
+        // lets the BER fire glow show through the glass when lit.
+        BlockRenderLayerMap.putBlock(
+                EnchantTransferMod.ZINC_SMELTER_BLOCK,
                 BlockRenderLayer.TRANSLUCENT);
 
         // ── Custom networking ─────────────────────────────────────────────────
