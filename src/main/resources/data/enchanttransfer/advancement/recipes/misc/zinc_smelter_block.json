@@ -1,0 +1,49 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_iron_ingot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          { "items": "minecraft:iron_ingot" }
+        ]
+      }
+    },
+    "has_copper_ingot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          { "items": "minecraft:copper_ingot" }
+        ]
+      }
+    },
+    "has_glass_pane": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          { "items": "minecraft:glass_pane" }
+        ]
+      }
+    },
+    "has_blast_furnace": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          { "items": "minecraft:blast_furnace" }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "enchanttransfer:zinc_smelter_block"
+      }
+    }
+  },
+  "requirements": [
+    ["has_iron_ingot", "has_copper_ingot", "has_glass_pane", "has_blast_furnace", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["enchanttransfer:zinc_smelter_block"]
+  }
+}
