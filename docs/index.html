@@ -356,6 +356,24 @@ ul li::before {
   font-weight: 500;
   color: var(--text-dim);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.recipe-cell img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.recipe-cell.recipe-arrow {
+  background: none;
+  border: none;
+  color: var(--gold);
+  font-size: 1.2rem;
+  justify-content: center;
 }
 
 .recipe-result {
@@ -573,7 +591,7 @@ hr.sep {
       <span>Transfer Table</span>
     </div>
     <div class="gui-item">
-      <img src="images/gui_infusor.png" alt="Infusor Screen">
+      <img src="images/gui_infusor.jpg" alt="Infusor Screen">
       <span>Infusion Coil</span>
     </div>
   </div>
@@ -600,15 +618,15 @@ hr.sep {
   <div class="recipe">
     <div class="recipe-title">Crafting Recipe</div>
     <div class="recipe-grid">
-      <div class="recipe-cell">Glass Bottle</div>
-      <div class="recipe-cell">XP Bottle</div>
-      <div class="recipe-cell">Glass Bottle</div>
-      <div class="recipe-cell">Emerald</div>
-      <div class="recipe-cell">Transfer Table</div>
-      <div class="recipe-cell">Emerald</div>
-      <div class="recipe-cell">Glass Bottle</div>
-      <div class="recipe-cell">Amethyst</div>
-      <div class="recipe-cell">Glass Bottle</div>
+      <div class="recipe-cell"><img src="images/glass_bottle.png" alt="">Glass Bottle</div>
+      <div class="recipe-cell"><img src="images/experience_bottle.png" alt="">XP Bottle</div>
+      <div class="recipe-cell"><img src="images/glass_bottle.png" alt="">Glass Bottle</div>
+      <div class="recipe-cell"><img src="images/emerald.png" alt="">Emerald</div>
+      <div class="recipe-cell"><img src="images/transfer_table_logo.png" alt="">Transfer Table</div>
+      <div class="recipe-cell"><img src="images/emerald.png" alt="">Emerald</div>
+      <div class="recipe-cell"><img src="images/glass_bottle.png" alt="">Glass Bottle</div>
+      <div class="recipe-cell"><img src="images/amethyst_shard.png" alt="">Amethyst</div>
+      <div class="recipe-cell"><img src="images/glass_bottle.png" alt="">Glass Bottle</div>
     </div>
     <p class="recipe-result">→ <strong>Infusion Coil</strong> × 1</p>
   </div>
@@ -642,40 +660,50 @@ hr.sep {
   <div class="recipe">
     <div class="recipe-title">1. Calcination</div>
     <div class="recipe-grid" style="grid-template-columns: 1fr auto 1fr; max-width: 320px;">
-      <div class="recipe-cell">Calcite</div>
-      <div class="recipe-cell" style="background: none; border: none; color: var(--gold);">→</div>
-      <div class="recipe-cell">Zinc Oxide ×2</div>
+      <div class="recipe-cell"><img src="images/calcite.png" alt="">Calcite</div>
+      <div class="recipe-cell recipe-arrow">→</div>
+      <div class="recipe-cell"><img src="images/zinc_oxide.png" alt="">Zinc Oxide ×2</div>
     </div>
   </div>
 
   <div class="recipe">
     <div class="recipe-title">2. Reduction</div>
     <div class="recipe-grid" style="grid-template-columns: 1fr 1fr auto 1fr; max-width: 380px;">
-      <div class="recipe-cell">Zinc Oxide</div>
-      <div class="recipe-cell">Coal</div>
-      <div class="recipe-cell" style="background: none; border: none; color: var(--gold);">→</div>
-      <div class="recipe-cell">Zinc Sheet</div>
+      <div class="recipe-cell"><img src="images/zinc_oxide.png" alt="">Zinc Oxide</div>
+      <div class="recipe-cell"><img src="images/coal.png" alt="">Coal</div>
+      <div class="recipe-cell recipe-arrow">→</div>
+      <div class="recipe-cell"><img src="images/zinc_sheet.png" alt="">Zinc Sheet</div>
     </div>
   </div>
 
   <div class="recipe">
     <div class="recipe-title">3. Alloying</div>
     <div class="recipe-grid" style="grid-template-columns: 1fr 1fr auto 1fr; max-width: 380px;">
-      <div class="recipe-cell">Copper Ingot</div>
-      <div class="recipe-cell">Zinc Sheet</div>
-      <div class="recipe-cell" style="background: none; border: none; color: var(--gold);">→</div>
-      <div class="recipe-cell">Brass Ingot</div>
+      <div class="recipe-cell"><img src="images/copper_ingot.png" alt="">Copper Ingot</div>
+      <div class="recipe-cell"><img src="images/zinc_sheet.png" alt="">Zinc Sheet</div>
+      <div class="recipe-cell recipe-arrow">→</div>
+      <div class="recipe-cell"><img src="images/brass_ingot.png" alt="">Brass Ingot</div>
     </div>
   </div>
 
   <h3>Fuel</h3>
+  <div class="card-sprites" style="margin-bottom: 0.8rem;">
+    <div class="card-sprite">
+      <img src="images/lava_bucket.png" alt="Lava Bucket">
+      <span>Lava Bucket</span>
+    </div>
+    <div class="card-sprite">
+      <img src="images/blaze_rod.png" alt="Blaze Rod">
+      <span>Blaze Rod</span>
+    </div>
+  </div>
   <p>The Zinc Smelter only accepts <strong>Lava Buckets</strong> and <strong>Blaze Rods</strong> as fuel — no coal or wood. Lava Buckets return an empty bucket after consumption.</p>
 
   <h3>GUI</h3>
 
   <div class="gui-showcase">
     <div class="gui-item">
-      <img src="images/gui_zinc_smelter.png" alt="Zinc Smelter GUI">
+      <img src="images/gui_zinc_smelter.jpg" alt="Zinc Smelter GUI">
       <span>Zinc Smelter</span>
     </div>
   </div>
@@ -689,15 +717,15 @@ hr.sep {
   <div class="recipe">
     <div class="recipe-title">Crafting Recipe</div>
     <div class="recipe-grid">
-      <div class="recipe-cell">Gold Ingot</div>
-      <div class="recipe-cell">Gold Ingot</div>
-      <div class="recipe-cell">Gold Ingot</div>
-      <div class="recipe-cell">Redstone</div>
-      <div class="recipe-cell">Redstone</div>
-      <div class="recipe-cell">Redstone</div>
-      <div class="recipe-cell">Coal</div>
-      <div class="recipe-cell">Diamond</div>
-      <div class="recipe-cell">Coal</div>
+      <div class="recipe-cell"><img src="images/gold_ingot.png" alt="">Gold Ingot</div>
+      <div class="recipe-cell"><img src="images/gold_ingot.png" alt="">Gold Ingot</div>
+      <div class="recipe-cell"><img src="images/gold_ingot.png" alt="">Gold Ingot</div>
+      <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
+      <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
+      <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
+      <div class="recipe-cell"><img src="images/coal.png" alt="">Coal</div>
+      <div class="recipe-cell"><img src="images/diamond.png" alt="">Diamond</div>
+      <div class="recipe-cell"><img src="images/coal.png" alt="">Coal</div>
     </div>
     <p class="recipe-result">→ <strong>Transfer Table</strong> × 1 · Requires an <strong>iron pickaxe</strong> or better to mine.</p>
   </div>
