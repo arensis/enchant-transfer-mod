@@ -144,7 +144,7 @@ The Zinc Smelter only accepts **Lava Buckets** and **Blaze Rods** as fuel — no
 
 ### GUI
 
-<img src="docs/images/gui_zinc_smelter.png" width="200" alt="Zinc Smelter GUI">
+<img src="docs/images/gui_zinc_smelter.jpg" width="200" alt="Zinc Smelter GUI">
 
 *Steampunk-themed interface with copper input slots, a lava-bordered fuel slot, and brass output slot.*
 
