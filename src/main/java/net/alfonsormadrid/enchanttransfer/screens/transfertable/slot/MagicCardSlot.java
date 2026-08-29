@@ -1,7 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
-import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
@@ -13,10 +13,7 @@ public class MagicCardSlot extends Slot {
 
     @Override
     public boolean canInsert(ItemStack stack) {
-        return itemIsMagicCard(stack);
-    }
-
-    private boolean itemIsMagicCard(ItemStack stack) {
-        return stack.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM;
+        // Any MagicCardItem instance — base or coloured — is accepted.
+        return stack.getItem() instanceof MagicCardItem;
     }
 }

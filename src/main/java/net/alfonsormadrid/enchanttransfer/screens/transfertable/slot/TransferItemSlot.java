@@ -1,12 +1,18 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.item.CardType;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.entry.RegistryEntry;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,9 +60,37 @@ public class TransferItemSlot extends TransferSlot {
 
     private List<ItemStack> buildMagicCardsFromEnchants(ItemEnchantmentsComponent enchants) {
         return enchants.getEnchantments().stream().map(entry -> {
-            ItemStack magicCardEnchanted = new ItemStack(EnchantTransferMod.MAGIC_CARD_ITEM);
-            magicCardEnchanted.addEnchantment(entry, enchants.getLevel(entry));
-            return magicCardEnchanted;
+            // Look up which category this enchantment belongs to.  If it's a
+            // modded enchantment we don't know about (or a vanilla one we
+            // haven't categorised yet), fall back to the blank/base card so
+            // the system degrades gracefully — the player still gets a card
+            // with the enchantment, just without its colour identity.
+            ItemStack card = new ItemStack(cardItemFor(cardTypeFor(entry)));
+            card.addEnchantment(entry, enchants.getLevel(entry));
+            return card;
         }).collect(Collectors.toList());
+    }
+
+    private static @Nullable CardType cardTypeFor(RegistryEntry<Enchantment> entry) {
+        RegistryKey<Enchantment> key = entry.getKey().orElse(null);
+        return key != null ? CardType.forEnchantment(key) : null;
+    }
+
+    /**
+     * Maps a {@link CardType} to the registered {@code MagicCardItem}
+     * variant.  Kept as a switch (rather than a Map field on CardType) to
+     * avoid the cyclical dependency between CardType and EnchantTransferMod's
+     * static item fields.
+     */
+    private static Item cardItemFor(@Nullable CardType type) {
+        if (type == null) return EnchantTransferMod.MAGIC_CARD_ITEM;
+        return switch (type) {
+            case BLUE   -> EnchantTransferMod.MAGIC_CARD_BLUE;
+            case GREEN  -> EnchantTransferMod.MAGIC_CARD_GREEN;
+            case RED    -> EnchantTransferMod.MAGIC_CARD_RED;
+            case YELLOW -> EnchantTransferMod.MAGIC_CARD_YELLOW;
+            case PURPLE -> EnchantTransferMod.MAGIC_CARD_PURPLE;
+            case BLACK  -> EnchantTransferMod.MAGIC_CARD_BLACK;
+        };
     }
 }

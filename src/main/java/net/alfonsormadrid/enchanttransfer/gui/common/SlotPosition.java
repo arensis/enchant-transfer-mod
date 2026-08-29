@@ -1,4 +1,4 @@
-package net.alfonsormadrid.enchanttransfer.gui.transfertable;
+package net.alfonsormadrid.enchanttransfer.gui.common;
 
 public class SlotPosition {
     public final Integer positionX;

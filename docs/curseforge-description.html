@@ -1,0 +1,158 @@
+<p><b>Enchant Transfer</b> adds a craftable block — the <b>Transfer Table</b> — that lets you extract enchantments from any item into individual <b>Magic Cards</b>, apply those cards to other compatible items, and combine two cards of the same enchantment and level to upgrade them. All operations are free (no XP cost), and vanilla enchantment compatibility rules are respected.</p>
+
+<p>Version 2.0 introduces the <b>Module System</b>: specialized blocks that attach to the Transfer Table on any face, extending its capabilities. The first module — the <b>Infusion Coil</b> — converts Magic Cards into stored XP and fills glass bottles into Bottles o' Enchanting.</p>
+
+<p><b>Requires:</b> Fabric Loader and Fabric API</p>
+
+<hr>
+
+<h2>Core Features</h2>
+
+<ul>
+<li><b>Extract</b> enchantments from any enchanted item or book into individual Magic Cards, each one color-coded by category</li>
+<li><b>Apply</b> cards to other compatible items, respecting vanilla incompatibility rules</li>
+<li><b>Combine</b> two cards of the same enchantment and level to get the next level (up to vanilla max). Stacks work too — 5 + 6 cards yields 5 upgraded and 1 remainder</li>
+<li><b>Zero cost</b> — all Transfer Table operations are completely free. No XP, no materials consumed</li>
+</ul>
+
+<hr>
+
+<h2>Typed Magic Cards (New in 2.0)</h2>
+
+<p>
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_blue.png" width="32" alt="Blue Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_green.png" width="32" alt="Green Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_red.png" width="32" alt="Red Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_yellow.png" width="32" alt="Yellow Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_purple.png" width="32" alt="Purple Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_black.png" width="32" alt="Black Card">
+</p>
+
+<p>Magic Cards are now color-coded by enchantment category. When you extract an enchantment, the Transfer Table automatically produces a card of the matching color.</p>
+
+<table>
+<thead>
+<tr><th>Card</th><th>Category</th><th>Enchantments</th></tr>
+</thead>
+<tbody>
+<tr><td>🔵 Blue</td><td>Protection</td><td>Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling</td></tr>
+<tr><td>🟢 Green</td><td>Nature</td><td>Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune</td></tr>
+<tr><td>🔴 Red</td><td>Combat</td><td>Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge</td></tr>
+<tr><td>🟡 Yellow</td><td>Utility</td><td>Efficiency, Unbreaking, Mending, Swift Sneak, Infinity, Power, Punch</td></tr>
+<tr><td>🟣 Purple</td><td>Arcane</td><td>Channeling, Riptide, Loyalty, Frost Walker</td></tr>
+<tr><td>⚫ Black</td><td>Curse</td><td>Curse of Vanishing, Curse of Binding</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>Module System (New in 2.0)</h2>
+
+<p>The Transfer Table now works as a <b>hub</b>. Specialized module blocks can be placed on any of its 6 faces. Right-click the Transfer Table to open the <b>Selector Screen</b> — a visual hub showing all connected modules with their real-time status.</p>
+
+<ul>
+<li>Up to <b>6 modules</b> per Transfer Table (one per face)</li>
+<li>Each module type adds different functionality</li>
+<li>Navigate between the hub and any module using the <b>dot navigation bar</b></li>
+<li>Modules show live status in the Selector — processing progress, tank levels, and connection state</li>
+</ul>
+
+<hr>
+
+<h2>Infusion Coil (New in 2.0)</h2>
+
+<p>The first module for the Transfer Table. A vertical flask made of copper, brass, and glass that converts Magic Cards into XP.</p>
+
+<h3>How it works</h3>
+
+<ul>
+<li><b>Insert</b> a Magic Card into the card slot — the coil processes it over ~10 seconds</li>
+<li><b>XP is stored</b> in an internal tank (1,000 XP capacity)</li>
+<li><b>Place glass bottles</b> in the bottle slot to extract XP as Bottles o' Enchanting (7 XP per bottle)</li>
+<li>Unenchanted cards yield a minimum of 5 XP; enchanted cards yield more based on their enchantment</li>
+</ul>
+
+<p><i>Tip: The Infusion Coil stays vertical regardless of which face it's attached to. The copper connector stub always points toward the Transfer Table.</i></p>
+
+<h3>Crafting Recipe — Infusion Coil</h3>
+<table>
+<tr><td>Brass Ingot</td><td>Amethyst Shard</td><td>Brass Ingot</td></tr>
+<tr><td>Copper Ingot</td><td>Glass Block</td><td>Copper Ingot</td></tr>
+<tr><td>Copper Ingot</td><td>Copper Ingot</td><td>Copper Ingot</td></tr>
+</table>
+
+<hr>
+
+<h2>Zinc Smelter (New in 2.0)</h2>
+
+<p>A standalone steampunk furnace for zinc processing and brass alloy creation. An ornate kiln made of copper, brass, and iron with a glass viewport and chimney that emits smoke and lava particles when lit.</p>
+
+<h3>New Materials</h3>
+
+<p>
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/zinc_oxide.png" width="32" alt="Zinc Oxide">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/zinc_sheet.png" width="32" alt="Zinc Sheet">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/brass_ingot.png" width="32" alt="Brass Ingot">
+</p>
+
+<h3>Processing Chain</h3>
+
+<p>Three smelting recipes form a material chain that produces <b>Brass Ingots</b> — required to craft the Infusion Coil.</p>
+
+<table>
+<thead>
+<tr><th>Step</th><th>Input(s)</th><th>Output</th></tr>
+</thead>
+<tbody>
+<tr><td>1. Calcination</td><td>Calcite</td><td>Zinc Oxide ×2</td></tr>
+<tr><td>2. Reduction</td><td>Zinc Oxide + Coal</td><td>Zinc Sheet</td></tr>
+<tr><td>3. Alloying</td><td>Copper Ingot + Zinc Sheet</td><td>Brass Ingot</td></tr>
+</tbody>
+</table>
+
+<h3>Crafting Recipe — Zinc Smelter</h3>
+<table>
+<tr><td>Iron Ingot</td><td>Iron Ingot</td><td>Iron Ingot</td></tr>
+<tr><td>Copper Ingot</td><td>Glass Pane</td><td>Copper Ingot</td></tr>
+<tr><td>Copper Ingot</td><td>Blast Furnace</td><td>Copper Ingot</td></tr>
+</table>
+
+<h3>Fuel</h3>
+
+<p>The Zinc Smelter only accepts <b>Lava Buckets</b> and <b>Blaze Rods</b> as fuel — no coal or wood. Lava Buckets return an empty bucket after consumption.</p>
+
+<hr>
+
+<h2>Redesigned Interface (Updated in 2.0)</h2>
+
+<p>All GUIs have been completely rebuilt with a new visual language: dark starry backgrounds, golden and cyan accents, and a purple-bordered parchment aesthetic.</p>
+
+<ul>
+<li><b>Selector Screen</b> — Hub view with 6 module sockets arranged around a golden center. Connected modules show their icon, processing state, and live tank level</li>
+<li><b>Navigation Bar</b> — A row of dots at the top of every screen lets you switch instantly between the hub and any connected module</li>
+<li><b>Ghost Inputs</b> — Empty slots show translucent silhouettes of the items they accept</li>
+<li><b>Transfer Table Core</b> — Redesigned layout with combine slots, item slot, and a 4×3 card grid</li>
+</ul>
+
+<hr>
+
+<h2>Transfer Table</h2>
+
+<h3>Crafting Recipe</h3>
+<table>
+<tr><td>Gold Ingot</td><td>Gold Ingot</td><td>Gold Ingot</td></tr>
+<tr><td>Redstone Dust</td><td>Redstone Dust</td><td>Redstone Dust</td></tr>
+<tr><td>Coal</td><td>Diamond</td><td>Coal</td></tr>
+</table>
+
+<p>Requires an <b>iron pickaxe</b> or better to mine.</p>
+
+<hr>
+
+<h2>Compatibility</h2>
+
+<p><b>Worlds from 1.0.x are fully compatible.</b> Existing Transfer Tables keep working — the block ID hasn't changed. Old Magic Cards stored in chests retain their enchantment data. They will appear as the generic (blank) card variant; their functionality is unchanged. New cards extracted after updating will automatically use the color-coded system.</p>
+
+<hr>
+
+<p><i>If you enjoy the mod, consider supporting its development — any contribution is greatly appreciated!</i></p>

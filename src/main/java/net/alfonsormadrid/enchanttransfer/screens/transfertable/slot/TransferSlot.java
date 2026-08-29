@@ -1,7 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
-import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.alfonsormadrid.enchanttransfer.gui.transfertable.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
+import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.inventory.Inventory;
@@ -20,8 +20,14 @@ public class TransferSlot extends Slot {
         return item == Items.ENCHANTED_BOOK;
     }
 
+    /**
+     * Any {@link MagicCardItem} qualifies — both the base/blank card and
+     * the 6 coloured variants.  We check the class rather than a specific
+     * instance so adding new card types in {@code EnchantTransferMod}
+     * doesn't require updating each slot's predicate.
+     */
     protected boolean itemIsMagicCard(ItemStack stack) {
-        return stack.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM;
+        return stack.getItem() instanceof MagicCardItem;
     }
 
     protected ItemEnchantmentsComponent getEffectiveEnchantments(ItemStack stack) {

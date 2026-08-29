@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Infusor Coil — Modelo 3D acoplado</title>
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #f3eee3; --bg-card: #fbf8f1; --ink: #1f1a14; --ink-soft: #5a5145; --ink-faint: #8a7f6f; --rule: #d9cfb8; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: Helvetica, Arial, sans-serif; font-size: 15px; line-height: 1.55; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 64px 40px 120px; }
+  header { border-bottom: 1px solid var(--rule); padding-bottom: 36px; margin-bottom: 48px; }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-faint); margin-bottom: 14px; }
+  h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 44px; line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .lede { font-size: 17px; color: var(--ink-soft); max-width: 720px; margin: 0; }
+  h2 { font-family: 'Silkscreen', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-faint); margin: 0 0 8px; padding-bottom: 12px; border-bottom: 1px solid var(--rule); }
+  section { margin-bottom: 72px; }
+  .sub { color: var(--ink-soft); max-width: 720px; margin: 0 0 24px; }
+
+  .viewer-grid { display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: stretch; }
+  @media (max-width: 880px) { .viewer-grid { grid-template-columns: 1fr; } }
+  .viewport {
+    background: radial-gradient(ellipse at 50% 35%, #2c2740 0%, #0c0a13 70%);
+    border: 1px solid var(--rule); border-radius: 8px;
+    height: 460px; position: relative; overflow: hidden;
+    perspective: 1100px; cursor: grab;
+  }
+  .viewport:active { cursor: grabbing; }
+  .world { position: absolute; left: 50%; top: 54%; transform-style: preserve-3d; }
+  .box { position: absolute; transform-style: preserve-3d; left: 0; top: 0; }
+  .face { position: absolute; left: 50%; top: 50%; }
+  .hint { position: absolute; bottom: 12px; left: 0; right: 0; text-align: center; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.4); pointer-events: none; }
+
+  .controls { display: flex; flex-direction: column; gap: 18px; padding: 22px; background: var(--bg-card); border: 1px solid var(--rule); border-radius: 8px; }
+  .control-group label { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink); margin-bottom: 8px; }
+  .control-group label .val { color: #6b8a2a; font-weight: 700; }
+  input[type=range] { width: 100%; accent-color: #6b8a2a; }
+  .btn-row { display: flex; gap: 8px; }
+  .btn { flex: 1; padding: 9px 6px; border: 1px solid var(--rule); background: var(--bg); border-radius: 6px; font-family: 'Silkscreen', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; color: var(--ink-soft); transition: all 0.15s; }
+  .btn.active { background: #2a3a1e; color: #d8ff60; border-color: #2a3a1e; }
+  .dock-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .legend { font-size: 12px; color: var(--ink-faint); font-family: 'JetBrains Mono', monospace; line-height: 1.9; padding-top: 6px; border-top: 1px solid var(--rule); }
+  .legend b { color: var(--ink); }
+  .sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+
+  .spec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; align-items: start; }
+  @media (max-width: 860px) { .spec-grid { grid-template-columns: 1fr; } }
+  .spec-card { background: var(--bg-card); border: 1px solid var(--rule); border-radius: 8px; padding: 24px; }
+  .spec-card h3 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 19px; margin: 0 0 14px; }
+  .spec-card dl { display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; margin: 0; font-size: 13px; }
+  .spec-card dt { font-family: 'JetBrains Mono', monospace; color: var(--ink); font-weight: 700; }
+  .spec-card dd { margin: 0; color: var(--ink-soft); }
+  .spec-card svg { width: 100%; height: auto; }
+
+  .codebox { background: #16131d; border-radius: 8px; padding: 22px 24px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.7; color: #cfc6dd; overflow-x: auto; }
+  .codebox .c { color: #6f6685; } .codebox .k { color: #c99bf0; } .codebox .s { color: #9ad06a; } .codebox .n { color: #e8b850; }
+  .note { background: #f7eede; border: 1px solid #e2cc9a; border-radius: 6px; padding: 18px 24px; font-size: 14px; color: var(--ink-soft); margin-top: 20px; }
+  .note code { font-family: 'JetBrains Mono', monospace; font-size: 12px; background: rgba(0,0,0,0.06); padding: 1px 5px; border-radius: 3px; color: var(--ink); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">Infusor Coil · modelo 3D</div>
+      <h1>Matraz 3D acoplado a la mesa</h1>
+      <p class="lede">Objeto 3D real de 3 cuboides — cuerpo ancho, tubo fino y tapón. Un conector sale de la <strong>base</strong> y lleva el XP líquido a la Transfer Table; el <strong>tapón se ilumina</strong> cuando está funcionando. Elige la cara de acople y el conector se reorienta. Arrastra para girar.</p>
+    </header>
+
+    <!-- VIEWER -->
+    <section>
+      <h2>01 · Visor 3D interactivo</h2>
+      <p class="sub">Arrastra con el ratón para orbitar. El conector sale de la <b>base</b> del matraz (por ahí fluye el XP a la mesa) y apunta a la cara de acople. El <b>tapón se enciende</b> solo cuando está infusionando (prueba Idle/Infusing). El líquido verde es el nivel real del tanque.</p>
+      <div class="viewer-grid">
+        <div class="viewport" id="vp">
+          <div class="world" id="world"></div>
+          <div class="hint">arrastra para girar · rueda para zoom</div>
+        </div>
+        <div class="controls">
+          <div class="control-group">
+            <label>Nivel del tanque <span class="val" id="lvl-val">55%</span></label>
+            <input type="range" id="lvl" min="0" max="100" value="55">
+          </div>
+          <div class="control-group">
+            <label>XP almacenado <span class="val" id="xp-val">550 / 1000</span></label>
+          </div>
+          <div class="btn-row">
+            <button class="btn" id="btn-idle">Idle</button>
+            <button class="btn active" id="btn-infuse">Infusing</button>
+          </div>
+          <div class="control-group">
+            <label>Cara de acople <span class="val" id="dock-val">Izquierda</span></label>
+            <div class="dock-grid">
+              <button class="btn" data-dock="W">◄ Izq</button>
+              <button class="btn" data-dock="E">Der ►</button>
+              <button class="btn" data-dock="Up">▲ Arriba</button>
+              <button class="btn" data-dock="N">Detrás</button>
+              <button class="btn" data-dock="S">Delante</button>
+              <button class="btn" data-dock="Down">▼ Abajo</button>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn active" id="btn-spin">⟳ Auto-girar</button>
+            <button class="btn" id="btn-reset">Reset vista</button>
+          </div>
+          <div class="legend">
+            <span><span class="sw" style="background:#b06a2c;"></span><b>Cobre</b> — textura tipo Minecraft</span><br>
+            <span><span class="sw" style="background:#c98a35;"></span><b>Latón</b> — oro + cobre (necesita zinc)</span><br>
+            <span><span class="sw" style="background:#eaffe0;border:1px solid #a8e030;"></span><b>Luz</b> — tapón encendido al funcionar</span><br>
+            <span><span class="sw" style="background:#2a4a44;"></span><b>Vidrio</b> — cara frontal del cuerpo</span><br>
+            <span><span class="sw" style="background:#a8e030;"></span><b>XP</b> — burbujas + rebote al gotear</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPEC -->
+    <section>
+      <h2>02 · Despiece del modelo (3 cuboides)</h2>
+      <div class="spec-grid">
+        <div class="spec-card">
+          <h3>Elevación lateral</h3>
+          <svg viewBox="0 0 220 280" id="elevation"></svg>
+        </div>
+        <div class="spec-card">
+          <h3>Dimensiones (px de Minecraft)</h3>
+          <dl>
+            <dt>① Cuerpo</dt><dd>9 × 9 × 9 — cubo ancho, vidrio con marco de cobre. Aloja el tanque de XP.</dd>
+            <dt>② Tubo</dt><dd>3 × 6 × 3 — cuello fino y alargado, cobre macizo.</dd>
+            <dt>③ Tapón</dt><dd>5 × 2 × 5 — cuadrado, algo más ancho que el tubo. Latón + pomo.</dd>
+            <dt>Tiras</dt><dd>1 × N × 1 de cobre en las 4 aristas verticales + aros superior/inferior del cuerpo.</dd>
+            <dt>Remaches</dt><dd>píxeles de latón en las tiras (detalle steampunk).</dd>
+            <dt>Conector</dt><dd>tubo de cobre desde la <b>base</b> que lleva el fluido a la mesa; se reorienta según la cara de acople.</dd>
+            <dt>Luz tapón</dt><dd>núcleo emisivo dentro del tapón; visible solo cuando el infusor está trabajando.</dd>
+            <dt>Altura total</dt><dd>~17 px (cuerpo 9 + tubo 6 + tapón 2).</dd>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    <!-- HANDOFF -->
+    <section>
+      <h2>03 · Handoff a Claude Code</h2>
+      <div class="spec-grid">
+        <div class="codebox">
+<span class="c">// models/block/infusor_coil.json</span>
+<span class="c">// 3 cuboides + tiras (elements[])</span>
+{
+  <span class="s">"elements"</span>: [
+    <span class="c">// ① cuerpo 9³  (from 3.5,0,3.5 to 12.5,9,12.5)</span>
+    { <span class="s">"from"</span>:[<span class="n">3.5</span>,<span class="n">0</span>,<span class="n">3.5</span>], <span class="s">"to"</span>:[<span class="n">12.5</span>,<span class="n">9</span>,<span class="n">12.5</span>] },
+    <span class="c">// ② tubo 3×6×3</span>
+    { <span class="s">"from"</span>:[<span class="n">6.5</span>,<span class="n">9</span>,<span class="n">6.5</span>], <span class="s">"to"</span>:[<span class="n">9.5</span>,<span class="n">15</span>,<span class="n">9.5</span>] },
+    <span class="c">// ③ tapón 5×2×5</span>
+    { <span class="s">"from"</span>:[<span class="n">5.5</span>,<span class="n">15</span>,<span class="n">5.5</span>], <span class="s">"to"</span>:[<span class="n">10.5</span>,<span class="n">17</span>,<span class="n">10.5</span>] },
+    <span class="c">// tiras de refuerzo en aristas (×4) ...</span>
+  ]
+}
+        </div>
+        <div>
+          <p style="color: var(--ink-soft); font-size: 14px;">Piezas para el código:</p>
+          <ul style="color: var(--ink-soft); font-size: 14px; padding-left: 18px;">
+            <li><strong>Modelo JSON</strong> con estos 3 cuboides + las tiras. Lo entrego completo con todas las caras y UVs.</li>
+            <li><strong>BlockEntityRenderer</strong> dibuja el cubo de fluido dentro del cuerpo a la altura real + la gota cuando <code style="font-family:'JetBrains Mono',monospace;font-size:12px;">isInfusing()</code>.</li>
+            <li><strong>BlockState direccional</strong> para que el matraz se oriente según la cara de la mesa a la que se acopla (N/E/S/W/Up/Down).</li>
+            <li><strong>Texturas</strong> de cobre/latón/vidrio para las caras (te las genero a 16×16 o atlas).</li>
+          </ul>
+          <div class="note">
+            <strong>Acople direccional + luz:</strong> el matraz es un bloque propio adyacente a la Transfer Table. El <strong>conector sale de la base</strong> y lleva el XP a la cara donde esté la mesa; su <code>BlockState</code> guarda esa dirección (N/E/S/W/Up/Down). El <strong>tapón se ilumina</strong> vía emisividad en el <code>BlockEntityRenderer</code> cuando <code>isInfusing()</code>. Misma lógica para los otros 5 módulos futuros.
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+<script>
+const S = 5.5; // px per MC-px
+
+function shade(rgb, f) { return `rgb(${Math.round(rgb[0]*f)},${Math.round(rgb[1]*f)},${Math.round(rgb[2]*f)})`; }
+function shadeA(rgb, f, a) { return `rgba(${Math.round(rgb[0]*f)},${Math.round(rgb[1]*f)},${Math.round(rgb[2]*f)},${a})`; }
+
+const COPPER=[176,106,44], COPPERD=[120,64,26], BRASS=[224,184,80], GLASS=[42,74,68], XP=[168,224,48], STONE=[74,42,94];
+const shadeMap = { front:0.9, back:0.72, right:0.64, left:0.58, top:1.0, bottom:0.42 };
+
+// Build a box centered at (x,y,z) MC-px (y up), size w,h,d. colorFn(face)->css
+function makeBox(parent, x, y, z, w, h, d, colorFn) {
+  const box = document.createElement('div');
+  box.className = 'box';
+  box.style.transform = `translate3d(${x*S}px, ${-y*S}px, ${z*S}px)`;
+  const W=w*S, H=h*S, D=d*S;
+  const faces = [
+    { n:'front',  t:`translate(-50%,-50%) translateZ(${D/2}px)`,                 w:W,h:H },
+    { n:'back',   t:`translate(-50%,-50%) rotateY(180deg) translateZ(${D/2}px)`,  w:W,h:H },
+    { n:'right',  t:`translate(-50%,-50%) rotateY(90deg) translateZ(${W/2}px)`,   w:D,h:H },
+    { n:'left',   t:`translate(-50%,-50%) rotateY(-90deg) translateZ(${W/2}px)`,  w:D,h:H },
+    { n:'top',    t:`translate(-50%,-50%) rotateX(90deg) translateZ(${H/2}px)`,   w:W,h:D },
+    { n:'bottom', t:`translate(-50%,-50%) rotateX(-90deg) translateZ(${H/2}px)`,  w:W,h:D },
+  ];
+  faces.forEach(f => {
+    const el = document.createElement('div');
+    el.className='face';
+    el.style.width=f.w+'px'; el.style.height=f.h+'px';
+    el.style.transform=f.t;
+    if (colorFn.tex) {
+      const fac = shadeMap[f.n];
+      const ov = (fac>=1 ? 0 : (1-fac)*0.85).toFixed(2);
+      // Detectar si la face tiene alpha (fluido translúcido)
+      const testColor = colorFn(f.n);
+      const hasAlpha = testColor.startsWith('rgba');
+      const alphaMatch = hasAlpha ? parseFloat(testColor.match(/[\d.]+\)$/)[0]) : 1;
+      el.style.backgroundImage = `linear-gradient(rgba(0,0,0,${ov}),rgba(0,0,0,${ov})), url(${colorFn.tex})`;
+      el.style.backgroundSize = 'cover';
+      el.style.imageRendering = 'pixelated';
+      if (hasAlpha) el.style.opacity = alphaMatch.toFixed(2);
+    } else {
+      el.style.background = colorFn(f.n);
+    }
+    box.appendChild(el);
+  });
+  parent.appendChild(box);
+  return box;
+}
+
+// ===== Texturas pixel-art (canvas → dataURL) =====
+function mkTex(kind){
+  const c=document.createElement('canvas'); c.width=16; c.height=16;
+  const x=c.getContext('2d');
+  const p=(px,py,col)=>{ x.fillStyle=col; x.fillRect(px,py,1,1); };
+  let seed = kind==='copper'?11:(kind==='brass'?23:5);
+  const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+  if(kind==='copper'){
+    // Cobre: franjas horizontales de brillo (como armadura) + brillos rectangulares
+    x.fillStyle='#b86a28'; x.fillRect(0,0,16,16);
+    [[0,'#c47630'],[1,'#b86a28'],[2,'#c07030'],[3,'#c87a34'],[4,'#b46228'],[5,'#c27232'],
+     [6,'#be6e2e'],[7,'#d08040'],[8,'#c47630'],[9,'#b86228'],[10,'#c47030'],[11,'#bc6a2c'],
+     [12,'#c87a34'],[13,'#b86228'],[14,'#a85e24'],[15,'#b86a28']].forEach(([yy,col])=>{
+       x.fillStyle=col; x.fillRect(0,yy,16,1); });
+    // brillos rectangulares horizontales (no puntos aislados)
+    x.fillStyle='#e89858'; x.fillRect(2,2,6,1); x.fillRect(4,5,4,1); x.fillRect(3,9,5,1);
+    x.fillStyle='#f0a868'; x.fillRect(3,2,3,1); x.fillRect(5,5,2,1);
+    x.fillStyle='#d88040'; x.fillRect(0,0,16,1); x.fillRect(0,0,1,16);
+    x.fillStyle='#7a3a10'; x.fillRect(0,15,16,1); x.fillRect(15,0,1,16);
+  } else if(kind==='brass'){
+    // Latón: mismo patrón bandas pero tono dorado-cálido
+    x.fillStyle='#c89030'; x.fillRect(0,0,16,16);
+    [[0,'#d49a3a'],[1,'#c89030'],[2,'#d09838'],[3,'#d89c3c'],[4,'#c48828'],[5,'#d29638'],
+     [6,'#ce9234'],[7,'#dea040'],[8,'#d49a3a'],[9,'#c68c2c'],[10,'#d49838'],[11,'#cc8e32'],
+     [12,'#d89c3c'],[13,'#c68a2c'],[14,'#be8428'],[15,'#c89030']].forEach(([yy,col])=>{
+       x.fillStyle=col; x.fillRect(0,yy,16,1); });
+    x.fillStyle='#f0c860'; x.fillRect(2,2,6,1); x.fillRect(4,5,4,1); x.fillRect(3,9,5,1);
+    x.fillStyle='#f8d878'; x.fillRect(3,2,3,1); x.fillRect(5,5,2,1);
+    x.fillStyle='#e8b050'; x.fillRect(0,0,16,1); x.fillRect(0,0,1,16);
+    x.fillStyle='#8a5c14'; x.fillRect(0,15,16,1); x.fillRect(15,0,1,16);
+  }
+  return c.toDataURL();
+}
+const TEX_COPPER = mkTex('copper');
+const TEX_BRASS  = mkTex('brass');
+
+const copperFace=(n)=>shade(COPPER,shadeMap[n]); copperFace.tex=TEX_COPPER;
+const copperDFace=(n)=>shade(COPPERD,shadeMap[n]); copperDFace.tex=TEX_COPPER;
+const brassFace=(n)=>shade(BRASS,shadeMap[n]); brassFace.tex=TEX_BRASS;
+const glassFace=(n)=>shadeA(GLASS,shadeMap[n],0.32);
+const stoneFace=(n)=>shade(STONE,shadeMap[n]);
+
+const world = document.getElementById('world');
+
+// ---------- TABLE + ARM se construyen según la cara de acople (ver buildDock) ----------
+
+// ---------- INFUSOR FLASK docked to the east ----------
+// Flask stands on ground (y=-8). Body 9³ base at y=-8.
+const fx = 6;   // flask center x
+const bodyBaseY = -8;
+const bodyH = 9, bodyW = 9, bodyD = 9;
+const bodyCy = bodyBaseY + bodyH/2;       // -3.5
+
+// ground shadow
+const gnd = document.createElement('div');
+gnd.className='box';
+gnd.style.transform = `translate3d(${(fx-3)*S}px, ${8*S}px, 0px) rotateX(90deg)`;
+gnd.innerHTML = `<div class="face" style="width:${22*S}px;height:${14*S}px;transform:translate(-50%,-50%);background:radial-gradient(ellipse,rgba(0,0,0,0.45),transparent 70%);"></div>`;
+world.appendChild(gnd);
+
+// ① BODY — glass body (translucent)
+makeBox(world, fx, bodyCy, 0, bodyW, bodyH, bodyD, glassFace);
+
+// FLUID inside body (rebuilt on update) — inset slightly
+let fluidBox = null;
+const fluidInset = 0.6;
+const fluidMaxH = bodyH - 1.2;       // usable inner height
+const fluidBottom = bodyBaseY + 0.6; // inner bottom
+// textura de XP con burbujas (verde lima con motas claras)
+function updateFluid(level) {
+  if (fluidBox) { fluidBox.remove(); fluidBox=null; }
+  const h = Math.max(0.01, fluidMaxH * level);
+  const cy = fluidBottom + h/2;
+  fluidBox = makeBox(world, fx, cy, 0, bodyW-fluidInset*2, h, bodyD-fluidInset*2, (n)=>{
+    if (n==='top') return shadeA(XP,1.15,0.95);
+    return shadeA(XP, shadeMap[n], 0.8);
+  });
+}
+
+// copper bottom rim (ring around base)
+makeBox(world, fx, bodyBaseY+0.3, 0, bodyW+0.5, 1.4, bodyD+0.5, copperFace);
+// copper top rim (ring around body top)
+makeBox(world, fx, bodyBaseY+bodyH-0.3, 0, bodyW+0.4, 1.2, bodyD+0.4, copperFace);
+// 4 vertical edge strips (refuerzo en aristas)
+const half = bodyW/2;
+[[half,half],[half,-half],[-half,half],[-half,-half]].forEach(([dx,dz])=>{
+  makeBox(world, fx+dx, bodyCy, dz, 1, bodyH, 1, copperFace);
+});
+// rivets on front-left & front-right vertical strips
+[[half,half],[-half,half]].forEach(([dx,dz])=>{
+  [-2.5,0,2.5].forEach(ry=>{
+    makeBox(world, fx+dx, bodyCy+ry, dz, 1.2, 0.8, 1.2, brassFace);
+  });
+});
+
+// build fluid AFTER rims so it's inside; glass already drawn behind — re-add glass front later not needed
+updateFluid(0.55);
+
+// ② TUBE (neck) 3×6×3 on top of body
+const neckBaseY = bodyBaseY + bodyH; // 1
+const neckH = 6;
+const neckCy = neckBaseY + neckH/2;  // 4
+makeBox(world, fx, neckCy, 0, 3, neckH, 3, copperFace);
+// neck edge strips (thin)
+[[1.5,1.5],[1.5,-1.5],[-1.5,1.5],[-1.5,-1.5]].forEach(([dx,dz])=>{
+  makeBox(world, fx+dx*0.95, neckCy, dz*0.95, 0.6, neckH, 0.6, copperDFace);
+});
+// neck collar rings
+makeBox(world, fx, neckBaseY+0.4, 0, 3.6, 0.8, 3.6, brassFace);
+makeBox(world, fx, neckBaseY+neckH-0.4, 0, 3.6, 0.8, 3.6, brassFace);
+
+// ③ CAP (stopper) 5×2×5 on top of neck
+const capBaseY = neckBaseY + neckH; // 7
+makeBox(world, fx, capBaseY+1, 0, 5, 2, 5, brassFace);
+// knob on top
+makeBox(world, fx, capBaseY+2.4, 0, 1.6, 1, 1.6, brassFace);
+// cap corner brackets
+[[2,2],[2,-2],[-2,2],[-2,-2]].forEach(([dx,dz])=>{
+  makeBox(world, fx+dx, capBaseY+1, dz, 1, 2, 1, copperFace);
+});
+
+// ---------- DOCK: mesa + brazo de alambique, orientado según la cara ----------
+let dockEls = [];
+function clearDock(){ dockEls.forEach(e=>e.remove()); dockEls=[]; }
+function addDock(el){ dockEls.push(el); return el; }
+
+const basePipeY = bodyBaseY + 1.5;  // altura del conector en la base
+const half2 = bodyW / 2;            // 4.5
+
+function buildTable(tx,ty,tz, toward){
+  addDock(makeBox(world, tx,ty,tz, 16,16,16, stoneFace));
+  const o = 8.05; const [dx,dy,dz] = toward;
+  addDock(makeBox(world, tx+dx*o, ty+dy*o, tz+dz*o,
+     dx!==0?0.4:6, dy!==0?0.4:6, dz!==0?0.4:6, ()=> '#b88a3a'));
+  addDock(makeBox(world, tx+dx*(o+0.1), ty+dy*(o+0.1), tz+dz*(o+0.1),
+     dx!==0?0.3:1.8, dy!==0?0.3:1.8, dz!==0?0.3:1.8, ()=> '#4dd4ff'));
+}
+
+// tubos rectos (cuboide alargado) + bridas de latón en extremos
+function pipeX(x0,x1,y,z){ const c=(x0+x1)/2, w=Math.abs(x1-x0)+1.5;
+  addDock(makeBox(world,c,y,z,w,1.8,1.8,copperFace));
+  addDock(makeBox(world,x0,y,z,1,2.6,2.6,brassFace)); addDock(makeBox(world,x1,y,z,1,2.6,2.6,brassFace)); }
+function pipeZ(z0,z1,x,y){ const c=(z0+z1)/2, d=Math.abs(z1-z0)+1.5;
+  addDock(makeBox(world,x,y,c,1.8,1.8,d,copperFace));
+  addDock(makeBox(world,x,y,z0,2.6,2.6,1,brassFace)); addDock(makeBox(world,x,y,z1,2.6,2.6,1,brassFace)); }
+function pipeY(y0,y1,x,z){ const c=(y0+y1)/2, h=Math.abs(y1-y0)+1.5;
+  addDock(makeBox(world,x,c,z,1.8,h,1.8,copperFace));
+  addDock(makeBox(world,x,y0,z,2.6,1,2.6,brassFace)); addDock(makeBox(world,x,y1,z,2.6,1,2.6,brassFace)); }
+
+// El conector SALE DE LA BASE (por ahí fluye el XP a la mesa) y apunta a la cara de acople
+const DOCKS = {
+  W:  () => { const tx=fx-half2-6-8; buildTable(tx,0,0,[1,0,0]); pipeX(fx-half2, tx+8, basePipeY, 0); },
+  E:  () => { const tx=fx+half2+6+8; buildTable(tx,0,0,[-1,0,0]); pipeX(fx+half2, tx-8, basePipeY, 0); },
+  N:  () => { const tz=-(half2+6+8); buildTable(fx,0,tz,[0,0,1]); pipeZ(-half2, tz+8, fx, basePipeY); },
+  S:  () => { const tz=(half2+6+8); buildTable(fx,0,tz,[0,0,-1]); pipeZ(half2, tz-8, fx, basePipeY); },
+  Up: () => { const ty=21; buildTable(fx,ty,0,[0,-1,0]);
+        pipeY(basePipeY, ty-8, fx+half2+1, 0); pipeX(fx+half2+1, fx, ty-8, 0); },
+  Down:()=> { const ty=-17; buildTable(fx,ty,0,[0,1,0]); pipeY(bodyBaseY, ty+8, fx, 0); },
+};
+let dockFace = 'W';
+function setDock(face){
+  dockFace = face; clearDock(); DOCKS[face]();
+  document.querySelectorAll('[data-dock]').forEach(b=>b.classList.toggle('active', b.dataset.dock===face));
+}
+setDock('W');
+
+// ---------- LUZ DEL TAPÓN — solo visible cuando está funcionando ----------
+const capLight = makeBox(world, fx, capBaseY+2.6, 0, 2, 2, 2, ()=> '#f0ffe0');
+capLight.style.filter = 'drop-shadow(0 0 5px #a8e030) drop-shadow(0 0 11px #4dd4ff)';
+const capHalo = makeBox(world, fx, capBaseY+2.6, 0, 4.5, 4.5, 4.5, ()=> 'rgba(168,224,48,0.22)');
+function setCapLight(on){ capLight.style.display = on?'block':'none'; capHalo.style.display = on?'block':'none'; }
+setCapLight(true);
+
+// DRIP element
+const drip = makeBox(world, fx, neckCy, 0, 1, 1.5, 1, (n)=> shadeA(XP, n==='top'?1.1:shadeMap[n], 0.95));
+drip.style.display = 'block';
+
+// ---------- INTERACTION ----------
+let rotX = -16, rotY = 34, dist = 0;
+let spinning = true, infusing = true, level = 0.55, dragging = false, lastX=0, lastY=0;
+const vp = document.getElementById('vp');
+
+function applyTransform() {
+  world.style.transform = `translateZ(${dist}px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
+}
+vp.addEventListener('pointerdown', e => { dragging=true; spinning=false; setSpinBtn(); lastX=e.clientX; lastY=e.clientY; vp.setPointerCapture(e.pointerId); });
+vp.addEventListener('pointermove', e => {
+  if (!dragging) return;
+  rotY += (e.clientX - lastX) * 0.5;
+  rotX += (e.clientY - lastY) * 0.5;
+  rotX = Math.max(-80, Math.min(80, rotX));
+  lastX=e.clientX; lastY=e.clientY;
+  applyTransform();
+});
+vp.addEventListener('pointerup', e => { dragging=false; });
+vp.addEventListener('wheel', e => { e.preventDefault(); dist = Math.max(-180, Math.min(120, dist - e.deltaY*0.3)); applyTransform(); }, {passive:false});
+
+const lvlInput = document.getElementById('lvl');
+const lvlVal = document.getElementById('lvl-val');
+const xpVal = document.getElementById('xp-val');
+function refresh() {
+  lvlVal.textContent = Math.round(level*100)+'%';
+  xpVal.textContent = Math.round(level*1000)+' / 1000';
+  lvlInput.value = Math.round(level*100);
+}
+lvlInput.addEventListener('input', e => { level=e.target.value/100; updateFluid(level); refresh(); });
+
+const btnIdle=document.getElementById('btn-idle'), btnInfuse=document.getElementById('btn-infuse'), btnSpin=document.getElementById('btn-spin');
+function setSpinBtn(){ btnSpin.classList.toggle('active', spinning); }
+btnIdle.addEventListener('click', ()=>{ infusing=false; btnIdle.classList.add('active'); btnInfuse.classList.remove('active'); drip.style.display='none'; setCapLight(false); });
+btnInfuse.addEventListener('click', ()=>{ infusing=true; btnInfuse.classList.add('active'); btnIdle.classList.remove('active'); drip.style.display='block'; setCapLight(true); });
+btnSpin.addEventListener('click', ()=>{ spinning=!spinning; setSpinBtn(); });
+document.getElementById('btn-reset').addEventListener('click', ()=>{ rotX=-16; rotY=34; dist=0; applyTransform(); });
+
+const DOCK_LABELS = { W:'Izquierda', E:'Derecha', Up:'Arriba', N:'Detrás', S:'Delante', Down:'Abajo' };
+document.querySelectorAll('[data-dock]').forEach(b=>{
+  b.addEventListener('click', ()=>{ setDock(b.dataset.dock); document.getElementById('dock-val').textContent = DOCK_LABELS[b.dataset.dock]; });
+});
+
+let t0 = performance.now();
+function loop(now) {
+  const dt = (now-t0)/1000; t0=now;
+  if (spinning && !dragging) { rotY = (rotY + dt*22) % 360; applyTransform(); }
+  if (infusing) {
+    level = Math.min(1, level + dt*0.025);
+    const surfaceY = fluidBottom + fluidMaxH*level;
+    const period = 0.85;
+    const phase = (now % (period*1000))/(period*1000);
+    const dripY = 6 - (6 - surfaceY)*phase;
+    drip.style.transform = `translate3d(${fx*S}px, ${-dripY*S}px, 0px)`;
+    drip.style.display='block';
+    updateFluid(level); refresh();
+    capHalo.style.opacity = (0.14 + 0.16*(0.5+0.5*Math.sin(now/170))).toFixed(3);
+    if (level>=1) level = 0.12;
+  }
+  requestAnimationFrame(loop);
+}
+applyTransform(); refresh(); requestAnimationFrame(loop);
+
+// ---------- ELEVATION DIAGRAM (SVG) ----------
+(function(){
+  const svg = document.getElementById('elevation');
+  const ox=70, scale=11, baseY=250;
+  function r(x,y,w,h,fill,stroke){ return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}" ${stroke?`stroke="${stroke}" stroke-width="1"`:''}/>`; }
+  let s='';
+  // body 9×9
+  s += r(ox, baseY-9*scale, 9*scale, 9*scale, '#2a4a44', '#b06a2c');
+  // fluid in body (55%)
+  s += r(ox+2, baseY-9*scale + 9*scale*0.45, 9*scale-4, 9*scale*0.55-2, '#a8e030');
+  // vertical edge strips
+  s += r(ox-2, baseY-9*scale, 4, 9*scale, '#b06a2c');
+  s += r(ox+9*scale-2, baseY-9*scale, 4, 9*scale, '#8a4a1e');
+  // top & bottom rims
+  s += r(ox-2, baseY-9*scale-3, 9*scale+4, 6, '#b06a2c');
+  s += r(ox-2, baseY-6, 9*scale+4, 8, '#b06a2c');
+  // neck 3×6
+  const nx = ox + (9*scale)/2 - (3*scale)/2;
+  s += r(nx, baseY-9*scale-6*scale, 3*scale, 6*scale, '#b06a2c', '#8a4a1e');
+  // cap 5×2
+  const cx = ox + (9*scale)/2 - (5*scale)/2;
+  s += r(cx, baseY-9*scale-6*scale-2*scale, 5*scale, 2*scale, '#e0b850', '#8a4a1e');
+  // knob
+  s += r(ox+(9*scale)/2-6, baseY-9*scale-6*scale-2*scale-8, 12, 8, '#e0b850');
+  // glowing cap light (encendido = funcionando)
+  const capCenterX = ox + (9*scale)/2;
+  const capTopSvgY = baseY-9*scale-6*scale-2*scale;
+  s += `<circle cx="${capCenterX}" cy="${capTopSvgY-2}" r="10" fill="#a8e030" opacity="0.35"/>`;
+  s += `<circle cx="${capCenterX}" cy="${capTopSvgY-2}" r="4.5" fill="#eaffe0"/>`;
+  // base connector pipe to table (left, ground level)
+  s += r(2, baseY-9*scale, 34, 9*scale, '#4a2a5e', '#7a4a96');
+  s += r(36, baseY-24, ox-36, 9, '#8a4a1e');
+  s += r(36, baseY-23, ox-36, 5, '#b06a2c');
+  // labels
+  function label(x,y,txt,color){ return `<text x="${x}" y="${y}" font-family="Silkscreen, monospace" font-size="8" fill="${color||'#5a5145'}">${txt}</text>`; }
+  s += label(6, baseY-9*scale-4, 'mesa', '#7a4a96');
+  s += label(capCenterX+14, capTopSvgY-2, 'luz on', '#6b8a2a');
+  s += `<line x1="${ox+9*scale+8}" y1="${baseY-4.5*scale}" x2="${ox+9*scale+24}" y2="${baseY-4.5*scale}" stroke="#8a7f6f" stroke-width="0.8"/>`;
+  s += label(ox+9*scale+26, baseY-4.5*scale+3, '① 9³', '#b06a2c');
+  s += `<line x1="${nx+3*scale+4}" y1="${baseY-9*scale-3*scale}" x2="${ox+9*scale+24}" y2="${baseY-9*scale-3*scale}" stroke="#8a7f6f" stroke-width="0.8"/>`;
+  s += label(ox+9*scale+26, baseY-9*scale-3*scale+3, '② 3×6', '#b06a2c');
+  s += `<line x1="${cx+5*scale+2}" y1="${baseY-9*scale-6*scale-scale}" x2="${ox+9*scale+24}" y2="${baseY-9*scale-6*scale-scale}" stroke="#8a7f6f" stroke-width="0.8"/>`;
+  s += label(ox+9*scale+26, baseY-9*scale-6*scale-scale+3, '③ 5×2', '#8a6a1e');
+  svg.innerHTML = s;
+})();
+</script>
+</body>
+</html>
