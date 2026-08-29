@@ -34,3 +34,6 @@ run/
 
 # Claude Code internal directories
 .claude/
+
+#graphify
+graphify-out/
