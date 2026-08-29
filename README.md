@@ -102,9 +102,9 @@ Unenchanted cards yield a minimum of 5 XP; enchanted cards yield more based on t
 
 |   |   |   |
 |---|---|---|
-| Glass Bottle | Experience Bottle | Glass Bottle |
-| Emerald | **Transfer Table** | Emerald |
-| Glass Bottle | Amethyst Shard | Glass Bottle |
+| Brass Ingot | Amethyst Shard | Brass Ingot |
+| Copper Ingot | Glass Block | Copper Ingot |
+| Copper Ingot | Copper Ingot | Copper Ingot |
 
 → **Infusion Coil** × 1
 
@@ -127,6 +127,16 @@ Three smelting recipes form a material chain that produces **Brass Ingots** — 
 | 1. Calcination | Calcite | Zinc Oxide ×2 |
 | 2. Reduction | Zinc Oxide + Coal | Zinc Sheet |
 | 3. Alloying | Copper Ingot + Zinc Sheet | Brass Ingot |
+
+### Crafting Recipe
+
+|   |   |   |
+|---|---|---|
+| Iron Ingot | Iron Ingot | Iron Ingot |
+| Copper Ingot | Glass Pane | Copper Ingot |
+| Copper Ingot | Blast Furnace | Copper Ingot |
+
+→ **Zinc Smelter** × 1
 
 ### Fuel
 

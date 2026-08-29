@@ -1,16 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "GBG",
-    "ECE",
-    "GAG"
+    "BAB",
+    "CGC",
+    "CCC"
   ],
   "key": {
-    "G": "minecraft:glass_bottle",
-    "B": "minecraft:experience_bottle",
-    "E": "minecraft:emerald",
-    "C": "enchanttransfer:transfer_table_block",
-    "A": "minecraft:amethyst_shard"
+    "B": "enchanttransfer:brass_ingot",
+    "A": "minecraft:amethyst_shard",
+    "C": "minecraft:copper_ingot",
+    "G": "minecraft:glass"
   },
   "result": {
     "id": "enchanttransfer:infusion_coil_block",

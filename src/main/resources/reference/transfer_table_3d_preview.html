@@ -66,8 +66,40 @@ const shadeMap = { front:0.92, back:0.72, right:0.66, left:0.58, top:1.0, bottom
 
 const world = document.getElementById('world');
 
-// Caja sólida centrada en (x,y,z) con tamaño (w,h,d)
-function makeBox(parent, x, y, z, w, h, d, colorFn) {
+// ===== Texturas (canvas → dataURL) para las capas =====
+function makeTex(kind){
+  const c=document.createElement('canvas'); c.width=16; c.height=16;
+  const ctx=c.getContext('2d');
+  const px=(x,y,col)=>{ ctx.fillStyle=col; ctx.fillRect(x,y,1,1); };
+  if(kind==='gold'){
+    ctx.fillStyle='#d8a02e'; ctx.fillRect(0,0,16,16);
+    const cells=['#e8b545','#d2962a','#dca838','#c88a22','#e0ad40'];
+    for(let y=0;y<16;y++)for(let x=0;x<16;x++){ if((x+y*3)%5===0) px(x,y,cells[(x*7+y)%cells.length]); }
+    ctx.fillStyle='#f4d070'; ctx.fillRect(0,0,16,1); ctx.fillRect(0,0,1,16);
+    ctx.fillStyle='#fae89a'; ctx.fillRect(1,1,5,1); ctx.fillRect(1,1,1,4);
+    ctx.fillStyle='#9a6a16'; ctx.fillRect(0,15,16,1); ctx.fillRect(15,0,1,16);
+    px(4,3,'#fff6c8'); px(10,6,'#fff0b0'); px(6,11,'#ffeaa0');
+  } else if(kind==='red'){
+    ctx.fillStyle='#9e1810'; ctx.fillRect(0,0,16,16);
+    let seed=7; const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+    for(let i=0;i<70;i++){ const x=Math.floor(rnd()*16),y=Math.floor(rnd()*16),r=rnd();
+      px(x,y, r<0.45?'#6e0c08':r<0.78?'#b82418':r<0.93?'#d83426':'#ff5a44'); }
+    ctx.fillStyle='#c43022'; ctx.fillRect(0,0,16,1); ctx.fillRect(0,0,1,16);
+    ctx.fillStyle='#5a0a06'; ctx.fillRect(0,15,16,1); ctx.fillRect(15,0,1,16);
+  } else if(kind==='carbon'){
+    ctx.fillStyle='#22222a'; ctx.fillRect(0,0,16,16);
+    let seed=3; const rnd=()=>{ seed=(seed*1103515245+12345)&0x7fffffff; return seed/0x7fffffff; };
+    for(let i=0;i<48;i++){ const x=Math.floor(rnd()*16),y=Math.floor(rnd()*16),r=rnd();
+      px(x,y, r<0.5?'#16161c':r<0.85?'#2c2c36':'#3a3a46'); }
+    ctx.fillStyle='#34343e'; ctx.fillRect(0,0,16,1); ctx.fillRect(0,0,1,16);
+    ctx.fillStyle='#121218'; ctx.fillRect(0,15,16,1); ctx.fillRect(15,0,1,16);
+  }
+  return c.toDataURL();
+}
+const TEX = { gold: makeTex('gold'), red: makeTex('red'), carbon: makeTex('carbon') };
+
+// Caja sólida centrada en (x,y,z) con tamaño (w,h,d). texUrl opcional aplica textura con sombreado por cara.
+function makeBox(parent, x, y, z, w, h, d, colorFn, texUrl) {
   const box = document.createElement('div');
   box.className = 'box';
   box.style.transform = `translate3d(${x*S}px, ${-y*S}px, ${z*S}px)`;
@@ -84,33 +116,40 @@ function makeBox(parent, x, y, z, w, h, d, colorFn) {
     const el = document.createElement('div');
     el.className='face';
     el.style.width=f.w+'px'; el.style.height=f.h+'px';
-    el.style.transform=f.t; el.style.background=colorFn(f.n);
+    el.style.transform=f.t;
+    if (texUrl) {
+      const fac = shadeMap[f.n];
+      const ov = (fac>=1 ? 0 : (1-fac)).toFixed(2);
+      el.style.backgroundImage = `linear-gradient(rgba(0,0,0,${ov}),rgba(0,0,0,${ov})), url(${texUrl})`;
+      el.style.backgroundSize = 'cover';
+      el.style.imageRendering = 'pixelated';
+    } else {
+      el.style.background = colorFn(f.n);
+    }
     box.appendChild(el);
   });
   parent.appendChild(box);
   return box;
 }
 
-// Anillo plano (tread del peldaño) que mira a +z local, centrado en origen a profundidad z
-function makeRing(parent, z, outerHalf, innerHalf, color) {
-  const ring = document.createElement('div');
-  ring.style.position='absolute'; ring.style.left='0'; ring.style.top='0';
-  const outer = 2*outerHalf*S;
-  ring.style.width = outer+'px'; ring.style.height = outer+'px';
-  ring.style.border = ((outerHalf-innerHalf)*S)+'px solid '+color;
-  ring.style.background = 'transparent';
-  ring.style.transform = `translate(-50%,-50%) translateZ(${z*S}px)`;
-  parent.appendChild(ring);
+// Anillo (tread) = marco de 4 barras texturizadas en un plano a profundidad z
+function makeRing(parent, z, outerHalf, innerHalf, rgb, texUrl) {
+  const O=outerHalf, I=innerHalf, t=0.5, band=(O-I);
+  const cf=(n)=>shade(rgb, shadeMap[n]);
+  makeBox(parent, 0,  (I+O)/2, z, 2*O, band, t, cf, texUrl);  // arriba
+  makeBox(parent, 0, -(I+O)/2, z, 2*O, band, t, cf, texUrl);  // abajo
+  makeBox(parent, -(I+O)/2, 0, z, band, 2*I, t, cf, texUrl);  // izquierda
+  makeBox(parent,  (I+O)/2, 0, z, band, 2*I, t, cf, texUrl);  // derecha
 }
 
 // Pared vertical (riser): tubo cuadrado de medio-lado H, entre z0 y z1
-function makeRiser(parent, H, z0, z1, rgb) {
+function makeRiser(parent, H, z0, z1, rgb, texUrl) {
   const midz = (z0+z1)/2, span = (z1-z0), t = 0.4;
-  // top, bottom, left, right
-  makeBox(parent, 0,  H, midz, 2*H, t, span, (n)=>shade(rgb, shadeMap[n]));
-  makeBox(parent, 0, -H, midz, 2*H, t, span, (n)=>shade(rgb, shadeMap[n]));
-  makeBox(parent, -H, 0, midz, t, 2*H, span, (n)=>shade(rgb, shadeMap[n]));
-  makeBox(parent,  H, 0, midz, t, 2*H, span, (n)=>shade(rgb, shadeMap[n]));
+  const cf=(n)=>shade(rgb, shadeMap[n]);
+  makeBox(parent, 0,  H, midz, 2*H, t, span, cf, texUrl);
+  makeBox(parent, 0, -H, midz, 2*H, t, span, cf, texUrl);
+  makeBox(parent, -H, 0, midz, t, 2*H, span, cf, texUrl);
+  makeBox(parent,  H, 0, midz, t, 2*H, span, cf, texUrl);
 }
 
 // Colores siguiendo la textura de la mesa: oro → rojo → negro → azul
@@ -118,14 +157,14 @@ const GOLD=[210,150,38], REDSTONE=[160,26,20], CARBON=[34,34,44];
 function buildFunnel(wrapper) {
   // Capas finas (1.5px de tread) para que las 4 bandas se vean. Superficie z=8 → centro
   // ORO:   tread z8 outer8 inner6.5 ; riser half6.5 z6..8
-  makeRing(wrapper, 8,    8,   6.5, shade(GOLD, 0.97));
-  makeRiser(wrapper, 6.5, 6,   8,   GOLD);
+  makeRing(wrapper, 8,    8,   6.5, GOLD, TEX.gold);
+  makeRiser(wrapper, 6.5, 6,   8,   GOLD, TEX.gold);
   // ROJO:  tread z6 outer6.5 inner5 ; riser half5 z4..6
-  makeRing(wrapper, 6,    6.5, 5,   shade(REDSTONE, 0.97));
-  makeRiser(wrapper, 5,   4,   6,   REDSTONE);
+  makeRing(wrapper, 6,    6.5, 5,   REDSTONE, TEX.red);
+  makeRiser(wrapper, 5,   4,   6,   REDSTONE, TEX.red);
   // NEGRO: tread z4 outer5 inner3 ; riser half3 z2..4
-  makeRing(wrapper, 4,    5,   3,   shade(CARBON, 1.0));
-  makeRiser(wrapper, 3,   2,   4,   CARBON);
+  makeRing(wrapper, 4,    5,   3,   CARBON, TEX.carbon);
+  makeRiser(wrapper, 3,   2,   4,   CARBON, TEX.carbon);
   // PLANO EMISIVO al fondo del embudo — mira hacia afuera de ESTA cara
   // (uno por cada una de las 6 caras → la cara azul se ve llena desde cualquier ángulo)
   const lit = document.createElement('div');

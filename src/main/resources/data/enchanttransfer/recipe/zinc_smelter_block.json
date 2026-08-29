@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "III",
+    "CGC",
+    "CBC"
+  ],
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "C": "minecraft:copper_ingot",
+    "G": "minecraft:glass_pane",
+    "B": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "enchanttransfer:zinc_smelter",
+    "count": 1
+  }
+}
