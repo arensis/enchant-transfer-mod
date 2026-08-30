@@ -1,6 +1,7 @@
 {
   "values": [
     "enchanttransfer:transfer_table_block",
+    "enchanttransfer:zinc_smelter",
     "enchanttransfer:infusion_coil_block"
   ]
 }
