@@ -1,0 +1,10 @@
+[Unit]
+Description=Auto-actualizacion de mods de Minecraft desde GitHub Releases
+After=network-online.target minecraft.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Amplio: incluye el aviso previo a jugadores (hasta 5 min) + parada + arranque
+TimeoutStartSec=1800
+ExecStart=/usr/local/bin/mc-mod-autoupdate.sh

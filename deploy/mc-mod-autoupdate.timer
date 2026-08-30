@@ -1,0 +1,11 @@
+[Unit]
+Description=Comprueba GitHub Releases y despliega mods nuevos (diario 05:00)
+
+[Timer]
+# Una vez al dia a las 05:00 (hora local de la Pi). Solo se reinicia si hay
+# una version nueva; y si hay jugadores conectados, se avisa antes.
+OnCalendar=*-*-* 05:00:00
+Persistent=false
+
+[Install]
+WantedBy=timers.target
