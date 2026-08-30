@@ -50,4 +50,5 @@ jobs:
           git add gradle.properties
           git commit -m "chore: bump version to $NEW [skip ci]"
           git tag "v$NEW"
-          git push origin master --follow-tags
+          git push origin master
+          git push origin "v$NEW"

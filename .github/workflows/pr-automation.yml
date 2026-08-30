@@ -62,7 +62,8 @@ jobs:
             git add gradle.properties
             git commit -m "chore: bump version to $NEW [skip ci]"
             git tag "v$NEW"
-            git push origin master --follow-tags
+            git push origin master
+            git push origin "v$NEW"
             echo "bumped=true" >> $GITHUB_OUTPUT
           else
             echo "bumped=false" >> $GITHUB_OUTPUT
