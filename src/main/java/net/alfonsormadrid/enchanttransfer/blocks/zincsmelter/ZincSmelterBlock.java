@@ -49,7 +49,7 @@ public class ZincSmelterBlock extends BlockWithEntity {
                 .registryKey(registryKey)
                 .sounds(BlockSoundGroup.COPPER_BULB)
                 .requiresTool()
-                .strength(4.5f, 20.0f)
+                .strength(7.0f, 7.0f)
                 .luminance(state -> state.get(LIT) ? 13 : 0)
                 .nonOpaque()
         );
