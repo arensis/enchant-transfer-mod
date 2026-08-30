@@ -4,6 +4,11 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to build and release (e.g. v2.0.1)'
+        required: true
 
 jobs:
   release:
@@ -14,6 +19,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag || github.ref }}
 
       - name: Set up Java 21
         uses: actions/setup-java@v4
@@ -39,6 +46,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: "v${{ steps.version.outputs.version }}"
           name: "Enchant Transfer Mod v${{ steps.version.outputs.version }}"
           files: ${{ steps.jar.outputs.path }}
           generate_release_notes: true
