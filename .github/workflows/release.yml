@@ -39,6 +39,10 @@ jobs:
         id: version
         run: echo "version=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')" >> $GITHUB_OUTPUT
 
+      - name: Get Minecraft version
+        id: mc
+        run: echo "version=$(grep 'minecraft_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')" >> $GITHUB_OUTPUT
+
       - name: Find main JAR
         id: jar
         run: echo "path=$(find build/libs -name '*.jar' ! -name '*-sources*' ! -name '*-dev*' | head -1)" >> $GITHUB_OUTPUT
@@ -50,3 +54,16 @@ jobs:
           name: "Enchant Transfer Mod v${{ steps.version.outputs.version }}"
           files: ${{ steps.jar.outputs.path }}
           generate_release_notes: true
+
+      - name: Publish to CurseForge
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          curseforge-id: 1540807
+          curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+          files: ${{ steps.jar.outputs.path }}
+          name: "Enchant Transfer Mod v${{ steps.version.outputs.version }}"
+          version: "v${{ steps.version.outputs.version }}"
+          version-type: release
+          loaders: fabric
+          game-versions: ${{ steps.mc.outputs.version }}
+          changelog: "Full changelog: https://github.com/${{ github.repository }}/releases/tag/v${{ steps.version.outputs.version }}"
