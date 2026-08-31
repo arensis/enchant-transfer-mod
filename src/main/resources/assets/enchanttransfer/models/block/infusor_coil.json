@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:translucent",
   "__comment": "Infusor Coil flask — STATIC geometry only. Fluid level, cap light and the directional base connector are drawn by InfusorCoilRenderer (BlockEntityRenderer). Flask stays UPRIGHT for all bonded faces.",
   "texture_size": [
     16,

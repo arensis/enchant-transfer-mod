@@ -2,7 +2,7 @@ package net.alfonsormadrid.enchanttransfer.screens;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 
@@ -16,7 +16,7 @@ import net.minecraft.network.chat.Component;
  * outline corners read as rounded rather than chamfered on very small radii
  * (the 3-px and 5-px dots/rings used by the nav row).
  *
- * <p>Per row only a single {@link GuiGraphics#fill} call is issued, so the
+ * <p>Per row only a single {@link GuiGraphicsExtractor#fill} call is issued, so the
  * cost is O(r) per shape — negligible for a nav row of 7 dots.
  */
 @Environment(EnvType.CLIENT)
@@ -43,7 +43,7 @@ public final class NavDotRenderer {
     }
 
     /** Fills a circular disk centred at ({@code cx}, {@code cy}) with half-extent {@code r}. */
-    public static void disk(GuiGraphics ctx, int cx, int cy, int r, int color) {
+    public static void disk(GuiGraphicsExtractor ctx, int cx, int cy, int r, int color) {
         int rSq = r * r + r;
         for (int dy = -r; dy <= r; dy++) {
             int rowSpan = (int) Math.sqrt(Math.max(0, rSq - dy * dy));
@@ -57,7 +57,7 @@ public final class NavDotRenderer {
      * (radius {@code r-1}) in {@code bgColor}.  Used to lift a circle off
      * a background of similar tone so its edge stays readable.
      */
-    public static void diskWithBorder(GuiGraphics ctx, int cx, int cy, int r,
+    public static void diskWithBorder(GuiGraphicsExtractor ctx, int cx, int cy, int r,
                                        int bgColor, int borderColor) {
         disk(ctx, cx, cy, r, borderColor);
         if (r > 0) disk(ctx, cx, cy, r - 1, bgColor);
@@ -71,7 +71,7 @@ public final class NavDotRenderer {
      *
      * @param fillRatio 0..1; clamped if outside
      */
-    public static void diskFillFromBottom(GuiGraphics ctx, int cx, int cy, int r, float fillRatio, int color) {
+    public static void diskFillFromBottom(GuiGraphicsExtractor ctx, int cx, int cy, int r, float fillRatio, int color) {
         if (fillRatio <= 0f) return;
         if (fillRatio > 1f) fillRatio = 1f;
         int rSq      = r * r + r;
@@ -100,7 +100,7 @@ public final class NavDotRenderer {
      * angles increasing CLOCKWISE so the visual matches the player's
      * intuition (clock hand sweeping right).
      */
-    public static void arc(GuiGraphics ctx, int cx, int cy,
+    public static void arc(GuiGraphicsExtractor ctx, int cx, int cy,
                             int rOuter, int rInner, float fraction, int color) {
         if (fraction <= 0f) return;
         if (fraction > 1f) fraction = 1f;
@@ -128,7 +128,7 @@ public final class NavDotRenderer {
      * <p>Used by the Selector screen to mark empty sockets instead of
      * relying on a static sprite.
      */
-    public static void plus(GuiGraphics ctx, int cx, int cy, int armRadius, int thickness, int color) {
+    public static void plus(GuiGraphicsExtractor ctx, int cx, int cy, int armRadius, int thickness, int color) {
         int halfT = thickness / 2;
         // Horizontal arm
         ctx.fill(cx - armRadius, cy - halfT,
@@ -142,7 +142,7 @@ public final class NavDotRenderer {
      * Draws a 1-pixel-thick circular outline at half-extent {@code r}.  Used as
      * the "this screen is active" ring around the selected nav dot.
      */
-    public static void ring(GuiGraphics ctx, int cx, int cy, int r, int color) {
+    public static void ring(GuiGraphicsExtractor ctx, int cx, int cy, int r, int color) {
         int rOuterSq = r * r + r;
         int rInnerSq = (r - 1) * (r - 1) + (r - 1);
         for (int dy = -r; dy <= r; dy++) {

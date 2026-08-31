@@ -7,7 +7,7 @@ import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilGuiMetric
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -90,9 +90,8 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
     public InfusionCoilScreen(InfusionCoilScreenHandler handler,
                                Inventory inventory,
                                Component title) {
-        super(handler, inventory, title);
-        imageWidth  = InfusionCoilGuiMetrics.BACKGROUND_WIDTH;
-        imageHeight = InfusionCoilGuiMetrics.BACKGROUND_HEIGHT;
+        super(handler, inventory, title,
+                InfusionCoilGuiMetrics.BACKGROUND_WIDTH, InfusionCoilGuiMetrics.BACKGROUND_HEIGHT);
     }
 
     /** Parchment-brown ink colour shared with the other screens. */
@@ -121,14 +120,15 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
      * because the Infusion Coil GUI doesn't have a spare row for it.
      */
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        context.drawString(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
+    protected void extractLabels(GuiGraphicsExtractor context, int mouseX, int mouseY) {
+        context.text(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
     }
 
     // ── Rendering ────────────────────────────────────────────────────────────
 
     @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractBackground(context, mouseX, mouseY, delta);
         int x = (width  - imageWidth)  / 2;
         int y = (height - imageHeight) / 2;
 
@@ -150,7 +150,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
      * Paints the faded card / glass-bottle hints over the empty card and
      * glass-bottle input slots.  Output slot intentionally not touched.
      */
-    private void drawGhostsForEmptyInputs(GuiGraphics ctx, int guiLeft, int guiTop) {
+    private void drawGhostsForEmptyInputs(GuiGraphicsExtractor ctx, int guiLeft, int guiTop) {
         if (!menu.slots.get(InfusionCoilBlockEntity.SLOT_CARD_IN).hasItem()) {
             drawGhostIcon(ctx, GHOST_CARD,
                     guiLeft + InfusionCoilSlotPositions.cardIn.positionX,
@@ -163,18 +163,17 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
         }
     }
 
-    private static void drawGhostIcon(GuiGraphics ctx, Identifier texture, int x, int y) {
+    private static void drawGhostIcon(GuiGraphicsExtractor ctx, Identifier texture, int x, int y) {
         ctx.blit(RenderPipelines.GUI_TEXTURED, texture,
                 x, y, 0f, 0f, 16, 16, 16, 16, GHOST_TINT);
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        renderBackground(context, mouseX, mouseY, delta);
-        super.render(context, mouseX, mouseY, delta);
-        // Nav row before tooltip so hover popups float above the dots.
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
+        // Nav row on top of the container contents; hover tooltips are drawn
+        // in the deferred tooltip pass so they still float above the dots.
         drawNavRow(context, mouseX, mouseY);
-        renderTooltip(context, mouseX, mouseY);
     }
 
     /**
@@ -183,7 +182,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
      * Always shows at least 1 pixel once progress > 0 so the player gets
      * immediate visual feedback when a card starts infusing.
      */
-    private void drawProgressArrow(GuiGraphics context, int guiLeft, int guiTop) {
+    private void drawProgressArrow(GuiGraphicsExtractor context, int guiLeft, int guiTop) {
         int progress    = menu.getProgress();
         int maxProgress = menu.getMaxProgress();
         if (maxProgress <= 0 || progress <= 0) return;
@@ -209,7 +208,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
     /**
      * Fills the XP tank bottom-to-top proportional to the stored XP.
      */
-    private void drawXpTank(GuiGraphics context, int guiLeft, int guiTop) {
+    private void drawXpTank(GuiGraphicsExtractor context, int guiLeft, int guiTop) {
         int stored   = menu.getStoredXp();
         int capacity = menu.getTankCapacity();
         if (capacity <= 0) return;
@@ -247,7 +246,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
         return null;
     }
 
-    private void drawNavRow(GuiGraphics ctx, int mouseX, int mouseY) {
+    private void drawNavRow(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
         BlockPos tablePos = findTablePos();
         BlockPos coilPos  = menu.getCoilPos();
 
@@ -305,7 +304,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
      * open; it stays on top of whichever palette is active so the
      * "you're here" signal never disappears.
      */
-    private void drawNavDot(GuiGraphics ctx, int cx, int cy, int borderColor, boolean active,
+    private void drawNavDot(GuiGraphicsExtractor ctx, int cx, int cy, int borderColor, boolean active,
                             float fillRatio, boolean hoverable, int mouseX, int mouseY) {
         boolean isHovered = hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2);
 
@@ -327,7 +326,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
         if (isHovered) NavDotRenderer.ring(ctx, cx, cy, NAV_RING + 1, HOVER_COL);
     }
 
-    private void drawNavEmptyDot(GuiGraphics ctx, int cx, int cy) {
+    private void drawNavEmptyDot(GuiGraphicsExtractor ctx, int cx, int cy) {
         NavDotRenderer.diskWithBorder(ctx, cx, cy, NAV_DOT, EMPTY_BG_COL, EMPTY_BORDER_COL);
         NavDotRenderer.plus(ctx, cx, cy, PLUS_ARM_RADIUS, PLUS_THICKNESS, EMPTY_PLUS_COL);
     }
@@ -337,7 +336,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
      * Transfer-Table screen so the player recognises it instantly across
      * both GUIs.
      */
-    private void drawHubDot(GuiGraphics ctx, int cx, int cy, boolean active,
+    private void drawHubDot(GuiGraphicsExtractor ctx, int cx, int cy, boolean active,
                             boolean hoverable, int mouseX, int mouseY) {
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT,     COL_HUB_GOLD);
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT - 1, COL_HUB_RED);
@@ -349,7 +348,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
         }
     }
 
-    private void drawDirLabel(GuiGraphics ctx, int cx, int dotCy, Direction dir) {
+    private void drawDirLabel(GuiGraphicsExtractor ctx, int cx, int dotCy, Direction dir) {
         if (minecraft == null) return;
         Component label   = NavDotRenderer.dirLabel(dir);
         int tw       = minecraft.font.width(label);
@@ -361,7 +360,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
         m.pushMatrix();
         m.translate(worldX, worldY);
         m.scale(LABEL_SCALE, LABEL_SCALE);
-        ctx.drawString(minecraft.font, label, 0, 0, LABEL_COL);
+        ctx.text(minecraft.font, label, 0, 0, LABEL_COL);
         m.popMatrix();
     }
 
@@ -412,8 +411,8 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
     // ── Tooltips ─────────────────────────────────────────────────────────────
 
     @Override
-    protected void renderTooltip(GuiGraphics context, int mouseX, int mouseY) {
-        super.renderTooltip(context, mouseX, mouseY);
+    protected void extractTooltip(GuiGraphicsExtractor context, int mouseX, int mouseY) {
+        super.extractTooltip(context, mouseX, mouseY);
 
         int x = (width  - imageWidth)  / 2;
         int y = (height - imageHeight) / 2;

@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:translucent",
   "__comment": "Horno de Zinc \u2014 Variante C (Ornate Kiln). Modelo est\u00e1tico base. Chimenea (y>16) v\u00eda BER.",
   "textures": {
     "copper": "enchanttransfer:block/smelter_copper",

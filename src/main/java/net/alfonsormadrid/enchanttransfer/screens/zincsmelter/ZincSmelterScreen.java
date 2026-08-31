@@ -3,7 +3,7 @@ package net.alfonsormadrid.enchanttransfer.screens.zincsmelter;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
@@ -55,24 +55,23 @@ public class ZincSmelterScreen extends AbstractContainerScreen<ZincSmelterScreen
 
     public ZincSmelterScreen(ZincSmelterScreenHandler handler,
                              Inventory inventory, Component title) {
-        super(handler, inventory, title);
+        super(handler, inventory, title, BG_W, BG_H);
     }
 
     @Override
     protected void init() {
-        imageWidth  = BG_W;
-        imageHeight = BG_H;
         super.init();
         titleLabelX = (imageWidth - font.width(title)) / 2;
     }
 
     @Override
-    protected void renderLabels(GuiGraphics ctx, int mouseX, int mouseY) {
-        ctx.drawString(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
+    protected void extractLabels(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
+        ctx.text(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
     }
 
     @Override
-    protected void renderBg(GuiGraphics ctx, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor ctx, int mouseX, int mouseY, float delta) {
+        super.extractBackground(ctx, mouseX, mouseY, delta);
         int gx = (width  - imageWidth)  / 2;
         int gy = (height - imageHeight) / 2;
         ctx.blit(RenderPipelines.GUI_TEXTURED,
@@ -104,12 +103,5 @@ public class ZincSmelterScreen extends AbstractContainerScreen<ZincSmelterScreen
                 }
             }
         }
-    }
-
-    @Override
-    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
-        renderBackground(ctx, mouseX, mouseY, delta);
-        super.render(ctx, mouseX, mouseY, delta);
-        renderTooltip(ctx, mouseX, mouseY);
     }
 }

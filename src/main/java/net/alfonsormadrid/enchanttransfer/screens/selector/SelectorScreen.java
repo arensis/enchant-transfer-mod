@@ -7,7 +7,7 @@ import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -139,7 +139,7 @@ public class SelectorScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor ctx, int mouseX, int mouseY, float delta) {
         // 1 — Static background (hub + 6 socket circle outlines baked into PNG)
         ctx.blit(RenderPipelines.GUI_TEXTURED,
                 BG_TEXTURE, bgX, bgY, 0f, 0f, BG_W, BG_H, 256, 256);
@@ -147,12 +147,12 @@ public class SelectorScreen extends Screen {
         // Parchment-brown title centred in the banner of the background.
         if (minecraft != null) {
             int tw = minecraft.font.width(TITLE_TEXT);
-            ctx.drawString(minecraft.font, TITLE_TEXT,
+            ctx.text(minecraft.font, TITLE_TEXT,
                     bgX + (BG_W - tw) / 2, bgY + TITLE_Y, TITLE_COL, false);
         }
 
         if (minecraft == null || minecraft.level == null) {
-            super.render(ctx, mouseX, mouseY, delta);
+            super.extractRenderState(ctx, mouseX, mouseY, delta);
             return;
         }
 
@@ -189,7 +189,7 @@ public class SelectorScreen extends Screen {
             drawDirectionLabel(ctx, e.getKey(), s[0], s[1]);
         }
 
-        super.render(ctx, mouseX, mouseY, delta);
+        super.extractRenderState(ctx, mouseX, mouseY, delta);
 
         // 6 — Hover tooltips for clickable elements
         drawHoverTooltip(ctx, mouseX, mouseY);
@@ -201,7 +201,7 @@ public class SelectorScreen extends Screen {
      * Draws a 2-pixel golden wire from the hub edge to the socket edge.
      * Uses the content-local socket centre {@code (sx, sy)}.
      */
-    private void drawWireHubToSocket(GuiGraphics ctx, int sx, int sy) {
+    private void drawWireHubToSocket(GuiGraphicsExtractor ctx, int sx, int sy) {
         double dx = sx - HUB_CX, dy = sy - HUB_CY;
         double len = Math.sqrt(dx * dx + dy * dy);
         if (len < 1) return;
@@ -225,11 +225,11 @@ public class SelectorScreen extends Screen {
      * model gives the player a faithful preview of the block they'd open
      * by clicking, instead of an abstract glyph.
      */
-    private void drawHub(GuiGraphics ctx, int mouseX, int mouseY) {
+    private void drawHub(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
         int cx = bgX + HUB_CX;
         int cy = bgY + HUB_CY;
         NavDotRenderer.diskWithBorder(ctx, cx, cy, HUB_R, HUB_BG_COL, HUB_BORDER_COL);
-        ctx.renderItem(TABLE_ITEM, cx - 8, cy - 8);
+        ctx.item(TABLE_ITEM, cx - 8, cy - 8);
         if (hovered(mouseX, mouseY, cx, cy, HUB_R)) {
             NavDotRenderer.ring(ctx, cx, cy, HUB_R + 1, HOVER_COL);
         }
@@ -241,7 +241,7 @@ public class SelectorScreen extends Screen {
      * centre.  The item makes the module type instantly recognisable; the
      * disk colour + fill still convey the live state at a glance.
      */
-    private void drawModuleIcon(GuiGraphics ctx, BlockPos coilPos,
+    private void drawModuleIcon(GuiGraphicsExtractor ctx, BlockPos coilPos,
                                 int iconX, int iconY, int mouseX, int mouseY) {
         boolean processing = false;
         float fillRatio       = 0f;
@@ -262,7 +262,7 @@ public class SelectorScreen extends Screen {
 
         NavDotRenderer.diskWithBorder(ctx, cx, cy, ICON_RADIUS, TANK_EMPTY_COL, border);
         NavDotRenderer.diskFillFromBottom(ctx, cx, cy, ICON_RADIUS - 1, fillRatio, FLUID_COLOR);
-        ctx.renderItem(COIL_ITEM, cx - 8, cy - 8);
+        ctx.item(COIL_ITEM, cx - 8, cy - 8);
 
         // Progress arc — 2-px-thick clockwise ring just outside the disk.
         // Only drawn while the coil is processing AND has actually started
@@ -284,7 +284,7 @@ public class SelectorScreen extends Screen {
      * smaller centred "+" glyph in lighter violet.  Not clickable, so no
      * hover ring.
      */
-    private void drawEmptySocket(GuiGraphics ctx, int iconX, int iconY) {
+    private void drawEmptySocket(GuiGraphicsExtractor ctx, int iconX, int iconY) {
         int cx = iconX + ICON_SIZE / 2;
         int cy = iconY + ICON_SIZE / 2;
         NavDotRenderer.diskWithBorder(ctx, cx, cy, ICON_RADIUS, EMPTY_BG_COL, EMPTY_BORDER_COL);
@@ -298,7 +298,7 @@ public class SelectorScreen extends Screen {
      * purple derived from the plus glyph so labels share the empty-socket
      * palette without screaming over the dots.
      */
-    private void drawDirectionLabel(GuiGraphics ctx, Direction dir, int sx, int sy) {
+    private void drawDirectionLabel(GuiGraphicsExtractor ctx, Direction dir, int sx, int sy) {
         if (minecraft == null) return;
         Component label = NavDotRenderer.dirLabel(dir);
         double dx = sx - HUB_CX, dy = sy - HUB_CY;
@@ -308,7 +308,7 @@ public class SelectorScreen extends Screen {
         int ly = (int) Math.round(bgY + sy + dy / len * LABEL_OFFSET);
         int tw = minecraft.font.width(label);
         int fh = minecraft.font.lineHeight;
-        ctx.drawString(minecraft.font, label,
+        ctx.text(minecraft.font, label,
                 lx - tw / 2, ly - fh / 2, 0xFF8240A0);
     }
 
@@ -319,7 +319,7 @@ public class SelectorScreen extends Screen {
 
     // ── Hover tooltips ────────────────────────────────────────────────────────
 
-    private void drawHoverTooltip(GuiGraphics ctx, int mouseX, int mouseY) {
+    private void drawHoverTooltip(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
         if (minecraft == null || minecraft.level == null) return;
         int hubX = bgX + HUB_CX, hubY = bgY + HUB_CY;
 

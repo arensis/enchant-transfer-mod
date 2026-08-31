@@ -8,7 +8,7 @@ import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardSl
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -94,7 +94,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
 
     public TransferTableScreen(TransferTableScreenHandler handler,
                                Inventory inventory, Component title) {
-        super(handler, inventory, title);
+        super(handler, inventory, title, BG_W, BG_H);
     }
 
     /** Parchment-brown ink colour shared with the other screens. */
@@ -102,8 +102,6 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
 
     @Override
     protected void init() {
-        imageWidth  = BG_W;
-        imageHeight = BG_H;
         super.init();
         titleLabelX = (imageWidth - font.width(title)) / 2;
     }
@@ -116,8 +114,8 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
      *     aesthetic of the background PNG.
      */
     @Override
-    protected void renderLabels(GuiGraphics ctx, int mouseX, int mouseY) {
-        ctx.drawString(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
+    protected void extractLabels(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
+        ctx.text(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
     }
 
     /** Ghost-icon hint shown on empty MagicCard inputs (combine slots). */
@@ -127,7 +125,8 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
     private static final int GHOST_TINT = 0x60FFFFFF;
 
     @Override
-    protected void renderBg(GuiGraphics ctx, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor ctx, int mouseX, int mouseY, float delta) {
+        super.extractBackground(ctx, mouseX, mouseY, delta);
         int gx = (width  - imageWidth)  / 2;
         int gy = (height - imageHeight) / 2;
         ctx.blit(RenderPipelines.GUI_TEXTURED,
@@ -148,13 +147,11 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
     }
 
     @Override
-    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
-        renderBackground(ctx, mouseX, mouseY, delta);
-        super.render(ctx, mouseX, mouseY, delta);
-        // Draw nav row BEFORE the tooltip so the hover tooltip floats on top
-        // of the dots instead of being painted over by them.
+    public void extractRenderState(GuiGraphicsExtractor ctx, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(ctx, mouseX, mouseY, delta);
+        // Nav row on top of the container contents; hover tooltips are drawn
+        // in the deferred tooltip pass so they still float above the dots.
         drawNavRow(ctx, mouseX, mouseY);
-        renderTooltip(ctx, mouseX, mouseY);
     }
 
     // ── Nav row ───────────────────────────────────────────────────────────────
@@ -176,7 +173,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
         return result;
     }
 
-    private void drawNavRow(GuiGraphics ctx, int mouseX, int mouseY) {
+    private void drawNavRow(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
         int gx = (width  - imageWidth)  / 2;
         int gy = (height - imageHeight) / 2;
         int hy = gy + NAV_Y;
@@ -221,7 +218,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
      * both GUIs (empty bit clearly dark, filled bit clearly green).
      * Adds the hover halo when the mouse is over a clickable dot.
      */
-    private void drawNavDot(GuiGraphics ctx, int cx, int cy, int borderColor, boolean active,
+    private void drawNavDot(GuiGraphicsExtractor ctx, int cx, int cy, int borderColor, boolean active,
                             float fillRatio, boolean hoverable, int mouseX, int mouseY) {
         boolean isHovered = hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2);
         // Hover → white + translucent lime.  Default (selected or not) →
@@ -247,7 +244,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
      * from the green/amber module dots at a glance.  Adds the active ring
      * + hover halo according to flags.
      */
-    private void drawHubDot(GuiGraphics ctx, int cx, int cy, boolean active,
+    private void drawHubDot(GuiGraphicsExtractor ctx, int cx, int cy, boolean active,
                             boolean hoverable, int mouseX, int mouseY) {
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT,     COL_HUB_GOLD);  // r=3 (outer)
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT - 1, COL_HUB_RED);   // r=2
@@ -263,7 +260,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
      * Empty-socket marker — purple-bordered circle with a tiny "+" glyph,
      * consistent with the Selector screen's vocabulary.
      */
-    private void drawNavEmptyDot(GuiGraphics ctx, int cx, int cy) {
+    private void drawNavEmptyDot(GuiGraphicsExtractor ctx, int cx, int cy) {
         NavDotRenderer.diskWithBorder(ctx, cx, cy, NAV_DOT, EMPTY_BG_COL, EMPTY_BORDER_COL);
         NavDotRenderer.plus(ctx, cx, cy, PLUS_ARM_RADIUS, PLUS_THICKNESS, EMPTY_PLUS_COL);
     }
@@ -279,7 +276,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
      * before the scale is applied — MC then rounds the resulting fractional
      * coordinates inconsistently and the glyph looked left-aligned.
      */
-    private void drawDirLabel(GuiGraphics ctx, int cx, int dotCy, Direction dir) {
+    private void drawDirLabel(GuiGraphicsExtractor ctx, int cx, int dotCy, Direction dir) {
         if (minecraft == null) return;
         Component label   = NavDotRenderer.dirLabel(dir);
         int tw       = minecraft.font.width(label);
@@ -291,7 +288,7 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
         m.pushMatrix();
         m.translate(worldX, worldY);
         m.scale(LABEL_SCALE, LABEL_SCALE);
-        ctx.drawString(minecraft.font, label, 0, 0, LABEL_COL);
+        ctx.text(minecraft.font, label, 0, 0, LABEL_COL);
         m.popMatrix();
     }
 
@@ -303,8 +300,8 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
     // ── Tooltips ──────────────────────────────────────────────────────────────
 
     @Override
-    protected void renderTooltip(GuiGraphics ctx, int mouseX, int mouseY) {
-        super.renderTooltip(ctx, mouseX, mouseY);
+    protected void extractTooltip(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
+        super.extractTooltip(ctx, mouseX, mouseY);
         if (minecraft == null || minecraft.level == null) return;
 
         int gx = (width  - imageWidth)  / 2;
