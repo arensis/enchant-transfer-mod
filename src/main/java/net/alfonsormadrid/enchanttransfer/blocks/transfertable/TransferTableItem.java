@@ -1,14 +1,14 @@
 package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 
 public class TransferTableItem extends BlockItem {
-    public TransferTableItem(TransferTableBlock transferTableBlock, RegistryKey<Item> registryKey) {
+    public TransferTableItem(TransferTableBlock transferTableBlock, ResourceKey<Item> registryKey) {
         super(
             transferTableBlock,
-            new Item.Settings().registryKey(registryKey).fireproof()
+            new Item.Properties().setId(registryKey).fireResistant()
         );
     }
 }

@@ -2,27 +2,27 @@ package net.alfonsormadrid.enchanttransfer.blocks.zincsmelter;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.screens.zincsmelter.ZincSmelterScreenHandler;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.SidedInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -36,7 +36,7 @@ import java.util.Set;
  * Recipes are matched via {@link ZincSmeltingRecipeRegistry}.
  */
 public class ZincSmelterBlockEntity extends BlockEntity
-        implements SidedInventory, NamedScreenHandlerFactory {
+        implements WorldlyContainer, MenuProvider {
 
     // ── Slot indices ───────────────────────────────────────────────────────
     public static final int SLOT_INPUT1 = 0;
@@ -64,13 +64,13 @@ public class ZincSmelterBlockEntity extends BlockEntity
     private static final String NBT_COOK_TOTAL     = "CookTotal";
 
     // ── State ──────────────────────────────────────────────────────────────
-    private final DefaultedList<ItemStack> items = DefaultedList.ofSize(INVENTORY_SIZE, ItemStack.EMPTY);
+    private final NonNullList<ItemStack> items = NonNullList.withSize(INVENTORY_SIZE, ItemStack.EMPTY);
     private int litTime;
     private int litDuration;
     private int cookingProgress;
     private int cookingTotalTime;
 
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+    private final ContainerData propertyDelegate = new ContainerData() {
         @Override public int get(int index) {
             return switch (index) {
                 case PROP_LIT_TIME      -> litTime;
@@ -88,7 +88,7 @@ public class ZincSmelterBlockEntity extends BlockEntity
                 case PROP_COOK_TOTAL    -> cookingTotalTime = value;
             }
         }
-        @Override public int size() { return PROPERTY_COUNT; }
+        @Override public int getCount() { return PROPERTY_COUNT; }
     };
 
     public ZincSmelterBlockEntity(BlockPos pos, BlockState state) {
@@ -97,7 +97,7 @@ public class ZincSmelterBlockEntity extends BlockEntity
 
     // ── Tick ───────────────────────────────────────────────────────────────
 
-    public static void serverTick(World world, BlockPos pos, BlockState state,
+    public static void serverTick(Level world, BlockPos pos, BlockState state,
                                   ZincSmelterBlockEntity be) {
         boolean wasLit = be.litTime > 0;
         boolean dirty = false;
@@ -161,17 +161,17 @@ public class ZincSmelterBlockEntity extends BlockEntity
         updateLitState(world, pos, state, isLit, wasLit);
 
         // Particles while lit
-        if (isLit && world instanceof ServerWorld sw) {
-            long tick = world.getTime();
+        if (isLit && world instanceof ServerLevel sw) {
+            long tick = world.getGameTime();
             // Smoke from chimney (every ~4 ticks)
             if (tick % 4 == 0) {
                 double cx = pos.getX() + 0.5;
                 double cy = pos.getY() + 1.5;
                 double cz = pos.getZ() + 0.5;
-                sw.spawnParticles(ParticleTypes.SMOKE, cx, cy, cz,
+                sw.sendParticles(ParticleTypes.SMOKE, cx, cy, cz,
                         1, 0.1, 0.1, 0.1, 0.01);
                 if (tick % 12 == 0) {
-                    sw.spawnParticles(ParticleTypes.LARGE_SMOKE, cx, cy + 0.2, cz,
+                    sw.sendParticles(ParticleTypes.LARGE_SMOKE, cx, cy + 0.2, cz,
                             1, 0.05, 0.05, 0.05, 0.005);
                 }
             }
@@ -179,48 +179,48 @@ public class ZincSmelterBlockEntity extends BlockEntity
             // The door is on the OPPOSITE face from facing: when
             // facing=NORTH the door faces SOUTH (+Z).
             if (tick % 3 == 0) {
-                Direction doorDir = state.get(ZincSmelterBlock.FACING).getOpposite();
-                double fx = pos.getX() + 0.5 + doorDir.getOffsetX() * 0.6;
+                Direction doorDir = state.getValue(ZincSmelterBlock.FACING).getOpposite();
+                double fx = pos.getX() + 0.5 + doorDir.getStepX() * 0.6;
                 double fy = pos.getY() + 0.38;
-                double fz = pos.getZ() + 0.5 + doorDir.getOffsetZ() * 0.6;
-                sw.spawnParticles(ParticleTypes.FLAME, fx, fy, fz,
+                double fz = pos.getZ() + 0.5 + doorDir.getStepZ() * 0.6;
+                sw.sendParticles(ParticleTypes.FLAME, fx, fy, fz,
                         1, 0.06, 0.04, 0.06, 0.005);
                 if (tick % 9 == 0) {
-                    sw.spawnParticles(ParticleTypes.LAVA, fx, fy, fz,
+                    sw.sendParticles(ParticleTypes.LAVA, fx, fy, fz,
                             1, 0.04, 0.02, 0.04, 0.0);
                 }
             }
         }
 
-        if (dirty) be.markDirty();
+        if (dirty) be.setChanged();
     }
 
-    private static void updateLitState(World world, BlockPos pos, BlockState state,
+    private static void updateLitState(Level world, BlockPos pos, BlockState state,
                                        boolean isLit, boolean wasLit) {
-        if (isLit != wasLit && world instanceof ServerWorld sw) {
-            sw.setBlockState(pos, state.with(ZincSmelterBlock.LIT, isLit));
+        if (isLit != wasLit && world instanceof ServerLevel sw) {
+            sw.setBlockAndUpdate(pos, state.setValue(ZincSmelterBlock.LIT, isLit));
         }
     }
 
     private boolean canAcceptOutput(ZincSmeltingRecipeRegistry.Recipe recipe) {
         ItemStack output = items.get(SLOT_OUTPUT);
         if (output.isEmpty()) return true;
-        if (!output.isOf(recipe.result().getItem())) return false;
-        return output.getCount() + recipe.result().getCount() <= output.getMaxCount();
+        if (!output.is(recipe.result().getItem())) return false;
+        return output.getCount() + recipe.result().getCount() <= output.getMaxStackSize();
     }
 
     private void craftRecipe(ZincSmeltingRecipeRegistry.Recipe recipe) {
         // Consume inputs
-        items.get(SLOT_INPUT1).decrement(1);
+        items.get(SLOT_INPUT1).shrink(1);
         if (recipe.input2() != null) {
-            items.get(SLOT_INPUT2).decrement(1);
+            items.get(SLOT_INPUT2).shrink(1);
         }
         // Produce output
         ItemStack output = items.get(SLOT_OUTPUT);
         if (output.isEmpty()) {
             items.set(SLOT_OUTPUT, recipe.result().copy());
         } else {
-            output.increment(recipe.result().getCount());
+            output.grow(recipe.result().getCount());
         }
     }
 
@@ -240,8 +240,8 @@ public class ZincSmelterBlockEntity extends BlockEntity
         if (fuel.isEmpty()) return 0;
         if (!VALID_FUELS.contains(fuel.getItem())) return 0;
 
-        if (fuel.isOf(Items.BLAZE_ROD)) {
-            fuel.decrement(1);
+        if (fuel.is(Items.BLAZE_ROD)) {
+            fuel.shrink(1);
         }
         // Lava bucket stays in slot — not consumed.
         // Return a short burn window: enough for one recipe cycle + margin.
@@ -258,19 +258,19 @@ public class ZincSmelterBlockEntity extends BlockEntity
     // ── NBT (1.21.11 ReadView/WriteView API) ──────────────────────────────
 
     @Override
-    protected void readData(ReadView view) {
-        super.readData(view);
-        Inventories.readData(view, items);
-        litTime          = view.getInt(NBT_LIT_TIME, 0);
-        litDuration      = view.getInt(NBT_LIT_DURATION, 0);
-        cookingProgress  = view.getInt(NBT_COOK_PROGRESS, 0);
-        cookingTotalTime = view.getInt(NBT_COOK_TOTAL, 0);
+    protected void loadAdditional(ValueInput view) {
+        super.loadAdditional(view);
+        ContainerHelper.loadAllItems(view, items);
+        litTime          = view.getIntOr(NBT_LIT_TIME, 0);
+        litDuration      = view.getIntOr(NBT_LIT_DURATION, 0);
+        cookingProgress  = view.getIntOr(NBT_COOK_PROGRESS, 0);
+        cookingTotalTime = view.getIntOr(NBT_COOK_TOTAL, 0);
     }
 
     @Override
-    protected void writeData(WriteView view) {
-        super.writeData(view);
-        Inventories.writeData(view, items);
+    protected void saveAdditional(ValueOutput view) {
+        super.saveAdditional(view);
+        ContainerHelper.saveAllItems(view, items);
         view.putInt(NBT_LIT_TIME, litTime);
         view.putInt(NBT_LIT_DURATION, litDuration);
         view.putInt(NBT_COOK_PROGRESS, cookingProgress);
@@ -279,7 +279,7 @@ public class ZincSmelterBlockEntity extends BlockEntity
 
     // ── Inventory ──────────────────────────────────────────────────────────
 
-    @Override public int size() { return INVENTORY_SIZE; }
+    @Override public int getContainerSize() { return INVENTORY_SIZE; }
 
     @Override
     public boolean isEmpty() {
@@ -287,39 +287,39 @@ public class ZincSmelterBlockEntity extends BlockEntity
     }
 
     @Override
-    public ItemStack getStack(int slot) { return items.get(slot); }
+    public ItemStack getItem(int slot) { return items.get(slot); }
 
     @Override
-    public ItemStack removeStack(int slot, int amount) {
-        ItemStack result = Inventories.splitStack(items, slot, amount);
-        if (!result.isEmpty()) markDirty();
+    public ItemStack removeItem(int slot, int amount) {
+        ItemStack result = ContainerHelper.removeItem(items, slot, amount);
+        if (!result.isEmpty()) setChanged();
         return result;
     }
 
     @Override
-    public ItemStack removeStack(int slot) {
-        return Inventories.removeStack(items, slot);
+    public ItemStack removeItemNoUpdate(int slot) {
+        return ContainerHelper.takeItem(items, slot);
     }
 
     @Override
-    public void setStack(int slot, ItemStack stack) {
+    public void setItem(int slot, ItemStack stack) {
         items.set(slot, stack);
-        stack.capCount(getMaxCountPerStack());
-        markDirty();
+        stack.limitSize(getMaxStackSize());
+        setChanged();
     }
 
     @Override
-    public boolean canPlayerUse(PlayerEntity player) {
-        return world != null
-                && world.getBlockEntity(pos) == this
-                && player.squaredDistanceTo(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) <= 64.0;
+    public boolean stillValid(Player player) {
+        return level != null
+                && level.getBlockEntity(worldPosition) == this
+                && player.distanceToSqr(worldPosition.getX() + 0.5, worldPosition.getY() + 0.5, worldPosition.getZ() + 0.5) <= 64.0;
     }
 
     @Override
-    public void clear() { items.clear(); }
+    public void clearContent() { items.clear(); }
 
     @Override
-    public boolean isValid(int slot, ItemStack stack) {
+    public boolean canPlaceItem(int slot, ItemStack stack) {
         return switch (slot) {
             case SLOT_FUEL   -> isValidFuel(stack);
             case SLOT_OUTPUT -> false; // output is read-only
@@ -334,7 +334,7 @@ public class ZincSmelterBlockEntity extends BlockEntity
     private static final int[] OUTPUT_SLOTS = {SLOT_OUTPUT};
 
     @Override
-    public int[] getAvailableSlots(Direction side) {
+    public int[] getSlotsForFace(Direction side) {
         return switch (side) {
             case DOWN  -> OUTPUT_SLOTS;
             case UP    -> INPUT_SLOTS;
@@ -343,24 +343,24 @@ public class ZincSmelterBlockEntity extends BlockEntity
     }
 
     @Override
-    public boolean canInsert(int slot, ItemStack stack, @Nullable Direction dir) {
-        return isValid(slot, stack);
+    public boolean canPlaceItemThroughFace(int slot, ItemStack stack, @Nullable Direction dir) {
+        return canPlaceItem(slot, stack);
     }
 
     @Override
-    public boolean canExtract(int slot, ItemStack stack, Direction dir) {
+    public boolean canTakeItemThroughFace(int slot, ItemStack stack, Direction dir) {
         return slot == SLOT_OUTPUT;
     }
 
     // ── Screen ─────────────────────────────────────────────────────────────
 
     @Override
-    public Text getDisplayName() {
-        return Text.translatable("block.enchanttransfer.zinc_smelter");
+    public Component getDisplayName() {
+        return Component.translatable("block.enchanttransfer.zinc_smelter");
     }
 
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new ZincSmelterScreenHandler(syncId, playerInventory, this, propertyDelegate);
     }
 

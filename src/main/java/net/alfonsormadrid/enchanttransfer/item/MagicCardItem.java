@@ -1,12 +1,12 @@
 package net.alfonsormadrid.enchanttransfer.item;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -35,13 +35,13 @@ public class MagicCardItem extends Item {
     private final @Nullable CardType cardType;
 
     /** Construye una carta base/blanco (sin categoría). */
-    public MagicCardItem(RegistryKey<Item> registryKey) {
+    public MagicCardItem(ResourceKey<Item> registryKey) {
         this(registryKey, null);
     }
 
     /** Construye una carta coloreada que pertenece a {@code cardType}. */
-    public MagicCardItem(RegistryKey<Item> registryKey, @Nullable CardType cardType) {
-        super(new Item.Settings().registryKey(registryKey).fireproof());
+    public MagicCardItem(ResourceKey<Item> registryKey, @Nullable CardType cardType) {
+        super(new Item.Properties().setId(registryKey).fireResistant());
         this.cardType = cardType;
     }
 
@@ -55,8 +55,8 @@ public class MagicCardItem extends Item {
     }
 
     @Override
-    public ActionResult use(World world, PlayerEntity playerEntity, Hand hand) {
-        playerEntity.playSound(SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, 1.0F, 1.0F);
-        return ActionResult.SUCCESS;
+    public InteractionResult use(Level world, Player playerEntity, InteractionHand hand) {
+        playerEntity.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 1.0F, 1.0F);
+        return InteractionResult.SUCCESS;
     }
 }

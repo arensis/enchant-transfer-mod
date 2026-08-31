@@ -7,16 +7,15 @@ import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilSlotPosit
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.slot.CardInputSlot;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.slot.ExperienceBottleOutputSlot;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.slot.GlassBottleSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.math.BlockPos;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import java.util.stream.IntStream;
 
 /**
@@ -24,50 +23,50 @@ import java.util.stream.IntStream;
  * inventory (card-in, glass-in, xp-out) to GUI slots at the coordinates
  * defined in {@link InfusionCoilSlotPositions}.
  */
-public class InfusionCoilScreenHandler extends ScreenHandler {
+public class InfusionCoilScreenHandler extends AbstractContainerMenu {
 
     private static final int GUI_SLOTS_END    = 3;
     private static final int PLAYER_INV_START = 3;
     private static final int HOTBAR_END       = 39;
 
-    private final Inventory inventory;
-    private final PropertyDelegate propertyDelegate;
+    private final Container inventory;
+    private final ContainerData propertyDelegate;
     /** Position of the Infusion Coil in the world — synced via ExtendedScreenHandlerType. */
     private final BlockPos coilPos;
 
     /** Client-side constructor: called by ExtendedScreenHandlerType with the synced coil pos. */
-    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory, BlockPos coilPos) {
+    public InfusionCoilScreenHandler(int syncId, Inventory playerInventory, BlockPos coilPos) {
         this(syncId, playerInventory,
-                new SimpleInventory(3),
-                new net.minecraft.screen.ArrayPropertyDelegate(InfusionCoilBlockEntity.PROPERTY_COUNT),
+                new SimpleContainer(3),
+                new net.minecraft.world.inventory.SimpleContainerData(InfusionCoilBlockEntity.PROPERTY_COUNT),
                 coilPos);
     }
 
     /** Fallback client-side constructor when position is not available. */
-    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, BlockPos.ORIGIN);
+    public InfusionCoilScreenHandler(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, BlockPos.ZERO);
     }
 
     /** Server-side constructor: bound to the live block entity inventory and its PropertyDelegate. */
-    public InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
-        this(syncId, playerInventory, inventory, propertyDelegate, BlockPos.ORIGIN);
+    public InfusionCoilScreenHandler(int syncId, Inventory playerInventory, Container inventory, ContainerData propertyDelegate) {
+        this(syncId, playerInventory, inventory, propertyDelegate, BlockPos.ZERO);
     }
 
     /** Master constructor — all other constructors delegate here. */
-    private InfusionCoilScreenHandler(int syncId, PlayerInventory playerInventory,
-                                      Inventory inventory, PropertyDelegate propertyDelegate,
+    private InfusionCoilScreenHandler(int syncId, Inventory playerInventory,
+                                      Container inventory, ContainerData propertyDelegate,
                                       BlockPos coilPos) {
         super(EnchantTransferMod.INFUSION_COIL_SCREEN_HANDLER, syncId);
-        checkSize(inventory, 3);
+        checkContainerSize(inventory, 3);
         this.inventory = inventory;
         this.propertyDelegate = propertyDelegate;
         this.coilPos = coilPos;
-        inventory.onOpen(playerInventory.player);
+        inventory.startOpen(playerInventory.player);
 
         buildModuleSlots();
         addPlayerInventory(playerInventory);
         addPlayerHotbar(playerInventory);
-        addProperties(propertyDelegate);
+        addDataSlots(propertyDelegate);
     }
 
     /** Returns the world position of the Infusion Coil block (available client-side). */
@@ -99,7 +98,7 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
         addSlot(new ExperienceBottleOutputSlot(inventory, InfusionCoilBlockEntity.SLOT_BOTTLE_OUT, InfusionCoilSlotPositions.xpOut));
     }
 
-    private void addPlayerInventory(PlayerInventory playerInventory) {
+    private void addPlayerInventory(Inventory playerInventory) {
         int x = InfusionCoilGuiMetrics.playerInventory.positionX;
         int y = InfusionCoilGuiMetrics.playerInventory.positionY;
         IntStream.range(0, 3).forEach(row ->
@@ -107,7 +106,7 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
                         addSlot(new Slot(playerInventory, col + row * 9 + 9, x + col * 18, y + row * 18))));
     }
 
-    private void addPlayerHotbar(PlayerInventory playerInventory) {
+    private void addPlayerHotbar(Inventory playerInventory) {
         int x = InfusionCoilGuiMetrics.playerHotbar.positionX;
         int y = InfusionCoilGuiMetrics.playerHotbar.positionY;
         IntStream.range(0, 9).forEach(col ->
@@ -115,27 +114,27 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return inventory.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return inventory.stillValid(player);
     }
 
     @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
-        inventory.onClose(player);
+    public void removed(Player player) {
+        super.removed(player);
+        inventory.stopOpen(player);
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+    public ItemStack quickMoveStack(Player player, int slotIndex) {
         Slot slot = slots.get(slotIndex);
-        if (!slot.hasStack()) return ItemStack.EMPTY;
+        if (!slot.hasItem()) return ItemStack.EMPTY;
 
-        ItemStack original = slot.getStack();
+        ItemStack original = slot.getItem();
         ItemStack copy = original.copy();
 
         if (slotIndex < GUI_SLOTS_END) {
             // From the coil to the player
-            if (!insertItem(original, PLAYER_INV_START, HOTBAR_END, true)) {
+            if (!moveItemStackTo(original, PLAYER_INV_START, HOTBAR_END, true)) {
                 return ItemStack.EMPTY;
             }
         } else {
@@ -143,11 +142,11 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
             // Any MagicCardItem (base or coloured) routes to the card slot;
             // glass bottles go to the bottle slot.
             if (original.getItem() instanceof net.alfonsormadrid.enchanttransfer.item.MagicCardItem) {
-                if (!insertItem(original, InfusionCoilBlockEntity.SLOT_CARD_IN, InfusionCoilBlockEntity.SLOT_CARD_IN + 1, false)) {
+                if (!moveItemStackTo(original, InfusionCoilBlockEntity.SLOT_CARD_IN, InfusionCoilBlockEntity.SLOT_CARD_IN + 1, false)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (original.isOf(net.minecraft.item.Items.GLASS_BOTTLE)) {
-                if (!insertItem(original, InfusionCoilBlockEntity.SLOT_BOTTLE_IN, InfusionCoilBlockEntity.SLOT_BOTTLE_IN + 1, false)) {
+            } else if (original.is(net.minecraft.world.item.Items.GLASS_BOTTLE)) {
+                if (!moveItemStackTo(original, InfusionCoilBlockEntity.SLOT_BOTTLE_IN, InfusionCoilBlockEntity.SLOT_BOTTLE_IN + 1, false)) {
                     return ItemStack.EMPTY;
                 }
             } else {
@@ -156,9 +155,9 @@ public class InfusionCoilScreenHandler extends ScreenHandler {
         }
 
         if (original.isEmpty()) {
-            slot.setStack(ItemStack.EMPTY);
+            slot.setByPlayer(ItemStack.EMPTY);
         } else {
-            slot.markDirty();
+            slot.setChanged();
         }
         return copy;
     }

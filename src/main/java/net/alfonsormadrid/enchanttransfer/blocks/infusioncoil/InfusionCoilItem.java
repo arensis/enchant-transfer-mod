@@ -1,14 +1,14 @@
 package net.alfonsormadrid.enchanttransfer.blocks.infusioncoil;
 
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.registry.RegistryKey;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 
 public class InfusionCoilItem extends BlockItem {
-    public InfusionCoilItem(InfusionCoilBlock block, RegistryKey<Item> registryKey) {
+    public InfusionCoilItem(InfusionCoilBlock block, ResourceKey<Item> registryKey) {
         super(
             block,
-            new Item.Settings().registryKey(registryKey).fireproof()
+            new Item.Properties().setId(registryKey).fireResistant()
         );
     }
 }

@@ -13,9 +13,9 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockRenderLayerMap;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.gui.screen.ingame.HandledScreens;
-import net.minecraft.client.render.BlockRenderLayer;
+import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 
 @Environment(EnvType.CLIENT)
 public class EnchantTransferClientMod implements ClientModInitializer {
@@ -23,28 +23,28 @@ public class EnchantTransferClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         // ── GUI screens ───────────────────────────────────────────────────────
-        HandledScreens.register(
+        MenuScreens.register(
                 EnchantTransferMod.TRANSFER_TABLE_SCREEN_HANDLER,
                 TransferTableScreen::new);
 
-        HandledScreens.register(
+        MenuScreens.register(
                 EnchantTransferMod.INFUSION_COIL_SCREEN_HANDLER,
                 InfusionCoilScreen::new);
 
-        HandledScreens.register(
+        MenuScreens.register(
                 EnchantTransferMod.ZINC_SMELTER_SCREEN_HANDLER,
                 ZincSmelterScreen::new);
 
         // ── Block entity renderers ────────────────────────────────────────────
-        BlockEntityRendererFactories.register(
+        BlockEntityRenderers.register(
                 EnchantTransferMod.TRANSFER_TABLE_BLOCK_ENTITY,
                 ctx -> new TransferTableRenderer(ctx));
 
-        BlockEntityRendererFactories.register(
+        BlockEntityRenderers.register(
                 EnchantTransferMod.INFUSION_COIL_BLOCK_ENTITY,
                 ctx -> new InfusionCoilRenderer(ctx));
 
-        BlockEntityRendererFactories.register(
+        BlockEntityRenderers.register(
                 EnchantTransferMod.ZINC_SMELTER_BLOCK_ENTITY,
                 ctx -> new ZincSmelterRenderer(ctx));
 
@@ -58,13 +58,13 @@ public class EnchantTransferClientMod implements ClientModInitializer {
         // the debugFilledBox render layer.
         BlockRenderLayerMap.putBlock(
                 EnchantTransferMod.INFUSION_COIL_BLOCK,
-                BlockRenderLayer.TRANSLUCENT);
+                ChunkSectionLayer.TRANSLUCENT);
 
         // The smelter_glass.png mirilla texture has alpha — TRANSLUCENT
         // lets the BER fire glow show through the glass when lit.
         BlockRenderLayerMap.putBlock(
                 EnchantTransferMod.ZINC_SMELTER_BLOCK,
-                BlockRenderLayer.TRANSLUCENT);
+                ChunkSectionLayer.TRANSLUCENT);
 
         // ── Custom networking ─────────────────────────────────────────────────
         // S2C: open the Selector screen for the given Transfer Table position

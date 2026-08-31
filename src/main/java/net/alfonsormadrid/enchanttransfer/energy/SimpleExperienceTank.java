@@ -1,7 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.energy;
 
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * In-memory implementation of {@link ExperienceStorage} with NBT serialization.
@@ -59,11 +59,11 @@ public class SimpleExperienceTank implements ExperienceStorage {
         this.stored = Math.max(0, Math.min(value, capacity));
     }
 
-    public void writeData(WriteView view) {
+    public void writeData(ValueOutput view) {
         view.putInt(NBT_STORED, stored);
     }
 
-    public void readData(ReadView view) {
-        this.stored = Math.max(0, Math.min(view.getInt(NBT_STORED, 0), capacity));
+    public void readData(ValueInput view) {
+        this.stored = Math.max(0, Math.min(view.getIntOr(NBT_STORED, 0), capacity));
     }
 }

@@ -1,22 +1,22 @@
 package net.alfonsormadrid.enchanttransfer.renderers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
 import net.alfonsormadrid.enchanttransfer.renderers.state.InfusionCoilRenderState;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * BlockEntityRenderer for the Infusion Coil.
@@ -44,7 +44,7 @@ public class InfusionCoilRenderer
   // the vertex colour, producing a checkerboard-of-vertex-colour-on-black
   // pattern.  Hosting our own guarantees the binding succeeds.
   private static final Identifier WHITE_TEXTURE =
-    Identifier.of(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
+    Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
 
   // ── Fluid (XP) ───────────────────────────────────────────────────────────
   // Fluid box sits INSIDE the glass cavity (glass body XZ = [3.5..12.5]/16)
@@ -118,7 +118,7 @@ public class InfusionCoilRenderer
 
   private static final int FULL_LIGHT = 0xF000F0;
 
-  public InfusionCoilRenderer(BlockEntityRendererFactory.Context ctx) {}
+  public InfusionCoilRenderer(BlockEntityRendererProvider.Context ctx) {}
 
   @Override
   public InfusionCoilRenderState createRenderState() {
@@ -129,25 +129,25 @@ public class InfusionCoilRenderer
   public void updateRenderState(InfusionCoilBlockEntity entity,
                                 InfusionCoilRenderState state,
                                 float tickDelta,
-                                Vec3d cameraPos,
-                                ModelCommandRenderer.CrumblingOverlayCommand crumbling) {
-    BlockEntityRenderer.super.updateRenderState(entity, state, tickDelta, cameraPos, crumbling);
+                                Vec3 cameraPos,
+                                ModelFeatureRenderer.CrumblingOverlay crumbling) {
+    BlockEntityRenderer.super.extractRenderState(entity, state, tickDelta, cameraPos, crumbling);
     state.fillRatio    = entity.getFillRatio();
     state.isProcessing = entity.isProcessing();
 
     state.dirToTable = null;
-    if (entity.getWorld() != null) {
-      BlockPos pos = entity.getPos();
+    if (entity.getLevel() != null) {
+      BlockPos pos = entity.getBlockPos();
       for (Direction dir : Direction.values()) {
-        if (entity.getWorld().getBlockState(pos.offset(dir))
-          .isOf(EnchantTransferMod.TRANSFER_TABLE_BLOCK)) {
+        if (entity.getLevel().getBlockState(pos.relative(dir))
+          .is(EnchantTransferMod.TRANSFER_TABLE_BLOCK)) {
           state.dirToTable = dir;
           break;
         }
       }
     }
 
-    long worldTime = entity.getWorld() != null ? entity.getWorld().getTime() : 0L;
+    long worldTime = entity.getLevel() != null ? entity.getLevel().getGameTime() : 0L;
     state.animTime = (worldTime + tickDelta) * 0.08f;
 
     // Drip plays whenever a card is being processed, regardless of the tank
@@ -181,8 +181,8 @@ public class InfusionCoilRenderer
 
   @Override
   public void render(InfusionCoilRenderState state,
-                     MatrixStack matrices,
-                     OrderedRenderCommandQueue queue,
+                     PoseStack matrices,
+                     SubmitNodeCollector queue,
                      CameraRenderState cameraState) {
 
     // Two render layers with WHITE_TEXTURE (1×1 solid white → final colour
@@ -199,8 +199,8 @@ public class InfusionCoilRenderer
     //   • layer (entityTranslucentEmissive) — translucent + always full-
     //     bright.  Used for the drip drop, the knob pulse skin, and the
     //     tube.  These are all overlay effects that should not occlude.
-    RenderLayer fluidLayer = RenderLayers.entityCutoutNoCull(WHITE_TEXTURE);
-    RenderLayer layer      = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
+    RenderType fluidLayer = RenderTypes.entityCutoutNoCull(WHITE_TEXTURE);
+    RenderType layer      = RenderTypes.entityTranslucentEmissive(WHITE_TEXTURE);
 
     // ── 1. FLUID (XP liquid) ─────────────────────────────────────────────
     // Diagnostic mode removed.  Renders only when the tank actually has XP,
@@ -215,7 +215,7 @@ public class InfusionCoilRenderer
       // Bump: fluid rises momentarily after the drip impacts the surface.
       float bumpHeight = state.fluidBump * 1.2f / 16f;
       float finalTopY = Math.min(FLUID_Y_MAX, fluidTopY + bumpHeight);
-      queue.submitCustom(matrices, fluidLayer, (entry, vc) ->
+      queue.submitCustomGeometry(matrices, fluidLayer, (entry, vc) ->
         drawBox(entry, vc,
           FLUID_X_MIN, FLUID_Y_BASE, FLUID_Z_MIN,
           FLUID_X_MAX, finalTopY,    FLUID_Z_MAX,
@@ -235,7 +235,7 @@ public class InfusionCoilRenderer
         float dropY0 = dropBottomY;
         float dropY1 = dropBottomY + DRIP_HEIGHT;
         final float dy0 = dropY0, dy1 = dropY1;
-        queue.submitCustom(matrices, layer, (entry, vc) ->
+        queue.submitCustomGeometry(matrices, layer, (entry, vc) ->
           drawBoxFlat(entry, vc,
             0.5f - DRIP_HALF_WIDTH, dy0, 0.5f - DRIP_HALF_DEPTH,
             0.5f + DRIP_HALF_WIDTH, dy1, 0.5f + DRIP_HALF_DEPTH,
@@ -262,7 +262,7 @@ public class InfusionCoilRenderer
       final float rG = Math.min(1f, FLUID_G * 1.2f);
       final float rB = Math.min(1f, FLUID_B * 1.3f);
 
-      queue.submitCustom(matrices, layer, (entry, vc) ->
+      queue.submitCustomGeometry(matrices, layer, (entry, vc) ->
         drawBoxFlat(entry, vc,
                 0.5f - rOut, rY0, 0.5f - rOut,
                 0.5f + rOut, rY1, 0.5f + rOut,
@@ -280,7 +280,7 @@ public class InfusionCoilRenderer
       float pulse = 0.5f + 0.5f * (float) Math.sin(state.animTime); // 0..1
 
       float skinAlpha = 0.12f + 0.48f * pulse;
-      queue.submitCustom(matrices, layer, (entry, vc) ->
+      queue.submitCustomGeometry(matrices, layer, (entry, vc) ->
         drawBox(entry, vc,
           6.95f / 16f, 17.02f / 16f, 6.95f / 16f,
           9.05f / 16f, 18.05f / 16f, 9.05f / 16f,
@@ -311,8 +311,8 @@ public class InfusionCoilRenderer
 
       // entityCutout writes depth — prevents translucent-sorting glitches
       // where back faces show through at oblique camera angles.
-      RenderLayer tubeLayer = RenderLayers.entityCutout(WHITE_TEXTURE);
-      queue.submitCustom(matrices, tubeLayer, (entry, vc) -> {
+      RenderType tubeLayer = RenderTypes.entityCutout(WHITE_TEXTURE);
+      queue.submitCustomGeometry(matrices, tubeLayer, (entry, vc) -> {
         drawBox(entry, vc,
           flangeNear[0], flangeNear[1], flangeNear[2],
           flangeNear[3], flangeNear[4], flangeNear[5],
@@ -354,7 +354,7 @@ public class InfusionCoilRenderer
     };
   }
 
-  private static void drawBox(MatrixStack.Entry entry, VertexConsumer vc,
+  private static void drawBox(PoseStack.Pose entry, VertexConsumer vc,
                               float x0, float y0, float z0,
                               float x1, float y1, float z1,
                               float r,  float g,  float b,  float a) {
@@ -370,7 +370,7 @@ public class InfusionCoilRenderer
   }
 
   /** Uniform-colour box — no directional shading. Used for small emissive beads. */
-  private static void drawBoxFlat(MatrixStack.Entry entry, VertexConsumer vc,
+  private static void drawBoxFlat(PoseStack.Pose entry, VertexConsumer vc,
                                    float x0, float y0, float z0,
                                    float x1, float y1, float z1,
                                    float r,  float g,  float b,  float a) {
@@ -382,16 +382,16 @@ public class InfusionCoilRenderer
     quad(entry, vc, x1,y1,z0, x1,y1,z1, x1,y0,z1, x1,y0,z0, r,g,b,a,  1f, 0f, 0f);
   }
 
-  private static void quad(MatrixStack.Entry entry, VertexConsumer vc,
+  private static void quad(PoseStack.Pose entry, VertexConsumer vc,
                             float ax, float ay, float az,
                             float bx, float by, float bz,
                             float cx, float cy, float cz,
                             float dx, float dy, float dz,
                             float r,  float g,  float b,  float a,
                             float nx, float ny, float nz) {
-    vc.vertex(entry, ax, ay, az).color(r,g,b,a).texture(0f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
-    vc.vertex(entry, bx, by, bz).color(r,g,b,a).texture(1f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
-    vc.vertex(entry, cx, cy, cz).color(r,g,b,a).texture(1f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
-    vc.vertex(entry, dx, dy, dz).color(r,g,b,a).texture(0f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
+    vc.addVertex(entry, ax, ay, az).setColor(r,g,b,a).setUv(0f,0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
+    vc.addVertex(entry, bx, by, bz).setColor(r,g,b,a).setUv(1f,0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
+    vc.addVertex(entry, cx, cy, cz).setColor(r,g,b,a).setUv(1f,1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
+    vc.addVertex(entry, dx, dy, dz).setColor(r,g,b,a).setUv(0f,1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
   }
 }

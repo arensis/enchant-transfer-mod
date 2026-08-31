@@ -7,15 +7,15 @@ import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilGuiMetric
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Inventory;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -31,10 +31,10 @@ import org.jetbrains.annotations.Nullable;
  *       {@link RequestOpenGuiPayload} C2S packet.</li>
  * </ul>
  */
-public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler> {
+public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScreenHandler> {
 
     private static final Identifier TEXTURE =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/gui/container/infusor_gui.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/gui/container/infusor_gui.png");
 
     // Progress-arrow fill colours (violet left-half → cyan right-half)
     private static final int ARROW_COL_LEFT  = 0xFF7B00FF; // violet
@@ -88,11 +88,11 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     private static final int   LABEL_GAP   = 4;
 
     public InfusionCoilScreen(InfusionCoilScreenHandler handler,
-                               PlayerInventory inventory,
-                               Text title) {
+                               Inventory inventory,
+                               Component title) {
         super(handler, inventory, title);
-        backgroundWidth  = InfusionCoilGuiMetrics.BACKGROUND_WIDTH;
-        backgroundHeight = InfusionCoilGuiMetrics.BACKGROUND_HEIGHT;
+        imageWidth  = InfusionCoilGuiMetrics.BACKGROUND_WIDTH;
+        imageHeight = InfusionCoilGuiMetrics.BACKGROUND_HEIGHT;
     }
 
     /** Parchment-brown ink colour shared with the other screens. */
@@ -102,9 +102,9 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     // item the slot expects.  Replaced by the real item the moment the
     // player drops one in.
     private static final Identifier GHOST_CARD =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/item/magic_card_item.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/item/magic_card_item.png");
     private static final Identifier GHOST_BOTTLE =
-            Identifier.of("minecraft", "textures/item/glass_bottle.png");
+            Identifier.fromNamespaceAndPath("minecraft", "textures/item/glass_bottle.png");
     /** ARGB tint for ghost icons — 38 % white opacity preserves the silhouette
      *  while clearly reading as a hint rather than an actual item. */
     private static final int GHOST_TINT = 0x60FFFFFF;
@@ -112,7 +112,7 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     @Override
     protected void init() {
         super.init();
-        titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+        titleLabelX = (imageWidth - font.width(title)) / 2;
     }
 
     /**
@@ -121,21 +121,21 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
      * because the Infusion Coil GUI doesn't have a spare row for it.
      */
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        context.drawText(textRenderer, title, titleX, titleY, TITLE_COL, false);
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
+        context.drawString(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
     }
 
     // ── Rendering ────────────────────────────────────────────────────────────
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        int x = (width  - backgroundWidth)  / 2;
-        int y = (height - backgroundHeight) / 2;
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+        int x = (width  - imageWidth)  / 2;
+        int y = (height - imageHeight) / 2;
 
         // Static background
-        context.drawTexture(RenderPipelines.GUI_TEXTURED,
+        context.blit(RenderPipelines.GUI_TEXTURED,
                 TEXTURE, x, y, 0.0f, 0.0f,
-                backgroundWidth, backgroundHeight, 256, 256);
+                imageWidth, imageHeight, 256, 256);
 
         // Ghost icons hint what each input slot accepts.  Drawn before the
         // progress / tank overlays so they sit behind everything dynamic
@@ -150,31 +150,31 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
      * Paints the faded card / glass-bottle hints over the empty card and
      * glass-bottle input slots.  Output slot intentionally not touched.
      */
-    private void drawGhostsForEmptyInputs(DrawContext ctx, int guiLeft, int guiTop) {
-        if (!handler.slots.get(InfusionCoilBlockEntity.SLOT_CARD_IN).hasStack()) {
+    private void drawGhostsForEmptyInputs(GuiGraphics ctx, int guiLeft, int guiTop) {
+        if (!menu.slots.get(InfusionCoilBlockEntity.SLOT_CARD_IN).hasItem()) {
             drawGhostIcon(ctx, GHOST_CARD,
                     guiLeft + InfusionCoilSlotPositions.cardIn.positionX,
                     guiTop  + InfusionCoilSlotPositions.cardIn.positionY);
         }
-        if (!handler.slots.get(InfusionCoilBlockEntity.SLOT_BOTTLE_IN).hasStack()) {
+        if (!menu.slots.get(InfusionCoilBlockEntity.SLOT_BOTTLE_IN).hasItem()) {
             drawGhostIcon(ctx, GHOST_BOTTLE,
                     guiLeft + InfusionCoilSlotPositions.glassIn.positionX,
                     guiTop  + InfusionCoilSlotPositions.glassIn.positionY);
         }
     }
 
-    private static void drawGhostIcon(DrawContext ctx, Identifier texture, int x, int y) {
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED, texture,
+    private static void drawGhostIcon(GuiGraphics ctx, Identifier texture, int x, int y) {
+        ctx.blit(RenderPipelines.GUI_TEXTURED, texture,
                 x, y, 0f, 0f, 16, 16, 16, 16, GHOST_TINT);
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
         // Nav row before tooltip so hover popups float above the dots.
         drawNavRow(context, mouseX, mouseY);
-        drawMouseoverTooltip(context, mouseX, mouseY);
+        renderTooltip(context, mouseX, mouseY);
     }
 
     /**
@@ -183,9 +183,9 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
      * Always shows at least 1 pixel once progress > 0 so the player gets
      * immediate visual feedback when a card starts infusing.
      */
-    private void drawProgressArrow(DrawContext context, int guiLeft, int guiTop) {
-        int progress    = handler.getProgress();
-        int maxProgress = handler.getMaxProgress();
+    private void drawProgressArrow(GuiGraphics context, int guiLeft, int guiTop) {
+        int progress    = menu.getProgress();
+        int maxProgress = menu.getMaxProgress();
         if (maxProgress <= 0 || progress <= 0) return;
 
         // Math.max ensures at least 1 px is painted on the very first tick
@@ -209,9 +209,9 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     /**
      * Fills the XP tank bottom-to-top proportional to the stored XP.
      */
-    private void drawXpTank(DrawContext context, int guiLeft, int guiTop) {
-        int stored   = handler.getStoredXp();
-        int capacity = handler.getTankCapacity();
+    private void drawXpTank(GuiGraphics context, int guiLeft, int guiTop) {
+        int stored   = menu.getStoredXp();
+        int capacity = menu.getTankCapacity();
         if (capacity <= 0) return;
 
         float fillRatio = (float) stored / capacity;
@@ -236,23 +236,23 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
      */
     @Nullable
     private BlockPos findTablePos() {
-        if (client == null || client.world == null) return null;
-        BlockPos coilPos = handler.getCoilPos();
+        if (minecraft == null || minecraft.level == null) return null;
+        BlockPos coilPos = menu.getCoilPos();
         for (Direction dir : Direction.values()) {
-            BlockPos nb = coilPos.offset(dir);
-            if (client.world.getBlockState(nb).isOf(EnchantTransferMod.TRANSFER_TABLE_BLOCK)) {
+            BlockPos nb = coilPos.relative(dir);
+            if (minecraft.level.getBlockState(nb).is(EnchantTransferMod.TRANSFER_TABLE_BLOCK)) {
                 return nb;
             }
         }
         return null;
     }
 
-    private void drawNavRow(DrawContext ctx, int mouseX, int mouseY) {
+    private void drawNavRow(GuiGraphics ctx, int mouseX, int mouseY) {
         BlockPos tablePos = findTablePos();
-        BlockPos coilPos  = handler.getCoilPos();
+        BlockPos coilPos  = menu.getCoilPos();
 
-        int gx = (width  - backgroundWidth)  / 2;
-        int gy = (height - backgroundHeight) / 2;
+        int gx = (width  - imageWidth)  / 2;
+        int gy = (height - imageHeight) / 2;
         int hy = gy + NAV_Y;
 
         // i=0 → hub.  Clickable when connected to a Transfer Table.
@@ -268,12 +268,12 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
             int cx = gx + NAV_X0 + i * NAV_STEP;
             Direction dir = Direction.values()[i - 1];
             boolean rendered = false;
-            if (tablePos != null && client != null && client.world != null) {
-                BlockPos nb = tablePos.offset(dir);
-                if (client.world.getBlockState(nb).isOf(EnchantTransferMod.INFUSION_COIL_BLOCK)) {
+            if (tablePos != null && minecraft != null && minecraft.level != null) {
+                BlockPos nb = tablePos.relative(dir);
+                if (minecraft.level.getBlockState(nb).is(EnchantTransferMod.INFUSION_COIL_BLOCK)) {
                     float  fillRatio = 0f;
                     boolean processing = false;
-                    var be = client.world.getBlockEntity(nb);
+                    var be = minecraft.level.getBlockEntity(nb);
                     if (be instanceof InfusionCoilBlockEntity coil) {
                         fillRatio  = coil.getFillRatio();
                         processing = coil.isProcessing();
@@ -305,7 +305,7 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
      * open; it stays on top of whichever palette is active so the
      * "you're here" signal never disappears.
      */
-    private void drawNavDot(DrawContext ctx, int cx, int cy, int borderColor, boolean active,
+    private void drawNavDot(GuiGraphics ctx, int cx, int cy, int borderColor, boolean active,
                             float fillRatio, boolean hoverable, int mouseX, int mouseY) {
         boolean isHovered = hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2);
 
@@ -327,7 +327,7 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
         if (isHovered) NavDotRenderer.ring(ctx, cx, cy, NAV_RING + 1, HOVER_COL);
     }
 
-    private void drawNavEmptyDot(DrawContext ctx, int cx, int cy) {
+    private void drawNavEmptyDot(GuiGraphics ctx, int cx, int cy) {
         NavDotRenderer.diskWithBorder(ctx, cx, cy, NAV_DOT, EMPTY_BG_COL, EMPTY_BORDER_COL);
         NavDotRenderer.plus(ctx, cx, cy, PLUS_ARM_RADIUS, PLUS_THICKNESS, EMPTY_PLUS_COL);
     }
@@ -337,7 +337,7 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
      * Transfer-Table screen so the player recognises it instantly across
      * both GUIs.
      */
-    private void drawHubDot(DrawContext ctx, int cx, int cy, boolean active,
+    private void drawHubDot(GuiGraphics ctx, int cx, int cy, boolean active,
                             boolean hoverable, int mouseX, int mouseY) {
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT,     COL_HUB_GOLD);
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT - 1, COL_HUB_RED);
@@ -349,19 +349,19 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
         }
     }
 
-    private void drawDirLabel(DrawContext ctx, int cx, int dotCy, Direction dir) {
-        if (client == null) return;
-        Text label   = NavDotRenderer.dirLabel(dir);
-        int tw       = client.textRenderer.getWidth(label);
+    private void drawDirLabel(GuiGraphics ctx, int cx, int dotCy, Direction dir) {
+        if (minecraft == null) return;
+        Component label   = NavDotRenderer.dirLabel(dir);
+        int tw       = minecraft.font.width(label);
         int scaledTw = Math.round(tw * LABEL_SCALE);
         int worldX   = cx - scaledTw / 2;
         int worldY   = dotCy + NAV_DOT + LABEL_GAP;
 
-        var m = ctx.getMatrices();
+        var m = ctx.pose();
         m.pushMatrix();
         m.translate(worldX, worldY);
         m.scale(LABEL_SCALE, LABEL_SCALE);
-        ctx.drawTextWithShadow(client.textRenderer, label, 0, 0, LABEL_COL);
+        ctx.drawString(minecraft.font, label, 0, 0, LABEL_COL);
         m.popMatrix();
     }
 
@@ -371,11 +371,11 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean down) {
-        if (click.button() == 0 && client != null && client.world != null) {
+    public boolean mouseClicked(MouseButtonEvent click, boolean down) {
+        if (click.button() == 0 && minecraft != null && minecraft.level != null) {
             BlockPos tablePos = findTablePos();
-            int gx = (width  - backgroundWidth)  / 2;
-            int gy = (height - backgroundHeight) / 2;
+            int gx = (width  - imageWidth)  / 2;
+            int gy = (height - imageHeight) / 2;
             int hy = gy + NAV_Y;
             int hitR = NAV_RING + 2;
 
@@ -391,11 +391,11 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
 
             // i=1..6 → module slots
             if (tablePos != null) {
-                BlockPos coilPos = handler.getCoilPos();
+                BlockPos coilPos = menu.getCoilPos();
                 for (int i = 1; i < NAV_SLOTS; i++) {
                     Direction dir = Direction.values()[i - 1];
-                    BlockPos nb = tablePos.offset(dir);
-                    if (!client.world.getBlockState(nb).isOf(EnchantTransferMod.INFUSION_COIL_BLOCK)) continue;
+                    BlockPos nb = tablePos.relative(dir);
+                    if (!minecraft.level.getBlockState(nb).is(EnchantTransferMod.INFUSION_COIL_BLOCK)) continue;
                     if (nb.equals(coilPos)) continue; // skip current screen
                     int cx = gx + NAV_X0 + i * NAV_STEP;
                     int dx = (int) click.x() - cx, dy = (int) click.y() - hy;
@@ -412,37 +412,37 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
     // ── Tooltips ─────────────────────────────────────────────────────────────
 
     @Override
-    protected void drawMouseoverTooltip(DrawContext context, int mouseX, int mouseY) {
-        super.drawMouseoverTooltip(context, mouseX, mouseY);
+    protected void renderTooltip(GuiGraphics context, int mouseX, int mouseY) {
+        super.renderTooltip(context, mouseX, mouseY);
 
-        int x = (width  - backgroundWidth)  / 2;
-        int y = (height - backgroundHeight) / 2;
+        int x = (width  - imageWidth)  / 2;
+        int y = (height - imageHeight) / 2;
 
         // Show "X / 1000 XP" tooltip when hovering over the tank
         int tankX = x + InfusionCoilGuiMetrics.xpTank.positionX;
         int tankY = y + InfusionCoilGuiMetrics.xpTank.positionY;
         if (mouseX >= tankX && mouseX < tankX + InfusionCoilGuiMetrics.TANK_WIDTH
                 && mouseY >= tankY && mouseY < tankY + InfusionCoilGuiMetrics.TANK_HEIGHT) {
-            context.drawTooltip(textRenderer,
-                    Text.literal(handler.getStoredXp() + " / " + handler.getTankCapacity() + " XP"),
+            context.setTooltipForNextFrame(font,
+                    Component.literal(menu.getStoredXp() + " / " + menu.getTankCapacity() + " XP"),
                     mouseX, mouseY);
             return;
         }
 
         // Nav-row hover tooltips
-        if (client == null || client.world == null) return;
+        if (minecraft == null || minecraft.level == null) return;
         int hy = y + NAV_Y;
         int hitR = NAV_RING + 2;
         BlockPos tablePos = findTablePos();
-        BlockPos thisCoilPos = handler.getCoilPos();
+        BlockPos thisCoilPos = menu.getCoilPos();
 
         // Hub dot
         int hubX = x + NAV_X0;
         if (sq(mouseX - hubX) + sq(mouseY - hy) <= hitR * hitR) {
-            context.drawTooltip(textRenderer,
+            context.setTooltipForNextFrame(font,
                     tablePos != null
-                            ? Text.translatable("block.enchanttransfer.transfer_table_block")
-                            : Text.literal("§7Disconnected"),
+                            ? Component.translatable("block.enchanttransfer.transfer_table_block")
+                            : Component.literal("§7Disconnected"),
                     mouseX, mouseY);
             return;
         }
@@ -454,30 +454,30 @@ public class InfusionCoilScreen extends HandledScreen<InfusionCoilScreenHandler>
             Direction dir = Direction.values()[i - 1];
             String dirName = dir.name();
             if (tablePos == null) {
-                context.drawTooltip(textRenderer,
-                        Text.literal("§7Empty (" + dirName + ")"),
+                context.setTooltipForNextFrame(font,
+                        Component.literal("§7Empty (" + dirName + ")"),
                         mouseX, mouseY);
                 return;
             }
-            BlockPos nb = tablePos.offset(dir);
-            if (!client.world.getBlockState(nb).isOf(EnchantTransferMod.INFUSION_COIL_BLOCK)) {
-                context.drawTooltip(textRenderer,
-                        Text.literal("§7Empty (" + dirName + ")"),
+            BlockPos nb = tablePos.relative(dir);
+            if (!minecraft.level.getBlockState(nb).is(EnchantTransferMod.INFUSION_COIL_BLOCK)) {
+                context.setTooltipForNextFrame(font,
+                        Component.literal("§7Empty (" + dirName + ")"),
                         mouseX, mouseY);
                 return;
             }
             String state  = "§aIdle";
             String levelS = "?";
             String suffix = nb.equals(thisCoilPos) ? " §6(this)" : "";
-            var be = client.world.getBlockEntity(nb);
+            var be = minecraft.level.getBlockEntity(nb);
             if (be instanceof InfusionCoilBlockEntity coil) {
                 state  = coil.isProcessing() ? "§eInfusing" : "§aIdle";
                 levelS = coil.getStored() + " / " + coil.getCapacity() + " XP";
             }
-            context.drawTooltip(textRenderer, java.util.List.of(
-                    Text.literal("§fInfusion Coil §7(" + dirName + ")" + suffix),
-                    Text.literal("§7" + levelS),
-                    Text.literal(state)
+            context.setComponentTooltipForNextFrame(font, java.util.List.of(
+                    Component.literal("§fInfusion Coil §7(" + dirName + ")" + suffix),
+                    Component.literal("§7" + levelS),
+                    Component.literal(state)
             ), mouseX, mouseY);
             return;
         }

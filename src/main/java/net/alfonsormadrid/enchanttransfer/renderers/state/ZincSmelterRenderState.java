@@ -1,7 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.renderers.state;
 
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.core.Direction;
 
 /**
  * Render state for the Zinc Smelter BER.

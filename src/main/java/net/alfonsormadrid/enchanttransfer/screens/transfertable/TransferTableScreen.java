@@ -5,19 +5,19 @@ import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockE
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardSlot;
-import net.minecraft.screen.slot.Slot;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.Slot;
 import java.util.List;
 
 /**
@@ -29,10 +29,10 @@ import java.util.List;
  * {@link RequestOpenGuiPayload} to the server to open that module's own screen.
  */
 @Environment(EnvType.CLIENT)
-public class TransferTableScreen extends HandledScreen<TransferTableScreenHandler> {
+public class TransferTableScreen extends AbstractContainerScreen<TransferTableScreenHandler> {
 
     private static final Identifier TEXTURE =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/gui/container/core_gui.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/gui/container/core_gui.png");
 
     // Background content size (176×200 inside a 256×256 PNG)
     private static final int BG_W = 176, BG_H = 200;
@@ -93,7 +93,7 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
     private static final int   LABEL_GAP   = 4;
 
     public TransferTableScreen(TransferTableScreenHandler handler,
-                               PlayerInventory inventory, Text title) {
+                               Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
 
@@ -102,10 +102,10 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
 
     @Override
     protected void init() {
-        backgroundWidth  = BG_W;
-        backgroundHeight = BG_H;
+        imageWidth  = BG_W;
+        imageHeight = BG_H;
         super.init();
-        titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+        titleLabelX = (imageWidth - font.width(title)) / 2;
     }
 
     /**
@@ -116,31 +116,31 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
      *     aesthetic of the background PNG.
      */
     @Override
-    protected void drawForeground(DrawContext ctx, int mouseX, int mouseY) {
-        ctx.drawText(textRenderer, title, titleX, titleY, TITLE_COL, false);
+    protected void renderLabels(GuiGraphics ctx, int mouseX, int mouseY) {
+        ctx.drawString(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
     }
 
     /** Ghost-icon hint shown on empty MagicCard inputs (combine slots). */
     private static final Identifier GHOST_CARD =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/item/magic_card_item.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/item/magic_card_item.png");
     /** ARGB tint for ghost icons — 38 % white opacity, matches InfusionCoilScreen. */
     private static final int GHOST_TINT = 0x60FFFFFF;
 
     @Override
-    protected void drawBackground(DrawContext ctx, float delta, int mouseX, int mouseY) {
-        int gx = (width  - backgroundWidth)  / 2;
-        int gy = (height - backgroundHeight) / 2;
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED,
-                TEXTURE, gx, gy, 0f, 0f, backgroundWidth, backgroundHeight, 256, 256);
+    protected void renderBg(GuiGraphics ctx, float delta, int mouseX, int mouseY) {
+        int gx = (width  - imageWidth)  / 2;
+        int gy = (height - imageHeight) / 2;
+        ctx.blit(RenderPipelines.GUI_TEXTURED,
+                TEXTURE, gx, gy, 0f, 0f, imageWidth, imageHeight, 256, 256);
 
         // Faded card silhouettes on the empty combine inputs.  Done in
         // drawBackground so super.render() can later paint a real card on
         // top once the player drops one in.  Iterating handler.slots and
         // filtering by class avoids hardcoded slot indices — adding more
         // MagicCardSlot inputs in the future is automatic.
-        for (Slot slot : handler.slots) {
-            if (slot instanceof MagicCardSlot && !slot.hasStack()) {
-                ctx.drawTexture(RenderPipelines.GUI_TEXTURED, GHOST_CARD,
+        for (Slot slot : menu.slots) {
+            if (slot instanceof MagicCardSlot && !slot.hasItem()) {
+                ctx.blit(RenderPipelines.GUI_TEXTURED, GHOST_CARD,
                         gx + slot.x, gy + slot.y,
                         0f, 0f, 16, 16, 16, 16, GHOST_TINT);
             }
@@ -148,13 +148,13 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
         renderBackground(ctx, mouseX, mouseY, delta);
         super.render(ctx, mouseX, mouseY, delta);
         // Draw nav row BEFORE the tooltip so the hover tooltip floats on top
         // of the dots instead of being painted over by them.
         drawNavRow(ctx, mouseX, mouseY);
-        drawMouseoverTooltip(ctx, mouseX, mouseY);
+        renderTooltip(ctx, mouseX, mouseY);
     }
 
     // ── Nav row ───────────────────────────────────────────────────────────────
@@ -165,10 +165,10 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
      */
     private boolean[] connectedSlots() {
         boolean[] result = new boolean[6];
-        if (client == null || client.world == null) return result;
-        BlockPos tablePos = handler.getTablePos();
+        if (minecraft == null || minecraft.level == null) return result;
+        BlockPos tablePos = menu.getTablePos();
         for (Direction dir : Direction.values()) {
-            if (client.world.getBlockState(tablePos.offset(dir)).getBlock()
+            if (minecraft.level.getBlockState(tablePos.relative(dir)).getBlock()
                     == EnchantTransferMod.INFUSION_COIL_BLOCK) {
                 result[dir.ordinal()] = true;
             }
@@ -176,13 +176,13 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
         return result;
     }
 
-    private void drawNavRow(DrawContext ctx, int mouseX, int mouseY) {
-        int gx = (width  - backgroundWidth)  / 2;
-        int gy = (height - backgroundHeight) / 2;
+    private void drawNavRow(GuiGraphics ctx, int mouseX, int mouseY) {
+        int gx = (width  - imageWidth)  / 2;
+        int gy = (height - imageHeight) / 2;
         int hy = gy + NAV_Y;
 
         boolean[] connected = connectedSlots();
-        BlockPos tablePos = handler.getTablePos();
+        BlockPos tablePos = menu.getTablePos();
 
         // i=0 → hub: this screen is active so it gets the cyan ring; not
         // clickable from itself so we don't draw a hover halo.
@@ -197,11 +197,11 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
             if (!connected[i - 1]) {
                 drawNavEmptyDot(ctx, cx, hy);
             } else {
-                BlockPos coilPos = tablePos.offset(dir);
+                BlockPos coilPos = tablePos.relative(dir);
                 float  fillRatio = 0f;
                 boolean processing = false;
-                if (client != null && client.world != null) {
-                    var be = client.world.getBlockEntity(coilPos);
+                if (minecraft != null && minecraft.level != null) {
+                    var be = minecraft.level.getBlockEntity(coilPos);
                     if (be instanceof InfusionCoilBlockEntity coil) {
                         fillRatio  = coil.getFillRatio();
                         processing = coil.isProcessing();
@@ -221,7 +221,7 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
      * both GUIs (empty bit clearly dark, filled bit clearly green).
      * Adds the hover halo when the mouse is over a clickable dot.
      */
-    private void drawNavDot(DrawContext ctx, int cx, int cy, int borderColor, boolean active,
+    private void drawNavDot(GuiGraphics ctx, int cx, int cy, int borderColor, boolean active,
                             float fillRatio, boolean hoverable, int mouseX, int mouseY) {
         boolean isHovered = hoverable && hovered(mouseX, mouseY, cx, cy, NAV_RING + 2);
         // Hover → white + translucent lime.  Default (selected or not) →
@@ -247,7 +247,7 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
      * from the green/amber module dots at a glance.  Adds the active ring
      * + hover halo according to flags.
      */
-    private void drawHubDot(DrawContext ctx, int cx, int cy, boolean active,
+    private void drawHubDot(GuiGraphics ctx, int cx, int cy, boolean active,
                             boolean hoverable, int mouseX, int mouseY) {
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT,     COL_HUB_GOLD);  // r=3 (outer)
         NavDotRenderer.disk(ctx, cx, cy, NAV_DOT - 1, COL_HUB_RED);   // r=2
@@ -263,7 +263,7 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
      * Empty-socket marker — purple-bordered circle with a tiny "+" glyph,
      * consistent with the Selector screen's vocabulary.
      */
-    private void drawNavEmptyDot(DrawContext ctx, int cx, int cy) {
+    private void drawNavEmptyDot(GuiGraphics ctx, int cx, int cy) {
         NavDotRenderer.diskWithBorder(ctx, cx, cy, NAV_DOT, EMPTY_BG_COL, EMPTY_BORDER_COL);
         NavDotRenderer.plus(ctx, cx, cy, PLUS_ARM_RADIUS, PLUS_THICKNESS, EMPTY_PLUS_COL);
     }
@@ -279,19 +279,19 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
      * before the scale is applied — MC then rounds the resulting fractional
      * coordinates inconsistently and the glyph looked left-aligned.
      */
-    private void drawDirLabel(DrawContext ctx, int cx, int dotCy, Direction dir) {
-        if (client == null) return;
-        Text label   = NavDotRenderer.dirLabel(dir);
-        int tw       = client.textRenderer.getWidth(label);
+    private void drawDirLabel(GuiGraphics ctx, int cx, int dotCy, Direction dir) {
+        if (minecraft == null) return;
+        Component label   = NavDotRenderer.dirLabel(dir);
+        int tw       = minecraft.font.width(label);
         int scaledTw = Math.round(tw * LABEL_SCALE);
         int worldX   = cx - scaledTw / 2;
         int worldY   = dotCy + NAV_DOT + LABEL_GAP;
 
-        var m = ctx.getMatrices();
+        var m = ctx.pose();
         m.pushMatrix();
         m.translate(worldX, worldY);
         m.scale(LABEL_SCALE, LABEL_SCALE);
-        ctx.drawTextWithShadow(client.textRenderer, label, 0, 0, LABEL_COL);
+        ctx.drawString(minecraft.font, label, 0, 0, LABEL_COL);
         m.popMatrix();
     }
 
@@ -303,21 +303,21 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
     // ── Tooltips ──────────────────────────────────────────────────────────────
 
     @Override
-    protected void drawMouseoverTooltip(DrawContext ctx, int mouseX, int mouseY) {
-        super.drawMouseoverTooltip(ctx, mouseX, mouseY);
-        if (client == null || client.world == null) return;
+    protected void renderTooltip(GuiGraphics ctx, int mouseX, int mouseY) {
+        super.renderTooltip(ctx, mouseX, mouseY);
+        if (minecraft == null || minecraft.level == null) return;
 
-        int gx = (width  - backgroundWidth)  / 2;
-        int gy = (height - backgroundHeight) / 2;
+        int gx = (width  - imageWidth)  / 2;
+        int gy = (height - imageHeight) / 2;
         int hy = gy + NAV_Y;
         int hitR = NAV_RING + 2;
-        BlockPos tablePos = handler.getTablePos();
+        BlockPos tablePos = menu.getTablePos();
 
         // Hub dot (i=0)
         int hubX = gx + NAV_X0;
         if (sq(mouseX - hubX) + sq(mouseY - hy) <= hitR * hitR) {
-            ctx.drawTooltip(textRenderer,
-                    Text.translatable("block.enchanttransfer.transfer_table_block"),
+            ctx.setTooltipForNextFrame(font,
+                    Component.translatable("block.enchanttransfer.transfer_table_block"),
                     mouseX, mouseY);
             return;
         }
@@ -329,25 +329,25 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
             Direction dir = Direction.values()[i - 1];
             String dirName = dir.name();
             if (!connected[i - 1]) {
-                ctx.drawTooltip(textRenderer,
-                        Text.literal("§7Empty (" + dirName + ")"),
+                ctx.setTooltipForNextFrame(font,
+                        Component.literal("§7Empty (" + dirName + ")"),
                         mouseX, mouseY);
                 return;
             }
-            BlockPos coilPos = tablePos.offset(dir);
+            BlockPos coilPos = tablePos.relative(dir);
             String state  = "Idle";
             String levelS = "?";
-            var be = client.world.getBlockEntity(coilPos);
+            var be = minecraft.level.getBlockEntity(coilPos);
             if (be instanceof InfusionCoilBlockEntity coil) {
                 state  = coil.isProcessing() ? "§eInfusing" : "§aIdle";
                 int stored   = coil.getStored();
                 int capacity = coil.getCapacity();
                 levelS = stored + " / " + capacity + " XP";
             }
-            ctx.drawTooltip(textRenderer, List.of(
-                    Text.literal("§fInfusion Coil §7(" + dirName + ")"),
-                    Text.literal("§7" + levelS),
-                    Text.literal(state)
+            ctx.setComponentTooltipForNextFrame(font, List.of(
+                    Component.literal("§fInfusion Coil §7(" + dirName + ")"),
+                    Component.literal("§7" + levelS),
+                    Component.literal(state)
             ), mouseX, mouseY);
             return;
         }
@@ -356,10 +356,10 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
     private static int sq(int v) { return v * v; }
 
     @Override
-    public boolean mouseClicked(Click click, boolean down) {
-        if (click.button() == 0 && client != null && client.world != null) {
-            int gx = (width  - backgroundWidth)  / 2;
-            int gy = (height - backgroundHeight) / 2;
+    public boolean mouseClicked(MouseButtonEvent click, boolean down) {
+        if (click.button() == 0 && minecraft != null && minecraft.level != null) {
+            int gx = (width  - imageWidth)  / 2;
+            int gy = (height - imageHeight) / 2;
             int hy = gy + NAV_Y;
             boolean[] connected = connectedSlots();
             int hitR = NAV_RING + 2;
@@ -372,7 +372,7 @@ public class TransferTableScreen extends HandledScreen<TransferTableScreenHandle
                 int dx = (int) click.x() - cx, dy = (int) click.y() - hy;
                 if (dx * dx + dy * dy <= hitR * hitR) {
                     Direction dir = Direction.values()[i - 1];
-                    BlockPos modulePos = handler.getTablePos().offset(dir);
+                    BlockPos modulePos = menu.getTablePos().relative(dir);
                     ClientPlayNetworking.send(new RequestOpenGuiPayload(modulePos));
                     return true;
                 }

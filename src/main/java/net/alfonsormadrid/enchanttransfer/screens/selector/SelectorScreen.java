@@ -7,16 +7,15 @@ import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.ItemStack;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +32,7 @@ import java.util.Map;
 public class SelectorScreen extends Screen {
 
     private static final Identifier BG_TEXTURE =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/gui/container/selector_gui.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/gui/container/selector_gui.png");
 
     /**
      * Actual block items used as the icon inside the disks.  Constructed
@@ -121,8 +120,8 @@ public class SelectorScreen extends Screen {
     private int bgX, bgY;  // top-left of background in screen coords
 
     /** Title text — shown in the parchment banner at the top of the screen. */
-    private static final Text TITLE_TEXT =
-            Text.translatable("enchanttransfer.gui.selector.title");
+    private static final Component TITLE_TEXT =
+            Component.translatable("enchanttransfer.gui.selector.title");
     /** Parchment-brown ink colour shared by every screen's title text. */
     private static final int TITLE_COL = 0xFF4A2811;
     /** Y offset (content-local) of the title inside the parchment banner. */
@@ -140,19 +139,19 @@ public class SelectorScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics ctx, int mouseX, int mouseY, float delta) {
         // 1 — Static background (hub + 6 socket circle outlines baked into PNG)
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED,
+        ctx.blit(RenderPipelines.GUI_TEXTURED,
                 BG_TEXTURE, bgX, bgY, 0f, 0f, BG_W, BG_H, 256, 256);
 
         // Parchment-brown title centred in the banner of the background.
-        if (client != null) {
-            int tw = client.textRenderer.getWidth(TITLE_TEXT);
-            ctx.drawText(client.textRenderer, TITLE_TEXT,
+        if (minecraft != null) {
+            int tw = minecraft.font.width(TITLE_TEXT);
+            ctx.drawString(minecraft.font, TITLE_TEXT,
                     bgX + (BG_W - tw) / 2, bgY + TITLE_Y, TITLE_COL, false);
         }
 
-        if (client == null || client.world == null) {
+        if (minecraft == null || minecraft.level == null) {
             super.render(ctx, mouseX, mouseY, delta);
             return;
         }
@@ -160,8 +159,8 @@ public class SelectorScreen extends Screen {
         // 2 — Wires (only between hub and occupied sockets)
         for (Map.Entry<Direction, int[]> e : SOCKET.entrySet()) {
             int[] s = e.getValue();
-            BlockPos nbPos = tablePos.offset(e.getKey());
-            if (client.world.getBlockState(nbPos).getBlock() == EnchantTransferMod.INFUSION_COIL_BLOCK) {
+            BlockPos nbPos = tablePos.relative(e.getKey());
+            if (minecraft.level.getBlockState(nbPos).getBlock() == EnchantTransferMod.INFUSION_COIL_BLOCK) {
                 drawWireHubToSocket(ctx, s[0], s[1]);
             }
         }
@@ -172,11 +171,11 @@ public class SelectorScreen extends Screen {
         // 4 — Socket icons
         for (Map.Entry<Direction, int[]> e : SOCKET.entrySet()) {
             int[] s = e.getValue();
-            BlockPos nbPos = tablePos.offset(e.getKey());
+            BlockPos nbPos = tablePos.relative(e.getKey());
             int iconX = bgX + s[0] - ICON_SIZE / 2;
             int iconY = bgY + s[1] - ICON_SIZE / 2;
             boolean connected =
-                    client.world.getBlockState(nbPos).getBlock() == EnchantTransferMod.INFUSION_COIL_BLOCK;
+                    minecraft.level.getBlockState(nbPos).getBlock() == EnchantTransferMod.INFUSION_COIL_BLOCK;
             if (connected) {
                 drawModuleIcon(ctx, nbPos, iconX, iconY, mouseX, mouseY);
             } else {
@@ -202,7 +201,7 @@ public class SelectorScreen extends Screen {
      * Draws a 2-pixel golden wire from the hub edge to the socket edge.
      * Uses the content-local socket centre {@code (sx, sy)}.
      */
-    private void drawWireHubToSocket(DrawContext ctx, int sx, int sy) {
+    private void drawWireHubToSocket(GuiGraphics ctx, int sx, int sy) {
         double dx = sx - HUB_CX, dy = sy - HUB_CY;
         double len = Math.sqrt(dx * dx + dy * dy);
         if (len < 1) return;
@@ -226,11 +225,11 @@ public class SelectorScreen extends Screen {
      * model gives the player a faithful preview of the block they'd open
      * by clicking, instead of an abstract glyph.
      */
-    private void drawHub(DrawContext ctx, int mouseX, int mouseY) {
+    private void drawHub(GuiGraphics ctx, int mouseX, int mouseY) {
         int cx = bgX + HUB_CX;
         int cy = bgY + HUB_CY;
         NavDotRenderer.diskWithBorder(ctx, cx, cy, HUB_R, HUB_BG_COL, HUB_BORDER_COL);
-        ctx.drawItem(TABLE_ITEM, cx - 8, cy - 8);
+        ctx.renderItem(TABLE_ITEM, cx - 8, cy - 8);
         if (hovered(mouseX, mouseY, cx, cy, HUB_R)) {
             NavDotRenderer.ring(ctx, cx, cy, HUB_R + 1, HOVER_COL);
         }
@@ -242,13 +241,13 @@ public class SelectorScreen extends Screen {
      * centre.  The item makes the module type instantly recognisable; the
      * disk colour + fill still convey the live state at a glance.
      */
-    private void drawModuleIcon(DrawContext ctx, BlockPos coilPos,
+    private void drawModuleIcon(GuiGraphics ctx, BlockPos coilPos,
                                 int iconX, int iconY, int mouseX, int mouseY) {
         boolean processing = false;
         float fillRatio       = 0f;
         float progressFraction = 0f;
-        if (client != null && client.world != null) {
-            var be = client.world.getBlockEntity(coilPos);
+        if (minecraft != null && minecraft.level != null) {
+            var be = minecraft.level.getBlockEntity(coilPos);
             if (be instanceof InfusionCoilBlockEntity coil) {
                 fillRatio  = coil.getFillRatio();
                 processing = coil.isProcessing();
@@ -263,7 +262,7 @@ public class SelectorScreen extends Screen {
 
         NavDotRenderer.diskWithBorder(ctx, cx, cy, ICON_RADIUS, TANK_EMPTY_COL, border);
         NavDotRenderer.diskFillFromBottom(ctx, cx, cy, ICON_RADIUS - 1, fillRatio, FLUID_COLOR);
-        ctx.drawItem(COIL_ITEM, cx - 8, cy - 8);
+        ctx.renderItem(COIL_ITEM, cx - 8, cy - 8);
 
         // Progress arc — 2-px-thick clockwise ring just outside the disk.
         // Only drawn while the coil is processing AND has actually started
@@ -285,7 +284,7 @@ public class SelectorScreen extends Screen {
      * smaller centred "+" glyph in lighter violet.  Not clickable, so no
      * hover ring.
      */
-    private void drawEmptySocket(DrawContext ctx, int iconX, int iconY) {
+    private void drawEmptySocket(GuiGraphics ctx, int iconX, int iconY) {
         int cx = iconX + ICON_SIZE / 2;
         int cy = iconY + ICON_SIZE / 2;
         NavDotRenderer.diskWithBorder(ctx, cx, cy, ICON_RADIUS, EMPTY_BG_COL, EMPTY_BORDER_COL);
@@ -294,22 +293,22 @@ public class SelectorScreen extends Screen {
 
     /**
      * Draws the direction tag (N/S/E/W/↑/↓) just outside the socket, on
-     * the radial axis from the hub.  Uses {@link DrawContext#drawTextWithShadow}
+     * the radial axis from the hub.  Uses {@link GuiGraphics#drawString}
      * so it stays readable on any background.  Colour is a desaturated dark
      * purple derived from the plus glyph so labels share the empty-socket
      * palette without screaming over the dots.
      */
-    private void drawDirectionLabel(DrawContext ctx, Direction dir, int sx, int sy) {
-        if (client == null) return;
-        Text label = NavDotRenderer.dirLabel(dir);
+    private void drawDirectionLabel(GuiGraphics ctx, Direction dir, int sx, int sy) {
+        if (minecraft == null) return;
+        Component label = NavDotRenderer.dirLabel(dir);
         double dx = sx - HUB_CX, dy = sy - HUB_CY;
         double len = Math.sqrt(dx * dx + dy * dy);
         if (len < 1) return;
         int lx = (int) Math.round(bgX + sx + dx / len * LABEL_OFFSET);
         int ly = (int) Math.round(bgY + sy + dy / len * LABEL_OFFSET);
-        int tw = client.textRenderer.getWidth(label);
-        int fh = client.textRenderer.fontHeight;
-        ctx.drawTextWithShadow(client.textRenderer, label,
+        int tw = minecraft.font.width(label);
+        int fh = minecraft.font.lineHeight;
+        ctx.drawString(minecraft.font, label,
                 lx - tw / 2, ly - fh / 2, 0xFF8240A0);
     }
 
@@ -320,13 +319,13 @@ public class SelectorScreen extends Screen {
 
     // ── Hover tooltips ────────────────────────────────────────────────────────
 
-    private void drawHoverTooltip(DrawContext ctx, int mouseX, int mouseY) {
-        if (client == null || client.world == null) return;
+    private void drawHoverTooltip(GuiGraphics ctx, int mouseX, int mouseY) {
+        if (minecraft == null || minecraft.level == null) return;
         int hubX = bgX + HUB_CX, hubY = bgY + HUB_CY;
 
         if (hovered(mouseX, mouseY, hubX, hubY, HUB_R)) {
-            ctx.drawTooltip(client.textRenderer,
-                    Text.translatable("block.enchanttransfer.transfer_table_block"),
+            ctx.setTooltipForNextFrame(minecraft.font,
+                    Component.translatable("block.enchanttransfer.transfer_table_block"),
                     mouseX, mouseY);
             return;
         }
@@ -336,24 +335,24 @@ public class SelectorScreen extends Screen {
             if (!hovered(mouseX, mouseY, cx, cy, SOCKET_R)) continue;
             Direction dir = e.getKey();
             String dirName = dir.name();
-            BlockPos nbPos = tablePos.offset(dir);
-            if (client.world.getBlockState(nbPos).getBlock() != EnchantTransferMod.INFUSION_COIL_BLOCK) {
-                ctx.drawTooltip(client.textRenderer,
-                        Text.literal("§7Empty (" + dirName + ")"),
+            BlockPos nbPos = tablePos.relative(dir);
+            if (minecraft.level.getBlockState(nbPos).getBlock() != EnchantTransferMod.INFUSION_COIL_BLOCK) {
+                ctx.setTooltipForNextFrame(minecraft.font,
+                        Component.literal("§7Empty (" + dirName + ")"),
                         mouseX, mouseY);
                 return;
             }
             String stateS = "§aIdle";
             String levelS = "?";
-            var be = client.world.getBlockEntity(nbPos);
+            var be = minecraft.level.getBlockEntity(nbPos);
             if (be instanceof InfusionCoilBlockEntity coil) {
                 stateS = coil.isProcessing() ? "§eInfusing" : "§aIdle";
                 levelS = coil.getStored() + " / " + coil.getCapacity() + " XP";
             }
-            ctx.drawTooltip(client.textRenderer, List.of(
-                    Text.literal("§fInfusion Coil §7(" + dirName + ")"),
-                    Text.literal("§7" + levelS),
-                    Text.literal(stateS)
+            ctx.setComponentTooltipForNextFrame(minecraft.font, List.of(
+                    Component.literal("§fInfusion Coil §7(" + dirName + ")"),
+                    Component.literal("§7" + levelS),
+                    Component.literal(stateS)
             ), mouseX, mouseY);
             return;
         }
@@ -362,8 +361,8 @@ public class SelectorScreen extends Screen {
     // ── Input handling ────────────────────────────────────────────────────────
 
     @Override
-    public boolean mouseClicked(Click click, boolean down) {
-        if (click.button() != 0 || client == null) return super.mouseClicked(click, down);
+    public boolean mouseClicked(MouseButtonEvent click, boolean down) {
+        if (click.button() != 0 || minecraft == null) return super.mouseClicked(click, down);
 
         int lx = (int) click.x() - bgX;
         int ly = (int) click.y() - bgY;
@@ -371,20 +370,20 @@ public class SelectorScreen extends Screen {
         // Hub click → open Transfer Table core screen
         if (dist2(lx, ly, HUB_CX, HUB_CY) <= HUB_R * HUB_R) {
             ClientPlayNetworking.send(new RequestOpenGuiPayload(tablePos));
-            close();
+            onClose();
             return true;
         }
 
         // Socket click → open module's screen if occupied
-        if (client.world != null) {
+        if (minecraft.level != null) {
             for (Map.Entry<Direction, int[]> e : SOCKET.entrySet()) {
                 int[] s = e.getValue();
                 if (dist2(lx, ly, s[0], s[1]) <= SOCKET_R * SOCKET_R) {
-                    BlockPos nbPos = tablePos.offset(e.getKey());
-                    if (client.world.getBlockState(nbPos).getBlock()
+                    BlockPos nbPos = tablePos.relative(e.getKey());
+                    if (minecraft.level.getBlockState(nbPos).getBlock()
                             == EnchantTransferMod.INFUSION_COIL_BLOCK) {
                         ClientPlayNetworking.send(new RequestOpenGuiPayload(nbPos));
-                        close();
+                        onClose();
                         return true;
                     }
                     break;
@@ -396,7 +395,7 @@ public class SelectorScreen extends Screen {
     }
 
     @Override
-    public boolean shouldPause() { return false; }
+    public boolean isPauseScreen() { return false; }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 

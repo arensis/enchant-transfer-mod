@@ -3,15 +3,15 @@ package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
 import net.alfonsormadrid.enchanttransfer.item.CardType;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -19,15 +19,15 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TransferItemSlot extends TransferSlot {
-    private final Inventory itemContentInventory;
+    private final Container itemContentInventory;
 
-    public TransferItemSlot(Inventory inventory, Inventory itemContentInventory, SlotPosition slotPosition) {
+    public TransferItemSlot(Container inventory, Container itemContentInventory, SlotPosition slotPosition) {
         super(inventory, 0, slotPosition);
         this.itemContentInventory = itemContentInventory;
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return !itemIsMagicCard(stack) && (stack.isEnchantable()
                 || !stack.getEnchantments().isEmpty()
                 || isEnchantedBook(stack.getItem())
@@ -35,44 +35,44 @@ public class TransferItemSlot extends TransferSlot {
     }
 
     @Override
-    public int getMaxItemCount() {
+    public int getMaxStackSize() {
         return 1;
     }
 
     @Override
-    public void onTakeItem(PlayerEntity player, ItemStack stack) {
+    public void onTake(Player player, ItemStack stack) {
         removeAllItemContentInventoryStacks();
-        super.onTakeItem(player, stack);
+        super.onTake(player, stack);
     }
 
     @Override
-    public void setStack(ItemStack itemStack) {
-        super.setStack(itemStack);
+    public void setByPlayer(ItemStack itemStack) {
+        super.setByPlayer(itemStack);
         removeAllItemContentInventoryStacks();
         List<ItemStack> magicCards = buildMagicCardsFromEnchants(getEffectiveEnchantments(itemStack));
         IntStream.range(0, magicCards.size())
-                .forEach(index -> this.itemContentInventory.setStack(index, magicCards.get(index)));
+                .forEach(index -> this.itemContentInventory.setItem(index, magicCards.get(index)));
     }
 
     private void removeAllItemContentInventoryStacks() {
-        IntStream.range(0, this.itemContentInventory.size()).forEach(this.itemContentInventory::removeStack);
+        IntStream.range(0, this.itemContentInventory.getContainerSize()).forEach(this.itemContentInventory::removeItemNoUpdate);
     }
 
-    private List<ItemStack> buildMagicCardsFromEnchants(ItemEnchantmentsComponent enchants) {
-        return enchants.getEnchantments().stream().map(entry -> {
+    private List<ItemStack> buildMagicCardsFromEnchants(ItemEnchantments enchants) {
+        return enchants.keySet().stream().map(entry -> {
             // Look up which category this enchantment belongs to.  If it's a
             // modded enchantment we don't know about (or a vanilla one we
             // haven't categorised yet), fall back to the blank/base card so
             // the system degrades gracefully — the player still gets a card
             // with the enchantment, just without its colour identity.
             ItemStack card = new ItemStack(cardItemFor(cardTypeFor(entry)));
-            card.addEnchantment(entry, enchants.getLevel(entry));
+            card.enchant(entry, enchants.getLevel(entry));
             return card;
         }).collect(Collectors.toList());
     }
 
-    private static @Nullable CardType cardTypeFor(RegistryEntry<Enchantment> entry) {
-        RegistryKey<Enchantment> key = entry.getKey().orElse(null);
+    private static @Nullable CardType cardTypeFor(Holder<Enchantment> entry) {
+        ResourceKey<Enchantment> key = entry.unwrapKey().orElse(null);
         return key != null ? CardType.forEnchantment(key) : null;
     }
 

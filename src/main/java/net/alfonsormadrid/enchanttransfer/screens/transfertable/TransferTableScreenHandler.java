@@ -8,33 +8,34 @@ import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardRe
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.TransferItemSlot;
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.TransferItemContentSlot;
 import net.alfonsormadrid.enchanttransfer.services.CombineCardService;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.*;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.*;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import java.util.stream.IntStream;
 
-public class TransferTableScreenHandler extends ScreenHandler {
-    private final Inventory combineCardsInput;
-    private final Inventory combineCardsOutput;
-    private final Inventory transferItem;
-    private final Inventory transferItemContent;
+public class TransferTableScreenHandler extends AbstractContainerMenu {
+    private final Container combineCardsInput;
+    private final Container combineCardsOutput;
+    private final Container transferItem;
+    private final Container transferItemContent;
     /** Position of the Transfer Table block — synced from server via ExtendedScreenHandlerType. */
-    private final net.minecraft.util.math.BlockPos tablePos;
+    private final net.minecraft.core.BlockPos tablePos;
     private final CombineCardService combineCardService;
 
     /** Fallback constructor — used when block-pos is unavailable (e.g. creative menus). */
-    public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, BlockPos.ORIGIN);
+    public TransferTableScreenHandler(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, BlockPos.ZERO);
     }
 
     /** Client-side constructor — called by ExtendedScreenHandlerType factory with the synced pos. */
-    public TransferTableScreenHandler(int syncId, PlayerInventory playerInventory,
-                                      net.minecraft.util.math.BlockPos tablePos) {
+    public TransferTableScreenHandler(int syncId, Inventory playerInventory,
+                                      net.minecraft.core.BlockPos tablePos) {
         super(EnchantTransferMod.TRANSFER_TABLE_SCREEN_HANDLER, syncId);
         this.combineCardsInput = buildInitInventory(2);
         this.combineCardsOutput = buildInitInventory(1);
@@ -43,8 +44,8 @@ public class TransferTableScreenHandler extends ScreenHandler {
         this.tablePos = tablePos;
 
         this.combineCardService = new CombineCardService(
-                this.combineCardsInput.getStack(0),
-                this.combineCardsInput.getStack(1)
+                this.combineCardsInput.getItem(0),
+                this.combineCardsInput.getItem(1)
         );
 
         this.builtCombineCardSlots();
@@ -69,43 +70,43 @@ public class TransferTableScreenHandler extends ScreenHandler {
     private static final int HOTBAR_END           = 52;
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slotIndex) {
+    public ItemStack quickMoveStack(Player player, int slotIndex) {
         Slot slot = this.slots.get(slotIndex);
-        if (!slot.hasStack()) {
+        if (!slot.hasItem()) {
             return ItemStack.EMPTY;
         }
 
-        ItemStack original = slot.getStack();
+        ItemStack original = slot.getItem();
         ItemStack copy = original.copy();
 
         if (slotIndex < GUI_SLOTS_END) {
-            if (!this.insertItem(original, PLAYER_INV_START, HOTBAR_END, true)) {
+            if (!this.moveItemStackTo(original, PLAYER_INV_START, HOTBAR_END, true)) {
                 return ItemStack.EMPTY;
             }
         } else {
             if (original.getItem() == EnchantTransferMod.MAGIC_CARD_ITEM) {
-                if (this.slots.get(3).hasStack()) {
-                    if (!this.insertItem(original, 4, GUI_SLOTS_END, false)
-                            && !this.insertItem(original, 0, 2, false)) {
+                if (this.slots.get(3).hasItem()) {
+                    if (!this.moveItemStackTo(original, 4, GUI_SLOTS_END, false)
+                            && !this.moveItemStackTo(original, 0, 2, false)) {
                         return ItemStack.EMPTY;
                     }
                 } else {
-                    if (!this.insertItem(original, 0, 2, false)) {
+                    if (!this.moveItemStackTo(original, 0, 2, false)) {
                         return ItemStack.EMPTY;
                     }
                 }
             } else {
-                if (!this.insertItem(original, 3, 4, false)) {
+                if (!this.moveItemStackTo(original, 3, 4, false)) {
                     return ItemStack.EMPTY;
                 }
             }
         }
 
         if (original.isEmpty()) {
-            slot.setStack(ItemStack.EMPTY);
-            slot.onTakeItem(player, copy);
+            slot.setByPlayer(ItemStack.EMPTY);
+            slot.onTake(player, copy);
         } else {
-            slot.markDirty();
+            slot.setChanged();
         }
 
         return copy;
@@ -117,13 +118,13 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public boolean canUse(PlayerEntity player) {
-        return this.combineCardsInput.canPlayerUse(player);
+    public boolean stillValid(Player player) {
+        return this.combineCardsInput.stillValid(player);
     }
 
     @Override
-    public void onContentChanged(Inventory inventory) {
-        super.onContentChanged(inventory);
+    public void slotsChanged(Container inventory) {
+        super.slotsChanged(inventory);
 
         if (inventory == this.combineCardsInput) {
             updateCombineCardsOutput();
@@ -131,30 +132,30 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void onClosed(PlayerEntity player) {
-        super.onClosed(player);
-        this.dropInventory(player, this.combineCardsInput);
-        this.dropInventory(player, this.transferItem);
+    public void removed(Player player) {
+        super.removed(player);
+        this.clearContainer(player, this.combineCardsInput);
+        this.clearContainer(player, this.transferItem);
     }
 
     private void updateCombineCardsOutput() {
-        combineCardService.setCard1(this.combineCardsInput.getStack(0));
-        combineCardService.setCard2(this.combineCardsInput.getStack(1));
+        combineCardService.setCard1(this.combineCardsInput.getItem(0));
+        combineCardService.setCard2(this.combineCardsInput.getItem(1));
 
         if (this.combineCardService.cardsCanCombine()) {
-            this.combineCardsOutput.setStack(0, this.combineCardService.combineCards());
+            this.combineCardsOutput.setItem(0, this.combineCardService.combineCards());
         } else {
-            this.combineCardsOutput.setStack(0, ItemStack.EMPTY);
+            this.combineCardsOutput.setItem(0, ItemStack.EMPTY);
         }
 
-        this.sendContentUpdates();
+        this.broadcastChanges();
     }
 
-    private SimpleInventory buildInitInventory(int size) {
-        return new SimpleInventory(size) {
-            public void markDirty(){
-                super.markDirty();
-                TransferTableScreenHandler.this.onContentChanged(this);
+    private SimpleContainer buildInitInventory(int size) {
+        return new SimpleContainer(size) {
+            public void setChanged(){
+                super.setChanged();
+                TransferTableScreenHandler.this.slotsChanged(this);
             }
         };
     }
@@ -173,7 +174,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
     }
 
     private void buildTransferItemContentSlots() {
-        IntStream.range(0, this.transferItemContent.size())
+        IntStream.range(0, this.transferItemContent.getContainerSize())
                 .forEach(index ->
                         this.addSlot(
                                 new TransferItemContentSlot(
@@ -184,7 +185,7 @@ public class TransferTableScreenHandler extends ScreenHandler {
                                 )));
     }
 
-    public void addSlotGrid(int columnsAmount, int rowsAmount, int startPositionX, int startPositionY, Inventory inventory, int startInventoryIndex) {
+    public void addSlotGrid(int columnsAmount, int rowsAmount, int startPositionX, int startPositionY, Container inventory, int startInventoryIndex) {
         IntStream.range(0, rowsAmount)
                 .forEach(rowIndex -> IntStream.range(0, columnsAmount)
                         .forEach(columnIndex -> {

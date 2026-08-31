@@ -1,6 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.renderers.state;
 
-import net.minecraft.client.render.block.entity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 
 /**
  * Render state for the Transfer Table block entity renderer.
@@ -14,7 +14,7 @@ public class TransferTableRenderState extends BlockEntityRenderState {
     public float animTime = 0f;
 
     /**
-     * For each {@link net.minecraft.util.math.Direction#ordinal()}, true when
+     * For each {@link net.minecraft.core.Direction#ordinal()}, true when
      * the neighbour block on that face is an Infusion Coil — populated on
      * the game thread by {@code updateRenderState}.  The BER renders a
      * core→face tube for every {@code true} entry.
