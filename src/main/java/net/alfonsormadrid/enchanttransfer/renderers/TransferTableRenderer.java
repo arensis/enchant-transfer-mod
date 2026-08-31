@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -80,7 +80,7 @@ public class TransferTableRenderer
     }
 
     @Override
-    public void updateRenderState(TransferTableBlockEntity entity,
+    public void extractRenderState(TransferTableBlockEntity entity,
                                   TransferTableRenderState state,
                                   float tickDelta,
                                   Vec3 cameraPos,
@@ -107,7 +107,7 @@ public class TransferTableRenderer
     }
 
     @Override
-    public void render(TransferTableRenderState state,
+    public void submit(TransferTableRenderState state,
                        PoseStack matrices,
                        SubmitNodeCollector queue,
                        CameraRenderState cameraState) {

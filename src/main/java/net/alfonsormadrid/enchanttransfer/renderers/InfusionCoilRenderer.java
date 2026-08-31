@@ -11,7 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -126,7 +126,7 @@ public class InfusionCoilRenderer
   }
 
   @Override
-  public void updateRenderState(InfusionCoilBlockEntity entity,
+  public void extractRenderState(InfusionCoilBlockEntity entity,
                                 InfusionCoilRenderState state,
                                 float tickDelta,
                                 Vec3 cameraPos,
@@ -180,7 +180,7 @@ public class InfusionCoilRenderer
   }
 
   @Override
-  public void render(InfusionCoilRenderState state,
+  public void submit(InfusionCoilRenderState state,
                      PoseStack matrices,
                      SubmitNodeCollector queue,
                      CameraRenderState cameraState) {
@@ -199,7 +199,7 @@ public class InfusionCoilRenderer
     //   • layer (entityTranslucentEmissive) — translucent + always full-
     //     bright.  Used for the drip drop, the knob pulse skin, and the
     //     tube.  These are all overlay effects that should not occlude.
-    RenderType fluidLayer = RenderTypes.entityCutoutNoCull(WHITE_TEXTURE);
+    RenderType fluidLayer = RenderTypes.entityCutout(WHITE_TEXTURE);
     RenderType layer      = RenderTypes.entityTranslucentEmissive(WHITE_TEXTURE);
 
     // ── 1. FLUID (XP liquid) ─────────────────────────────────────────────

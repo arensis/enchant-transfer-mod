@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
@@ -49,7 +49,7 @@ public class ZincSmelterRenderer
     }
 
     @Override
-    public void updateRenderState(ZincSmelterBlockEntity entity,
+    public void extractRenderState(ZincSmelterBlockEntity entity,
                                   ZincSmelterRenderState state,
                                   float tickDelta,
                                   Vec3 cameraPos,
@@ -63,7 +63,7 @@ public class ZincSmelterRenderer
     }
 
     @Override
-    public void render(ZincSmelterRenderState state,
+    public void submit(ZincSmelterRenderState state,
                        PoseStack matrices,
                        SubmitNodeCollector queue,
                        CameraRenderState cameraState) {
