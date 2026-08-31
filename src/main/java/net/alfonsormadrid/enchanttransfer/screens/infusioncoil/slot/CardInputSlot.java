@@ -2,9 +2,9 @@ package net.alfonsormadrid.enchanttransfer.screens.infusioncoil.slot;
 
 import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 /**
  * Slot of the Infusion Coil that accepts any Magic Card variant — base or
@@ -12,12 +12,12 @@ import net.minecraft.screen.slot.Slot;
  * coil burns the card for its XP value regardless of its category.
  */
 public class CardInputSlot extends Slot {
-    public CardInputSlot(Inventory inventory, int index, SlotPosition position) {
+    public CardInputSlot(Container inventory, int index, SlotPosition position) {
         super(inventory, index, position.positionX, position.positionY);
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return stack.getItem() instanceof MagicCardItem;
     }
 }

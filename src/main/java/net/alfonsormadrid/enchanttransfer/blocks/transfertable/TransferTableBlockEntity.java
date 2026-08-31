@@ -4,18 +4,18 @@ import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.modules.ModuleConnectionRegistry;
 import net.alfonsormadrid.enchanttransfer.modules.TransferTableModule;
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScreenHandler;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.fabricmc.fabric.api.menu.v1.ExtendedMenuProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class TransferTableBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPos> {
+public class TransferTableBlockEntity extends BlockEntity implements ExtendedMenuProvider<BlockPos> {
 
     private final ModuleConnectionRegistry moduleRegistry = new ModuleConnectionRegistry();
 
@@ -34,27 +34,27 @@ public class TransferTableBlockEntity extends BlockEntity implements ExtendedScr
      */
     public void attachModule(Direction coreFace, TransferTableModule module) {
         moduleRegistry.attach(coreFace, module);
-        markDirty();
+        setChanged();
     }
 
     public void detachModule(Direction coreFace) {
         moduleRegistry.detach(coreFace);
-        markDirty();
+        setChanged();
     }
 
     /** Sends the table's own position to the client so the screen can access adjacent modules. */
     @Override
-    public BlockPos getScreenOpeningData(ServerPlayerEntity player) {
-        return this.pos;
+    public BlockPos getScreenOpeningData(ServerPlayer player) {
+        return this.worldPosition;
     }
 
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory playerInventory, PlayerEntity player) {
-        return new TransferTableScreenHandler(syncId, playerInventory, this.pos);
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
+        return new TransferTableScreenHandler(syncId, playerInventory, this.worldPosition);
     }
 
     @Override
-    public Text getDisplayName() {
-        return Text.translatable(getCachedState().getBlock().getTranslationKey());
+    public Component getDisplayName() {
+        return Component.translatable(getBlockState().getBlock().getDescriptionId());
     }
 }

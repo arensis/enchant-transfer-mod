@@ -1,6 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.modules;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 /**
  * Identifies a kind of module that can be attached to the Transfer Table core.

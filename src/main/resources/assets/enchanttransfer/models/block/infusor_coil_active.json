@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:translucent",
   "__comment": "Infusor Coil flask — ACTIVE variant.  Identical to infusor_coil.json except the knob uses the vanilla sea_lantern texture, giving it a clean cyan/ice-blue look while the block entity is processing.  Combined with the bumped luminance set in InfusionCoilBlock (15 when ACTIVE=true) the knob reads convincingly as a lit lightbulb.",
   "texture_size": [16, 16],
   "textures": {

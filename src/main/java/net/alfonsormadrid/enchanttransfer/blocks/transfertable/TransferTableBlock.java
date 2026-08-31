@@ -3,86 +3,92 @@ package net.alfonsormadrid.enchanttransfer.blocks.transfertable;
 import com.mojang.serialization.MapCodec;
 import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class TransferTableBlock extends BlockWithEntity {
+public class TransferTableBlock extends BaseEntityBlock {
 
-    public static final MapCodec<TransferTableBlock> CODEC = createCodec(TransferTableBlock::new);
+    public static final MapCodec<TransferTableBlock> CODEC = simpleCodec(TransferTableBlock::new);
 
-    public TransferTableBlock(RegistryKey<Block> registryKey) {
+    public TransferTableBlock(ResourceKey<Block> registryKey) {
         this(
-            AbstractBlock.Settings.copy(Blocks.CHEST)
-                .registryKey(registryKey)
-                .sounds(
-                    new BlockSoundGroup(
+            BlockBehaviour.Properties.ofFullCopy(Blocks.CHEST)
+                .setId(registryKey)
+                .sound(
+                    new SoundType(
                         5.0F,
                         5.0F,
-                        SoundEvents.ENTITY_LIGHTNING_BOLT_IMPACT,
-                        SoundEvents.BLOCK_ANVIL_STEP,
-                        SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER,
-                        SoundEvents.BLOCK_CHAIN_HIT,
-                        SoundEvents.BLOCK_SLIME_BLOCK_FALL)
+                        SoundEvents.LIGHTNING_BOLT_IMPACT,
+                        SoundEvents.ANVIL_STEP,
+                        SoundEvents.LIGHTNING_BOLT_THUNDER,
+                        SoundEvents.CHAIN_HIT,
+                        SoundEvents.SLIME_BLOCK_FALL)
                 )
-                .requiresTool()
+                .requiresCorrectToolForDrops()
                 .strength(5.0f, 30.0f)
-                .luminance(state -> 10)
+                .lightLevel(state -> 10)
         );
     }
 
-    private TransferTableBlock(AbstractBlock.Settings settings) {
+    private TransferTableBlock(BlockBehaviour.Properties settings) {
         super(settings);
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        if (world instanceof ServerWorld serverWorld) {
-            Vec3d center = Vec3d.ofCenter(pos);
-            serverWorld.spawnParticles(ParticleTypes.ELECTRIC_SPARK,
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+        if (world instanceof ServerLevel serverWorld) {
+            Vec3 center = Vec3.atCenterOf(pos);
+            serverWorld.sendParticles(ParticleTypes.ELECTRIC_SPARK,
                     center.x, center.y + 0.5, center.z, 40, 0.45, 0.45, 0.45, 0.25);
-            serverWorld.spawnParticles(ParticleTypes.SCULK_SOUL,
+            serverWorld.sendParticles(ParticleTypes.SCULK_SOUL,
                     center.x, center.y + 0.5, center.z, 20, 0.35, 0.35, 0.35, 0.08);
         }
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        Vec3d center = Vec3d.ofCenter(pos);
-        world.spawnParticles(ParticleTypes.TOTEM_OF_UNDYING,
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        Vec3 center = Vec3.atCenterOf(pos);
+        world.sendParticles(ParticleTypes.TOTEM_OF_UNDYING,
                 center.x, center.y + 0.5, center.z, 25, 0.4, 0.4, 0.4, 0.3);
-        world.spawnParticles(ParticleTypes.REVERSE_PORTAL,
+        world.sendParticles(ParticleTypes.REVERSE_PORTAL,
                 center.x, center.y + 0.5, center.z, 50, 0.5, 0.5, 0.5, 0.6);
-        super.onStateReplaced(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new TransferTableBlockEntity(pos, state);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     /**
@@ -91,15 +97,15 @@ public class TransferTableBlock extends BlockWithEntity {
      * or any attached module.
      */
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos,
-                              PlayerEntity player, BlockHitResult hit) {
-        if (!(world instanceof ServerWorld)) {
-            return ActionResult.SUCCESS;
+    public InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos,
+                              Player player, BlockHitResult hit) {
+        if (!(world instanceof ServerLevel)) {
+            return InteractionResult.SUCCESS;
         }
-        if (player instanceof ServerPlayerEntity serverPlayer) {
+        if (player instanceof ServerPlayer serverPlayer) {
             ServerPlayNetworking.send(serverPlayer, new OpenSelectorPayload(pos));
         }
-        return ActionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
 
 }

@@ -1,28 +1,28 @@
 package net.alfonsormadrid.enchanttransfer.network;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
 /**
  * S2C payload that tells the client to open the Transfer Table selector screen
  * for the given table position.
  */
-public record OpenSelectorPayload(BlockPos tablePos) implements CustomPayload {
+public record OpenSelectorPayload(BlockPos tablePos) implements CustomPacketPayload {
 
-    public static final Id<OpenSelectorPayload> ID =
-            new Id<>(Identifier.of(EnchantTransferMod.MOD_ID, "open_selector"));
+    public static final Type<OpenSelectorPayload> ID =
+            new Type<>(Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "open_selector"));
 
-    public static final PacketCodec<RegistryByteBuf, OpenSelectorPayload> CODEC =
-            PacketCodec.ofStatic(
+    public static final StreamCodec<RegistryFriendlyByteBuf, OpenSelectorPayload> CODEC =
+            StreamCodec.of(
                     (buf, p) -> buf.writeBlockPos(p.tablePos()),
                     buf -> new OpenSelectorPayload(buf.readBlockPos()));
 
     @Override
-    public Id<OpenSelectorPayload> getId() {
+    public Type<OpenSelectorPayload> type() {
         return ID;
     }
 }

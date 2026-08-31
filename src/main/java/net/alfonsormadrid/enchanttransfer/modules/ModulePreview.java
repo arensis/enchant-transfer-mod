@@ -1,8 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.modules;
 
-import net.minecraft.util.Identifier;
-
 import java.util.Optional;
+import net.minecraft.resources.Identifier;
 
 /**
  * Snapshot of a module's state for display in the core's hub and nav-row.

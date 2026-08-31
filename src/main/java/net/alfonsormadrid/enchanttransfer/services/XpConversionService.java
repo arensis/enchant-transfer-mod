@@ -1,11 +1,10 @@
 package net.alfonsormadrid.enchanttransfer.services;
 
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-
 import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 /**
  * Converts a Magic Card stack into raw XP points for the Infusion Coil.
@@ -31,13 +30,13 @@ public class XpConversionService {
     public int convertSingle(ItemStack card) {
         if (card.isEmpty()) return 0;
 
-        ItemEnchantmentsComponent enchants = card.getEnchantments();
-        Optional<RegistryEntry<Enchantment>> first = enchants.getEnchantments().stream().findFirst();
+        ItemEnchantments enchants = card.getEnchantments();
+        Optional<Holder<Enchantment>> first = enchants.keySet().stream().findFirst();
         // Unenchanted cards yield a flat base amount instead of 0 so they can
         // always be infused (the enchanted-card path adds a rarity bonus on top).
         if (first.isEmpty()) return MIN_POINTS_PER_CARD;
 
-        RegistryEntry<Enchantment> entry = first.get();
+        Holder<Enchantment> entry = first.get();
         int level = enchants.getLevel(entry);
         if (level <= 0) return 0;
 

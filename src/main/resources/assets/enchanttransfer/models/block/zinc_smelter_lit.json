@@ -1,4 +1,5 @@
 {
+  "render_type": "minecraft:translucent",
   "__comment": "Horno de Zinc \u2014 Variante C (Ornate Kiln). Modelo LIT con glow de lava en mirilla.",
   "textures": {
     "copper": "enchanttransfer:block/smelter_copper",

@@ -1,11 +1,10 @@
 package net.alfonsormadrid.enchanttransfer.services;
 
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.entry.RegistryEntry;
-
 import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 public class CombineCardService {
     ItemStack card1;
@@ -17,8 +16,8 @@ public class CombineCardService {
     }
 
     public ItemStack combineCards() {
-        ItemEnchantmentsComponent enchants1 = card1.getEnchantments();
-        Optional<RegistryEntry<Enchantment>> enchantmentEntry = enchants1.getEnchantments().stream().findFirst();
+        ItemEnchantments enchants1 = card1.getEnchantments();
+        Optional<Holder<Enchantment>> enchantmentEntry = enchants1.keySet().stream().findFirst();
 
         if (enchantmentEntry.isPresent()) {
             int currentLevel = enchants1.getLevel(enchantmentEntry.get());
@@ -27,7 +26,7 @@ public class CombineCardService {
             // same enchantment to be combinable, so they're already the same
             // CardType — reusing card1.getItem() avoids a separate lookup.
             ItemStack outputCard = new ItemStack(card1.getItem(), resultCount);
-            outputCard.addEnchantment(enchantmentEntry.get(), currentLevel + 1);
+            outputCard.enchant(enchantmentEntry.get(), currentLevel + 1);
             return outputCard;
         } else {
             return ItemStack.EMPTY;
@@ -39,8 +38,8 @@ public class CombineCardService {
     }
 
     private boolean noMaxLevelCards() {
-        ItemEnchantmentsComponent enchants = card1.getEnchantments();
-        Optional<RegistryEntry<Enchantment>> enchantmentEntry = enchants.getEnchantments().stream().findFirst();
+        ItemEnchantments enchants = card1.getEnchantments();
+        Optional<Holder<Enchantment>> enchantmentEntry = enchants.keySet().stream().findFirst();
 
         return enchantmentEntry.isPresent()
                 && enchants.getLevel(enchantmentEntry.get()) < enchantmentEntry.get().value().getMaxLevel();
@@ -61,14 +60,14 @@ public class CombineCardService {
     }
 
     private boolean cardsHaveSameEnchant() {
-        ItemEnchantmentsComponent enchants1 = card1.getEnchantments();
-        ItemEnchantmentsComponent enchants2 = card2.getEnchantments();
+        ItemEnchantments enchants1 = card1.getEnchantments();
+        ItemEnchantments enchants2 = card2.getEnchantments();
 
-        if (enchants1.getEnchantments().size() != enchants2.getEnchantments().size()) {
+        if (enchants1.keySet().size() != enchants2.keySet().size()) {
             return false;
         }
 
-        return enchants1.getEnchantments().stream().allMatch(entry -> {
+        return enchants1.keySet().stream().allMatch(entry -> {
             int level1 = enchants1.getLevel(entry);
             int level2 = enchants2.getLevel(entry);
             return level1 > 0 && level1 == level2;

@@ -1,7 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.modules;
 
 import net.alfonsormadrid.enchanttransfer.energy.ExperienceStorage;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.Collections;

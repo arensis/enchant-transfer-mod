@@ -1,28 +1,28 @@
 package net.alfonsormadrid.enchanttransfer.network;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
 /**
  * C2S payload: the client asks the server to open the GUI for the block
  * at the given position (Transfer Table core or any attached module).
  */
-public record RequestOpenGuiPayload(BlockPos blockPos) implements CustomPayload {
+public record RequestOpenGuiPayload(BlockPos blockPos) implements CustomPacketPayload {
 
-    public static final Id<RequestOpenGuiPayload> ID =
-            new Id<>(Identifier.of(EnchantTransferMod.MOD_ID, "request_open_gui"));
+    public static final Type<RequestOpenGuiPayload> ID =
+            new Type<>(Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "request_open_gui"));
 
-    public static final PacketCodec<RegistryByteBuf, RequestOpenGuiPayload> CODEC =
-            PacketCodec.ofStatic(
+    public static final StreamCodec<RegistryFriendlyByteBuf, RequestOpenGuiPayload> CODEC =
+            StreamCodec.of(
                     (buf, p) -> buf.writeBlockPos(p.blockPos()),
                     buf -> new RequestOpenGuiPayload(buf.readBlockPos()));
 
     @Override
-    public Id<RequestOpenGuiPayload> getId() {
+    public Type<RequestOpenGuiPayload> type() {
         return ID;
     }
 }

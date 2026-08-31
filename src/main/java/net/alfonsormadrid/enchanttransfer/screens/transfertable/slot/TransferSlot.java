@@ -2,17 +2,17 @@ package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
 import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
 
 public class TransferSlot extends Slot {
-    public TransferSlot(Inventory inventory, int index, SlotPosition positions) {
+    public TransferSlot(Container inventory, int index, SlotPosition positions) {
         super(inventory, index, positions.positionX, positions.positionY);
     }
 
@@ -30,10 +30,10 @@ public class TransferSlot extends Slot {
         return stack.getItem() instanceof MagicCardItem;
     }
 
-    protected ItemEnchantmentsComponent getEffectiveEnchantments(ItemStack stack) {
+    protected ItemEnchantments getEffectiveEnchantments(ItemStack stack) {
         if (isEnchantedBook(stack.getItem())) {
-            ItemEnchantmentsComponent stored = stack.get(DataComponentTypes.STORED_ENCHANTMENTS);
-            return stored != null ? stored : ItemEnchantmentsComponent.DEFAULT;
+            ItemEnchantments stored = stack.get(DataComponents.STORED_ENCHANTMENTS);
+            return stored != null ? stored : ItemEnchantments.EMPTY;
         }
         return stack.getEnchantments();
     }

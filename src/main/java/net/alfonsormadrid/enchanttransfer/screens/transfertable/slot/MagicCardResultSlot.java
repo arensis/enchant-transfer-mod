@@ -1,34 +1,34 @@
 package net.alfonsormadrid.enchanttransfer.screens.transfertable.slot;
 
 import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 public class MagicCardResultSlot extends Slot {
-    private final Inventory combineCardsInput;
+    private final Container combineCardsInput;
 
-    public MagicCardResultSlot(Inventory inventory, Inventory combineCardsInput, Integer index, SlotPosition positions) {
+    public MagicCardResultSlot(Container inventory, Container combineCardsInput, Integer index, SlotPosition positions) {
         super(inventory, index, positions.positionX, positions.positionY);
         this.combineCardsInput = combineCardsInput;
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
         return false;
     }
 
     @Override
-    public void onTakeItem(PlayerEntity player, ItemStack stack) {
+    public void onTake(Player player, ItemStack stack) {
         decrementCombineCardsInput(stack.getCount());
-        super.onTakeItem(player, stack);
+        super.onTake(player, stack);
     }
 
     private void decrementCombineCardsInput(int amount) {
-        for (int i = 0; i < this.combineCardsInput.size(); i++) {
-            this.combineCardsInput.getStack(i).decrement(amount);
+        for (int i = 0; i < this.combineCardsInput.getContainerSize(); i++) {
+            this.combineCardsInput.getItem(i).shrink(amount);
         }
-        this.combineCardsInput.markDirty();
+        this.combineCardsInput.setChanged();
     }
 }

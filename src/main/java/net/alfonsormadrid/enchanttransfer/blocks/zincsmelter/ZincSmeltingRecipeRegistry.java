@@ -1,9 +1,9 @@
 package net.alfonsormadrid.enchanttransfer.blocks.zincsmelter;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -59,9 +59,9 @@ public final class ZincSmeltingRecipeRegistry {
     }
 
     private static boolean matches(Recipe r, ItemStack slot0, ItemStack slot1) {
-        if (!slot0.isOf(r.input1)) return false;
+        if (!slot0.is(r.input1)) return false;
         if (r.input2 == null) return true;
-        return slot1.isOf(r.input2);
+        return slot1.is(r.input2);
     }
 
     /** Returns all recipes — used by JEI/EMI integration or tooltip display. */

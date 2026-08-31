@@ -2,31 +2,31 @@ package net.alfonsormadrid.enchanttransfer.blocks.zincsmelter;
 
 import com.mojang.serialization.MapCodec;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.minecraft.block.AbstractBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.EnumProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ItemScatterer;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 /**
  * Standalone steampunk smelter for zinc processing and brass alloying.
@@ -36,90 +36,90 @@ import net.minecraft.world.World;
  * The {@code lit} variant swaps the baked model so the lava glow texture
  * shows inside the mirilla and bumps luminance.
  */
-public class ZincSmelterBlock extends BlockWithEntity {
+public class ZincSmelterBlock extends BaseEntityBlock {
 
-    public static final MapCodec<ZincSmelterBlock> CODEC = createCodec(ZincSmelterBlock::new);
+    public static final MapCodec<ZincSmelterBlock> CODEC = simpleCodec(ZincSmelterBlock::new);
 
-    public static final EnumProperty<Direction> FACING = Properties.HORIZONTAL_FACING;
-    public static final BooleanProperty LIT = Properties.LIT;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
-    public ZincSmelterBlock(RegistryKey<Block> registryKey) {
+    public ZincSmelterBlock(ResourceKey<Block> registryKey) {
         this(
-            AbstractBlock.Settings.copy(Blocks.BLAST_FURNACE)
-                .registryKey(registryKey)
-                .sounds(BlockSoundGroup.COPPER_BULB)
-                .requiresTool()
+            BlockBehaviour.Properties.ofFullCopy(Blocks.BLAST_FURNACE)
+                .setId(registryKey)
+                .sound(SoundType.COPPER_BULB)
+                .requiresCorrectToolForDrops()
                 .strength(7.0f, 7.0f)
-                .luminance(state -> state.get(LIT) ? 13 : 0)
-                .nonOpaque()
+                .lightLevel(state -> state.getValue(LIT) ? 13 : 0)
+                .noOcclusion()
         );
     }
 
-    private ZincSmelterBlock(AbstractBlock.Settings settings) {
+    private ZincSmelterBlock(BlockBehaviour.Properties settings) {
         super(settings);
-        setDefaultState(getStateManager().getDefaultState()
-                .with(FACING, Direction.NORTH)
-                .with(LIT, false));
+        registerDefaultState(getStateDefinition().any()
+                .setValue(FACING, Direction.NORTH)
+                .setValue(LIT, false));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        super.appendProperties(builder);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
         builder.add(FACING, LIT);
     }
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return getDefaultState().with(FACING, ctx.getHorizontalPlayerFacing());
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ZincSmelterBlockEntity(pos, state);
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.MODEL;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.MODEL;
     }
 
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        if (!(world instanceof ServerWorld)) return null;
-        return validateTicker(type, EnchantTransferMod.ZINC_SMELTER_BLOCK_ENTITY,
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
+        if (!(world instanceof ServerLevel)) return null;
+        return createTickerHelper(type, EnchantTransferMod.ZINC_SMELTER_BLOCK_ENTITY,
                 ZincSmelterBlockEntity::serverTick);
     }
 
     @Override
-    protected ActionResult onUse(BlockState state, World world, BlockPos pos,
-                                 PlayerEntity player, BlockHitResult hit) {
-        if (!(world instanceof ServerWorld)) {
-            return ActionResult.SUCCESS;
+    protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos,
+                                 Player player, BlockHitResult hit) {
+        if (!(world instanceof ServerLevel)) {
+            return InteractionResult.SUCCESS;
         }
-        var factory = state.createScreenHandlerFactory(world, pos);
+        var factory = state.getMenuProvider(world, pos);
         if (factory != null) {
-            player.openHandledScreen(factory);
+            player.openMenu(factory);
         }
-        return ActionResult.CONSUME;
+        return InteractionResult.CONSUME;
     }
 
     @Override
-    public void onStateReplaced(BlockState state, ServerWorld world, BlockPos pos, boolean moved) {
-        if (!state.isOf(this) || moved) {
-            super.onStateReplaced(state, world, pos, moved);
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
+        if (!state.is(this) || moved) {
+            super.affectNeighborsAfterRemoval(state, world, pos, moved);
             return;
         }
         BlockEntity be = world.getBlockEntity(pos);
-        if (be instanceof Inventory inventory) {
-            ItemScatterer.spawn(world, pos, inventory);
-            world.updateComparators(pos, this);
+        if (be instanceof Container inventory) {
+            Containers.dropContents(world, pos, inventory);
+            world.updateNeighbourForOutputSignal(pos, this);
         }
-        super.onStateReplaced(state, world, pos, moved);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     // Smoke + lava particles from the chimney are emitted by the BER or

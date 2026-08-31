@@ -3,12 +3,12 @@ package net.alfonsormadrid.enchanttransfer.screens.zincsmelter;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.Inventory;
 
 /**
  * GUI screen for the Zinc Smelter.
@@ -18,10 +18,10 @@ import net.minecraft.util.Identifier;
  * progress arrow (while smelting).
  */
 @Environment(EnvType.CLIENT)
-public class ZincSmelterScreen extends HandledScreen<ZincSmelterScreenHandler> {
+public class ZincSmelterScreen extends AbstractContainerScreen<ZincSmelterScreenHandler> {
 
     private static final Identifier TEXTURE =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/gui/container/zinc_smelter_gui.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/gui/container/zinc_smelter_gui.png");
 
     // Background content size inside the 256×256 PNG.
     // The GUI image spans 176×190 px (NOT the standard 166).
@@ -54,33 +54,32 @@ public class ZincSmelterScreen extends HandledScreen<ZincSmelterScreenHandler> {
     private static final int TITLE_COL = 0xFF3A2008;
 
     public ZincSmelterScreen(ZincSmelterScreenHandler handler,
-                             PlayerInventory inventory, Text title) {
-        super(handler, inventory, title);
+                             Inventory inventory, Component title) {
+        super(handler, inventory, title, BG_W, BG_H);
     }
 
     @Override
     protected void init() {
-        backgroundWidth  = BG_W;
-        backgroundHeight = BG_H;
         super.init();
-        titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+        titleLabelX = (imageWidth - font.width(title)) / 2;
     }
 
     @Override
-    protected void drawForeground(DrawContext ctx, int mouseX, int mouseY) {
-        ctx.drawText(textRenderer, title, titleX, titleY, TITLE_COL, false);
+    protected void extractLabels(GuiGraphicsExtractor ctx, int mouseX, int mouseY) {
+        ctx.text(font, title, titleLabelX, titleLabelY, TITLE_COL, false);
     }
 
     @Override
-    protected void drawBackground(DrawContext ctx, float delta, int mouseX, int mouseY) {
-        int gx = (width  - backgroundWidth)  / 2;
-        int gy = (height - backgroundHeight) / 2;
-        ctx.drawTexture(RenderPipelines.GUI_TEXTURED,
-                TEXTURE, gx, gy, 0f, 0f, backgroundWidth, backgroundHeight, 256, 256);
+    public void extractBackground(GuiGraphicsExtractor ctx, int mouseX, int mouseY, float delta) {
+        super.extractBackground(ctx, mouseX, mouseY, delta);
+        int gx = (width  - imageWidth)  / 2;
+        int gy = (height - imageHeight) / 2;
+        ctx.blit(RenderPipelines.GUI_TEXTURED,
+                TEXTURE, gx, gy, 0f, 0f, imageWidth, imageHeight, 256, 256);
 
         // ── Flame indicator (burns down as fuel depletes) ────────────────
-        if (handler.isLit()) {
-            float lit = handler.getLitProgress();
+        if (menu.isLit()) {
+            float lit = menu.getLitProgress();
             int filledH = Math.max(1, Math.round(FLAME_H * lit));
             int yOffset = FLAME_H - filledH;
             ctx.fill(gx + FLAME_X, gy + FLAME_Y + yOffset,
@@ -91,7 +90,7 @@ public class ZincSmelterScreen extends HandledScreen<ZincSmelterScreenHandler> {
         // ── Progress arrow (fills left-to-right, clipped to arrow shape) ─
         // One fill rectangle per row.  The right edge follows the ">"
         // diagonal so the fill conforms to the arrowhead silhouette.
-        float cook = handler.getCookProgress();
+        float cook = menu.getCookProgress();
         if (cook > 0f) {
             int fillRight = ARROW_LEFT + Math.max(1, Math.round(ARROW_TOTAL_W * cook));
             for (int row = 0; row < ARROW_BOT - ARROW_TOP; row++) {
@@ -104,12 +103,5 @@ public class ZincSmelterScreen extends HandledScreen<ZincSmelterScreenHandler> {
                 }
             }
         }
-    }
-
-    @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
-        renderBackground(ctx, mouseX, mouseY, delta);
-        super.render(ctx, mouseX, mouseY, delta);
-        drawMouseoverTooltip(ctx, mouseX, mouseY);
     }
 }

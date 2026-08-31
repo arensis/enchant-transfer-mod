@@ -1,23 +1,23 @@
 package net.alfonsormadrid.enchanttransfer.renderers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlockEntity;
 import net.alfonsormadrid.enchanttransfer.renderers.state.ZincSmelterRenderState;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * BER for the Zinc Smelter — renders ONLY the animated fire glow behind
@@ -29,7 +29,7 @@ public class ZincSmelterRenderer
         implements BlockEntityRenderer<ZincSmelterBlockEntity, ZincSmelterRenderState> {
 
     private static final Identifier WHITE_TEXTURE =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
 
     // Fire glow quad — on the BACK WALL of the door cavity (z=15.6).
     // The player looks through glass → dark empty cavity → this fire
@@ -41,7 +41,7 @@ public class ZincSmelterRenderer
     private static final float FIRE_R = 1.00f, FIRE_G = 0.45f, FIRE_B = 0.08f;
     private static final int FULL_LIGHT = 0xF000F0;
 
-    public ZincSmelterRenderer(BlockEntityRendererFactory.Context ctx) {}
+    public ZincSmelterRenderer(BlockEntityRendererProvider.Context ctx) {}
 
     @Override
     public ZincSmelterRenderState createRenderState() {
@@ -49,40 +49,40 @@ public class ZincSmelterRenderer
     }
 
     @Override
-    public void updateRenderState(ZincSmelterBlockEntity entity,
+    public void extractRenderState(ZincSmelterBlockEntity entity,
                                   ZincSmelterRenderState state,
                                   float tickDelta,
-                                  Vec3d cameraPos,
-                                  ModelCommandRenderer.CrumblingOverlayCommand crumbling) {
-        BlockEntityRenderer.super.updateRenderState(entity, state, tickDelta, cameraPos, crumbling);
-        var blockState = entity.getCachedState();
-        state.facing = blockState.get(ZincSmelterBlock.FACING);
-        state.lit = blockState.get(ZincSmelterBlock.LIT);
-        long worldTime = entity.getWorld() != null ? entity.getWorld().getTime() : 0L;
+                                  Vec3 cameraPos,
+                                  ModelFeatureRenderer.CrumblingOverlay crumbling) {
+        BlockEntityRenderer.super.extractRenderState(entity, state, tickDelta, cameraPos, crumbling);
+        var blockState = entity.getBlockState();
+        state.facing = blockState.getValue(ZincSmelterBlock.FACING);
+        state.lit = blockState.getValue(ZincSmelterBlock.LIT);
+        long worldTime = entity.getLevel() != null ? entity.getLevel().getGameTime() : 0L;
         state.animTime = (worldTime + tickDelta) * 0.15f;
     }
 
     @Override
-    public void render(ZincSmelterRenderState state,
-                       MatrixStack matrices,
-                       OrderedRenderCommandQueue queue,
+    public void submit(ZincSmelterRenderState state,
+                       PoseStack matrices,
+                       SubmitNodeCollector queue,
                        CameraRenderState cameraState) {
 
         if (!state.lit) return; // Nothing dynamic to render when idle
 
-        RenderLayer glowLayer = RenderLayers.entityTranslucentEmissive(WHITE_TEXTURE);
+        RenderType glowLayer = RenderTypes.entityTranslucentEmissive(WHITE_TEXTURE);
 
         // Rotate to match block facing
-        matrices.push();
+        matrices.pushPose();
         matrices.translate(0.5f, 0f, 0.5f);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(facingToYaw(state.facing)));
+        matrices.mulPose(Axis.YP.rotationDegrees(facingToYaw(state.facing)));
         matrices.translate(-0.5f, 0f, -0.5f);
 
         // Pulsing fire glow on the mirilla — higher alpha for visibility
         float pulse = 0.6f + 0.4f * (float) Math.sin(state.animTime);
         float alpha = 0.65f + 0.30f * pulse;
         final float a = alpha;
-        queue.submitCustom(matrices, glowLayer, (entry, vc) -> {
+        queue.submitCustomGeometry(matrices, glowLayer, (entry, vc) -> {
             quad(entry, vc,
                     FIRE_X0, FIRE_Y0, FIRE_Z,
                     FIRE_X1, FIRE_Y0, FIRE_Z,
@@ -92,7 +92,7 @@ public class ZincSmelterRenderer
                     0, 0, 1);
         });
 
-        matrices.pop();
+        matrices.popPose();
     }
 
     /** Maps facing to the same Y rotation the blockstate JSON uses. */
@@ -106,16 +106,16 @@ public class ZincSmelterRenderer
         };
     }
 
-    private static void quad(MatrixStack.Entry entry, VertexConsumer vc,
+    private static void quad(PoseStack.Pose entry, VertexConsumer vc,
                              float ax, float ay, float az,
                              float bx, float by, float bz,
                              float cx, float cy, float cz,
                              float dx, float dy, float dz,
                              float r, float g, float b, float a,
                              float nx, float ny, float nz) {
-        vc.vertex(entry, ax,ay,az).color(r,g,b,a).texture(0f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx,ny,nz);
-        vc.vertex(entry, bx,by,bz).color(r,g,b,a).texture(1f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx,ny,nz);
-        vc.vertex(entry, cx,cy,cz).color(r,g,b,a).texture(1f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx,ny,nz);
-        vc.vertex(entry, dx,dy,dz).color(r,g,b,a).texture(0f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx,ny,nz);
+        vc.addVertex(entry, ax,ay,az).setColor(r,g,b,a).setUv(0f,0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx,ny,nz);
+        vc.addVertex(entry, bx,by,bz).setColor(r,g,b,a).setUv(1f,0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx,ny,nz);
+        vc.addVertex(entry, cx,cy,cz).setColor(r,g,b,a).setUv(1f,1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx,ny,nz);
+        vc.addVertex(entry, dx,dy,dz).setColor(r,g,b,a).setUv(0f,1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx,ny,nz);
     }
 }

@@ -1,22 +1,22 @@
 package net.alfonsormadrid.enchanttransfer.renderers;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlockEntity;
 import net.alfonsormadrid.enchanttransfer.renderers.state.TransferTableRenderState;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.render.command.ModelCommandRenderer;
-import net.minecraft.client.render.command.OrderedRenderCommandQueue;
-import net.minecraft.client.render.state.CameraRenderState;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.phys.Vec3;
 
 /**
  * Block entity renderer for the Transfer Table.
@@ -69,10 +69,10 @@ public class TransferTableRenderer
     // the tube on the entityTranslucentEmissive layer so the two halves at the
     // block boundary are lit identically.
     private static final Identifier WHITE_TEXTURE =
-            Identifier.of(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "textures/misc/white.png");
     private static final int FULL_LIGHT = 0xF000F0;
 
-    public TransferTableRenderer(BlockEntityRendererFactory.Context ctx) {}
+    public TransferTableRenderer(BlockEntityRendererProvider.Context ctx) {}
 
     @Override
     public TransferTableRenderState createRenderState() {
@@ -80,24 +80,24 @@ public class TransferTableRenderer
     }
 
     @Override
-    public void updateRenderState(TransferTableBlockEntity entity,
+    public void extractRenderState(TransferTableBlockEntity entity,
                                   TransferTableRenderState state,
                                   float tickDelta,
-                                  Vec3d cameraPos,
-                                  ModelCommandRenderer.CrumblingOverlayCommand crumbling) {
-        BlockEntityRenderer.super.updateRenderState(entity, state, tickDelta, cameraPos, crumbling);
-        long worldTime = entity.getWorld() != null ? entity.getWorld().getTime() : 0L;
+                                  Vec3 cameraPos,
+                                  ModelFeatureRenderer.CrumblingOverlay crumbling) {
+        BlockEntityRenderer.super.extractRenderState(entity, state, tickDelta, cameraPos, crumbling);
+        long worldTime = entity.getLevel() != null ? entity.getLevel().getGameTime() : 0L;
         state.animTime = (worldTime + tickDelta) * 0.05f;
 
         // Scan the 6 neighbours.  We can't trust the server-only
         // ModuleConnectionRegistry on the client, so we check block states
         // directly — same pattern the coil renderer uses to find its table.
-        if (entity.getWorld() != null) {
-            BlockPos pos = entity.getPos();
+        if (entity.getLevel() != null) {
+            BlockPos pos = entity.getBlockPos();
             for (Direction dir : Direction.values()) {
                 state.connectedFaces[dir.ordinal()] =
-                        entity.getWorld().getBlockState(pos.offset(dir))
-                                .isOf(EnchantTransferMod.INFUSION_COIL_BLOCK);
+                        entity.getLevel().getBlockState(pos.relative(dir))
+                                .is(EnchantTransferMod.INFUSION_COIL_BLOCK);
             }
         } else {
             for (int i = 0; i < state.connectedFaces.length; i++) {
@@ -107,9 +107,9 @@ public class TransferTableRenderer
     }
 
     @Override
-    public void render(TransferTableRenderState state,
-                       MatrixStack matrices,
-                       OrderedRenderCommandQueue queue,
+    public void submit(TransferTableRenderState state,
+                       PoseStack matrices,
+                       SubmitNodeCollector queue,
                        CameraRenderState cameraState) {
         float alpha = 0.55f + 0.45f * (0.5f + 0.5f * (float) Math.sin(state.animTime));
 
@@ -117,7 +117,7 @@ public class TransferTableRenderer
         //     the polygon-offset and translucent-sorting artefacts that
         //     entityTranslucentEmissive causes on this in-block geometry.
         //     Brighter RGB values compensate for world-lighting attenuation.
-        queue.submitCustom(matrices, RenderLayers.debugFilledBox(), (entry, vc) ->
+        queue.submitCustomGeometry(matrices, RenderTypes.debugFilledBox(), (entry, vc) ->
                 colorBox(entry, vc,
                         CORE_MIN, CORE_MIN, CORE_MIN,
                         CORE_MAX, CORE_MAX, CORE_MAX,
@@ -133,7 +133,7 @@ public class TransferTableRenderer
         // entityCutout writes depth — prevents translucent-sorting glitches
         // where back faces of the tube show through the core glow at
         // oblique angles.
-        RenderLayer tubeLayer = RenderLayers.entityCutout(WHITE_TEXTURE);
+        RenderType tubeLayer = RenderTypes.entityCutout(WHITE_TEXTURE);
         for (Direction dir : Direction.values()) {
             if (!state.connectedFaces[dir.ordinal()]) continue;
             drawTube(matrices, queue, tubeLayer, dir);
@@ -144,8 +144,8 @@ public class TransferTableRenderer
      * Emits the three segments of one tube (near flange → pipe → far flange)
      * going from the {@code dir} face of the table inward toward the core.
      */
-    private void drawTube(MatrixStack matrices, OrderedRenderCommandQueue queue,
-                          RenderLayer layer, Direction dir) {
+    private void drawTube(PoseStack matrices, SubmitNodeCollector queue,
+                          RenderType layer, Direction dir) {
         final float[] flangeNear =
                 tubeSegment(dir, TUBE_FLANGE_MIN, TUBE_FLANGE_MAX, 0f, TUBE_FLANGE_DEPTH);
         final float[] pipe =
@@ -155,7 +155,7 @@ public class TransferTableRenderer
                 tubeSegment(dir, TUBE_FLANGE_MIN, TUBE_FLANGE_MAX,
                             TUBE_LENGTH - TUBE_FLANGE_DEPTH, TUBE_LENGTH);
 
-        queue.submitCustom(matrices, layer, (entry, vc) -> {
+        queue.submitCustomGeometry(matrices, layer, (entry, vc) -> {
             drawEntityBox(entry, vc,
                     flangeNear[0], flangeNear[1], flangeNear[2],
                     flangeNear[3], flangeNear[4], flangeNear[5],
@@ -193,7 +193,7 @@ public class TransferTableRenderer
     // ── POSITION_COLOR box (debugFilledBox) ─────────────────────────────────
 
     /** Solid-colour box, 6 quads, POSITION_COLOR vertex format. */
-    private static void colorBox(MatrixStack.Entry entry, VertexConsumer vc,
+    private static void colorBox(PoseStack.Pose entry, VertexConsumer vc,
                                   float x0, float y0, float z0,
                                   float x1, float y1, float z1,
                                   float r, float g, float b, float a) {
@@ -205,28 +205,28 @@ public class TransferTableRenderer
         cq(entry, vc, x1,y1,z0,  x1,y1,z1,  x1,y0,z1,  x1,y0,z0,  r,g,b,a); // +X
     }
 
-    private static void cq(MatrixStack.Entry entry, VertexConsumer vc,
+    private static void cq(PoseStack.Pose entry, VertexConsumer vc,
                             float ax, float ay, float az,
                             float bx, float by, float bz,
                             float cx, float cy, float cz,
                             float dx, float dy, float dz,
                             float r, float g, float b, float a) {
-        vc.vertex(entry, ax, ay, az).color(r, g, b, a);
-        vc.vertex(entry, bx, by, bz).color(r, g, b, a);
-        vc.vertex(entry, cx, cy, cz).color(r, g, b, a);
-        vc.vertex(entry, dx, dy, dz).color(r, g, b, a);
+        vc.addVertex(entry, ax, ay, az).setColor(r, g, b, a);
+        vc.addVertex(entry, bx, by, bz).setColor(r, g, b, a);
+        vc.addVertex(entry, cx, cy, cz).setColor(r, g, b, a);
+        vc.addVertex(entry, dx, dy, dz).setColor(r, g, b, a);
     }
 
     // ── ENTITY-format box (entityTranslucentEmissive) ───────────────────────
 
     /**
      * Same 6-quad box but emitting the ENTITY vertex format expected by
-     * {@link RenderLayers#entityTranslucentEmissive}.  Pos + colour +
+     * {@link RenderTypes#entityTranslucentEmissive}.  Pos + colour +
      * tex(0,0) + overlay + full-bright light + normal — matches the helper
      * used by the coil renderer so the boundary between table tube and
      * coil tube is invisible.
      */
-    private static void drawEntityBox(MatrixStack.Entry entry, VertexConsumer vc,
+    private static void drawEntityBox(PoseStack.Pose entry, VertexConsumer vc,
                                        float x0, float y0, float z0,
                                        float x1, float y1, float z1,
                                        float r, float g, float b, float a) {
@@ -241,16 +241,16 @@ public class TransferTableRenderer
         eq(entry, vc, x1,y1,z0, x1,y1,z1, x1,y0,z1, x1,y0,z0, r*sX, g*sX, b*sX, a,  1f, 0f, 0f); // +X
     }
 
-    private static void eq(MatrixStack.Entry entry, VertexConsumer vc,
+    private static void eq(PoseStack.Pose entry, VertexConsumer vc,
                             float ax, float ay, float az,
                             float bx, float by, float bz,
                             float cx, float cy, float cz,
                             float dx, float dy, float dz,
                             float r, float g, float b, float a,
                             float nx, float ny, float nz) {
-        vc.vertex(entry, ax, ay, az).color(r,g,b,a).texture(0f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
-        vc.vertex(entry, bx, by, bz).color(r,g,b,a).texture(1f,0f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
-        vc.vertex(entry, cx, cy, cz).color(r,g,b,a).texture(1f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
-        vc.vertex(entry, dx, dy, dz).color(r,g,b,a).texture(0f,1f).overlay(OverlayTexture.DEFAULT_UV).light(FULL_LIGHT).normal(entry, nx, ny, nz);
+        vc.addVertex(entry, ax, ay, az).setColor(r,g,b,a).setUv(0f,0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
+        vc.addVertex(entry, bx, by, bz).setColor(r,g,b,a).setUv(1f,0f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
+        vc.addVertex(entry, cx, cy, cz).setColor(r,g,b,a).setUv(1f,1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
+        vc.addVertex(entry, dx, dy, dz).setColor(r,g,b,a).setUv(0f,1f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(FULL_LIGHT).setNormal(entry, nx, ny, nz);
     }
 }

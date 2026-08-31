@@ -1,11 +1,11 @@
 package net.alfonsormadrid.enchanttransfer.item;
 
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.registry.RegistryKey;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 /**
  * Categoria de una {@link MagicCardItem}.  Cada tipo de carta:
@@ -93,10 +93,10 @@ public enum CardType {
 
     private final String colorId;
     private final String categoryKey;
-    private final List<RegistryKey<Enchantment>> allowedEnchantments;
+    private final List<ResourceKey<Enchantment>> allowedEnchantments;
 
     CardType(String colorId, String categoryKey,
-             List<RegistryKey<Enchantment>> allowedEnchantments) {
+             List<ResourceKey<Enchantment>> allowedEnchantments) {
         this.colorId             = colorId;
         this.categoryKey         = categoryKey;
         this.allowedEnchantments = allowedEnchantments;
@@ -120,7 +120,7 @@ public enum CardType {
      * Returned list is immutable.  Mod-custom enchantments will be appended
      * here once their registry keys exist.
      */
-    public List<RegistryKey<Enchantment>> allowedEnchantments() {
+    public List<ResourceKey<Enchantment>> allowedEnchantments() {
         return allowedEnchantments;
     }
 
@@ -134,7 +134,7 @@ public enum CardType {
      *         enchantment isn't categorised yet (e.g. modded enchantment
      *         from another mod, or a vanilla one we haven't mapped).
      */
-    public static @Nullable CardType forEnchantment(RegistryKey<Enchantment> key) {
+    public static @Nullable CardType forEnchantment(ResourceKey<Enchantment> key) {
         for (CardType t : values()) {
             if (t.allowedEnchantments.contains(key)) return t;
         }
