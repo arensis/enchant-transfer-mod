@@ -17,7 +17,6 @@ import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableItem
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScreenHandler;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
-import net.fabricmc.fabric.api.creativetab.v1.CreativeModeTabEvents;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -170,26 +169,28 @@ public class EnchantTransferMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "zinc_sheet"),  ZINC_SHEET_ITEM);
 		Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "brass_ingot"), BRASS_INGOT_ITEM);
 
+		// Populate the tab directly via displayItems: a custom tab with no
+		// display generator produces no output, so CreativeModeTabEvents never
+		// fires for it and Minecraft hides the (empty) tab.
 		Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ITEM_GROUP_KEY, FabricCreativeModeTab.builder()
 				.icon(() -> new ItemStack(TRANSFER_TABLE_BLOCK))
 				.title(Component.translatable("itemGroup.enchanttransfer.general"))
+				.displayItems((params, entries) -> {
+					entries.accept(TRANSFER_TABLE_ITEM);
+					entries.accept(INFUSION_COIL_ITEM);
+					entries.accept(MAGIC_CARD_ITEM);
+					entries.accept(MAGIC_CARD_BLUE);
+					entries.accept(MAGIC_CARD_GREEN);
+					entries.accept(MAGIC_CARD_RED);
+					entries.accept(MAGIC_CARD_YELLOW);
+					entries.accept(MAGIC_CARD_PURPLE);
+					entries.accept(MAGIC_CARD_BLACK);
+					entries.accept(ZINC_SMELTER_ITEM);
+					entries.accept(ZINC_OXIDE_ITEM);
+					entries.accept(ZINC_SHEET_ITEM);
+					entries.accept(BRASS_INGOT_ITEM);
+				})
 				.build());
-
-		CreativeModeTabEvents.modifyOutputEvent(ITEM_GROUP_KEY).register(entries -> {
-			entries.accept(TRANSFER_TABLE_ITEM);
-			entries.accept(INFUSION_COIL_ITEM);
-			entries.accept(MAGIC_CARD_ITEM);
-			entries.accept(MAGIC_CARD_BLUE);
-			entries.accept(MAGIC_CARD_GREEN);
-			entries.accept(MAGIC_CARD_RED);
-			entries.accept(MAGIC_CARD_YELLOW);
-			entries.accept(MAGIC_CARD_PURPLE);
-			entries.accept(MAGIC_CARD_BLACK);
-			entries.accept(ZINC_SMELTER_ITEM);
-			entries.accept(ZINC_OXIDE_ITEM);
-			entries.accept(ZINC_SHEET_ITEM);
-			entries.accept(BRASS_INGOT_ITEM);
-		});
 
 		// ── Custom networking ──────────────────────────────────────────────────
 		// S2C: server → client to open the Selector screen
