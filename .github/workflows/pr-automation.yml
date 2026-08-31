@@ -11,12 +11,12 @@ jobs:
       github.event.pull_request.merged == true && (
         contains(github.event.pull_request.labels.*.name, 'tag/major') ||
         contains(github.event.pull_request.labels.*.name, 'tag/minor') ||
-        contains(github.event.pull_request.labels.*.name, 'tag/patch') ||
-        contains(github.event.pull_request.labels.*.name, 'force-release')
+        contains(github.event.pull_request.labels.*.name, 'tag/patch')
       )
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: write
 
     steps:
       - name: Checkout
@@ -34,9 +34,7 @@ jobs:
           HAS_PATCH: ${{ contains(github.event.pull_request.labels.*.name, 'tag/patch') }}
         run: |
           if [ "$HAS_MAJOR" = "true" ] || [ "$HAS_MINOR" = "true" ] || [ "$HAS_PATCH" = "true" ]; then
-            # Read version from before the merge so we don't double-bump
             RAW=$(git show HEAD^1:gradle.properties | grep 'mod_version' | cut -d'=' -f2 | tr -d ' ')
-            # Strip pre-release suffix (e.g. -alpha, -beta)
             CURRENT=$(echo "$RAW" | cut -d'-' -f1)
           else
             CURRENT=$(grep 'mod_version' gradle.properties | cut -d'=' -f2 | tr -d ' ')
@@ -72,33 +70,9 @@ jobs:
           echo "version=$NEW"   >> $GITHUB_OUTPUT
           echo "tag=v$NEW"      >> $GITHUB_OUTPUT
 
-      # ── Release ─────────────────────────────────────────────────────────────
-      - name: Set up Java 21
-        if: contains(github.event.pull_request.labels.*.name, 'force-release')
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'gradle'
-
-      - name: Grant Gradle wrapper permissions
-        if: contains(github.event.pull_request.labels.*.name, 'force-release')
-        run: chmod +x gradlew
-
-      - name: Build with Gradle
-        if: contains(github.event.pull_request.labels.*.name, 'force-release')
-        run: ./gradlew build
-
-      - name: Find main JAR
-        if: contains(github.event.pull_request.labels.*.name, 'force-release')
-        id: jar
-        run: echo "path=$(find build/libs -name '*.jar' ! -name '*-sources*' ! -name '*-dev*' | head -1)" >> $GITHUB_OUTPUT
-
-      - name: Create GitHub Release
-        if: contains(github.event.pull_request.labels.*.name, 'force-release')
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.version.outputs.tag }}
-          name: "Enchant Transfer Mod ${{ steps.version.outputs.tag }}"
-          files: ${{ steps.jar.outputs.path }}
-          generate_release_notes: true
+      # ── Trigger release workflow ────────────────────────────────────────────
+      - name: Trigger release
+        if: steps.version.outputs.bumped == 'true'
+        run: gh workflow run release.yml -f tag=${{ steps.version.outputs.tag }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
