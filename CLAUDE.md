@@ -1,7 +1,13 @@
 # enchant-transfer-mod — Claude context
 
-Fabric mod for Minecraft **1.21.11**.  
-Yarn mappings `1.21.11+build.3` · Fabric API `0.141.4+1.21.11`
+Fabric mod for Minecraft **26.2**.  
+**Mojang (official) mappings** · Fabric API `0.158.0+26.2` · Fabric Loom `1.17` · Java **25**
+
+> Build/run with JDK 25 as `JAVA_HOME` (the daemon default `java` may be newer and
+> unsupported by Gradle 9.5):
+> `JAVA_HOME=…/jdk-25… ./gradlew build` / `runClient`.
+> Migrated from 1.21.11 + Yarn — see the `feature/Update26_2` history. Yarn→Mojmap
+> remap was done with Loom's `migrateMappings` task.
 
 ---
 
@@ -14,26 +20,56 @@ Modules are placed adjacent to the table; the server scans neighbours each tick.
 | Class | Notes |
 |---|---|
 | `EnchantTransferMod` | Registry (blocks, items, block entities, screen handlers) |
-| `EnchantTransferClientMod` | BER registration, render layers, S2C listeners |
+| `EnchantTransferClientMod` | BER registration, screen registration, S2C listeners |
 | `TransferTableBlockEntity` | Hub – attaches/detaches modules, `attachModule(face, module)` |
 | `InfusionCoilBlockEntity` | Module – consumes Magic Cards → XP tank → glass bottles |
 | `InfusionCoilRenderer` | BER: fluid fill, cap glow, copper nozzle stub |
 | `TransferTableRenderer` | BER: pulsing blue core box |
 | `SelectorScreen` | L1 GUI (plain `Screen`); opened via `OpenSelectorPayload` S2C |
-| `InfusionCoilScreen` | L2 GUI (`HandledScreen`) |
-| `TransferTableScreen` | L2 GUI (`HandledScreen`) |
+| `InfusionCoilScreen` | L2 GUI (`AbstractContainerScreen`) |
+| `TransferTableScreen` | L2 GUI (`AbstractContainerScreen`) |
 
 ---
 
-## Critical 1.21.11 API notes
+## Critical 26.2 API notes
 
-- **BER API** uses `BlockEntityRenderer<T, S>` with two type params.  
-  - `updateRenderState()` runs on game thread; `render()` on render thread.  
-  - Geometry submitted via `OrderedRenderCommandQueue.submitCustom(matrices, layer, (entry, vc) → ...)`.
-- **Render layer for colored boxes**: `RenderLayers.debugFilledBox()` — uses `POSITION_COLOR` shader, no UV/Normal/Overlay needed. Avoids Apple Silicon shader warnings from `eyes` layer.
-- **Screen blur crash**: `Screen.renderWithTooltip()` in 1.21.11 applies blur before `render()`. Never call `renderBackground()` inside `render()` on a plain `Screen` subclass — only from `HandledScreen`.
-- **`BlockPos.PACKET_CODEC`** used with `ExtendedScreenHandlerType` to send coil position to client at screen-open time.
-- **`Screen.mouseClicked(Click click, boolean down)`** — use `click.x()`, `click.y()`, `click.button()`.
+Mojang mappings. 26.2 replaced the immediate-mode render/GUI APIs with a **deferred
+render-state** pipeline — this is the crux of most of the code here.
+
+- **BER (`BlockEntityRenderer<T, S>`)** — override `createRenderState()`,
+  `extractRenderState(entity, state, tickDelta, cameraPos, crumbling)` (game thread),
+  and `submit(state, PoseStack, SubmitNodeCollector, CameraRenderState)` (render thread).
+  Geometry via `queue.submitCustomGeometry(matrices, layer, (entry, vc) → ...)`.
+  `CameraRenderState` lives in `net.minecraft.client.renderer.state.level`.
+- **Render types** — `RenderTypes` (package `net.minecraft.client.renderer.rendertype`):
+  `debugFilledBox()` for `POSITION_COLOR` boxes; `entityCutout(id)` is the **no-cull**
+  cutout (culled variant is `entityCutoutCull`).
+- **GUI (`Screen` / `AbstractContainerScreen`)** — no more `GuiGraphics`; draw via
+  **`GuiGraphicsExtractor`**. Override points: `extractRenderState(gfx, mx, my, delta)`
+  (was `render`), `extractBackground(gfx, mx, my, delta)` (was `renderBg`, **call
+  `super`**), `extractLabels(gfx, mx, my)` (was `renderLabels`), `extractTooltip(gfx,
+  mx, my)` (was `renderTooltip`). Methods: `text()` (was `drawString`), `item()` (was
+  `renderItem`); `blit`, `fill`, `setTooltipForNextFrame`, `pose()` (a 2D
+  `Matrix3x2fStack`) unchanged. Tooltips render in a deferred final pass, so drawing
+  extra overlays in `extractRenderState` after `super` still sits under them.
+- **`imageWidth`/`imageHeight` are `final`** — pass them to
+  `super(handler, inv, title, w, h)` in the constructor, don't assign in `init()`.
+- **Block render layer** is data-driven: `"render_type": "minecraft:translucent"` in the
+  block model JSON (Fabric's `BlockRenderLayerMap` was removed in 26.2).
+- **Screen handlers / menus** — `ExtendedMenuType` + `ExtendedMenuProvider`
+  (`net.fabricmc.fabric.api.menu.v1`; replace old `screenhandler.v1`); ship the coil
+  `BlockPos` via `BlockPos.STREAM_CODEC` at screen-open time.
+- **Creative tab** — `FabricCreativeModeTab.builder()` +
+  `CreativeModeTabEvents.modifyOutputEvent(key)` (`creativetab.v1`; replaces
+  `itemgroup.v1`).
+- **Networking** — `PayloadTypeRegistry.clientboundPlay()` / `.serverboundPlay()`
+  (were `playS2C` / `playC2S`). Open a screen client-side with
+  `Minecraft.setScreenAndShow(screen)` (was `setScreen`).
+- **Misc** — `Vec3.atCenterOf(blockPos)` (was `BlockPos.getCenter()`);
+  `Screen.mouseClicked(MouseButtonEvent click, boolean down)` uses
+  `click.x()/.y()/.button()`.
+- **`depends`** in `fabric.mod.json` is `fabric-api` (the 26.2 bundle id; the legacy
+  `fabric` id is gone).
 
 ---
 
@@ -51,10 +87,14 @@ Modules are placed adjacent to the table; the server scans neighbours each tick.
 
 ## Render layers
 
-| Block | Layer | Reason |
+Set data-side via `"render_type"` in the block **model** JSON (not code — `BlockRenderLayerMap`
+was removed in 26.2).
+
+| Block | `render_type` | Reason |
 |---|---|---|
-| `INFUSION_COIL_BLOCK` | `TRANSLUCENT` | `infusor_glass.png` has 196 semi-transparent pixels; CUTOUT renders them opaque hiding the fluid |
-| `TRANSFER_TABLE_BLOCK` | default (SOLID) | |
+| `INFUSION_COIL_BLOCK` (`infusor_coil.json`, `infusor_coil_active.json`) | `minecraft:translucent` | `infusor_glass.png` has 196 semi-transparent pixels; cutout renders them opaque hiding the fluid |
+| `ZINC_SMELTER_BLOCK` (`zinc_smelter.json`, `zinc_smelter_lit.json`) | `minecraft:translucent` | glass mirilla lets the BER fire glow show through |
+| `TRANSFER_TABLE_BLOCK` | default (solid) | |
 
 ---
 
@@ -88,5 +128,5 @@ Empty → dim dot. Active screen → filled dot + cyan ring (border at radius 5)
 ## Known architecture constraints
 
 - `cachedCoreFace` in `InfusionCoilBlockEntity` is server-only; never synced to client.  
-  The client BER scans adjacent block states directly in `updateRenderState()`.
+  The client BER scans adjacent block states directly in `extractRenderState()`.
 - The `InfusionCoilBlock` must have `.nonOpaque()` in settings to prevent Minecraft culling the top face of the block it sits on (inset model has corner gaps).
