@@ -55,9 +55,12 @@ jobs:
 
           if [ "$NEW" != "$CURRENT" ]; then
             sed -i "s/mod_version = .*/mod_version = $NEW/" gradle.properties
+            # Sync version numbers in README, website and store descriptions
+            # so the docs are part of the tagged release commit.
+            python3 scripts/sync-release-docs.py
             git config user.name  "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add gradle.properties
+            git add gradle.properties README.md docs/
             git commit -m "chore: bump version to $NEW [skip ci]"
             git tag "v$NEW"
             git push origin master
@@ -74,5 +77,13 @@ jobs:
       - name: Trigger release
         if: steps.version.outputs.bumped == 'true'
         run: gh workflow run release.yml -f tag=${{ steps.version.outputs.tag }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Pushes made with GITHUB_TOKEN don't trigger pages.yml, so deploy the
+      # synced website explicitly.
+      - name: Deploy website
+        if: steps.version.outputs.bumped == 'true'
+        run: gh workflow run pages.yml --ref master
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
