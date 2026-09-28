@@ -1,8 +1,31 @@
 <p><b>Enchant Transfer</b> adds a craftable block — the <b>Transfer Table</b> — that lets you extract enchantments from any item into individual <b>Magic Cards</b>, apply those cards to other compatible items, and combine two cards of the same enchantment and level to upgrade them. All operations are free (no XP cost), and vanilla enchantment compatibility rules are respected.</p>
 
-<p>Version 2.0 introduces the <b>Module System</b>: specialized blocks that attach to the Transfer Table on any face, extending its capabilities. The first module — the <b>Infusion Coil</b> — converts Magic Cards into stored XP and fills glass bottles into Bottles o' Enchanting.</p>
+<p>Version 2.0 introduced the <b>Module System</b>: specialized blocks that attach to the Transfer Table on any face, extending its capabilities. The first module — the <b>Infusion Coil</b> — converts Magic Cards into stored XP and fills glass bottles into Bottles o' Enchanting.</p>
+
+<blockquote>
+<p><b>Version support:</b> New features and modules are developed for Minecraft 26.x only.<br>
+The 1.21.11 version (v2.0.x) is in maintenance mode and will only receive critical bug fixes.</p>
+</blockquote>
 
 <p><b>Requires:</b> Fabric Loader and Fabric API</p>
+
+<hr>
+
+<h2>Supported Versions</h2>
+
+<!-- AUTO:versions-table -->
+<table>
+<thead>
+<tr><th>Mod version</th><th>Minecraft</th><th>Java</th><th>Fabric Loader</th><th>Fabric API</th><th>Status</th></tr>
+</thead>
+<tbody>
+<tr><td><b>3.0.x</b></td><td>26.2</td><td>25</td><td>≥ 0.19.3</td><td>0.158.0+26.2</td><td>Active development</td></tr>
+<tr><td><b>2.0.x</b></td><td>1.21.11</td><td>21</td><td>≥ 0.19.2</td><td>0.141.4+1.21.11</td><td>Maintenance (critical bug fixes only)</td></tr>
+</tbody>
+</table>
+<!-- /AUTO:versions-table -->
+
+<p><b>Fabric API is required.</b> The mod will not start without it. Make sure the mod file, Fabric API, and Fabric Loader all match your Minecraft version.</p>
 
 <hr>
 
@@ -20,12 +43,12 @@
 <h2>Typed Magic Cards (New in 2.0)</h2>
 
 <p>
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_blue.png" width="32" alt="Blue Card">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_green.png" width="32" alt="Green Card">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_red.png" width="32" alt="Red Card">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_yellow.png" width="32" alt="Yellow Card">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_purple.png" width="32" alt="Purple Card">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/magic_card_black.png" width="32" alt="Black Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_blue.png" width="32" alt="Blue Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_green.png" width="32" alt="Green Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_red.png" width="32" alt="Red Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_yellow.png" width="32" alt="Yellow Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_purple.png" width="32" alt="Purple Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_black.png" width="32" alt="Black Card">
 </p>
 
 <p>Magic Cards are now color-coded by enchantment category. When you extract an enchantment, the Transfer Table automatically produces a card of the matching color.</p>
@@ -56,6 +79,16 @@
 <li>Navigate between the hub and any module using the <b>dot navigation bar</b></li>
 <li>Modules show live status in the Selector — processing progress, tank levels, and connection state</li>
 </ul>
+
+<h3>GUI Screens</h3>
+
+<p>
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_selector.png" width="200" alt="Selector Screen">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_core.png" width="200" alt="Core Screen">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_infusor.jpg" width="200" alt="Infusion Coil Screen">
+</p>
+
+<p><i>From left to right: Selector (hub with module sockets), Transfer Table Core (enchantment operations), Infusion Coil (XP conversion).</i></p>
 
 <hr>
 
@@ -90,9 +123,9 @@
 <h3>New Materials</h3>
 
 <p>
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/zinc_oxide.png" width="32" alt="Zinc Oxide">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/zinc_sheet.png" width="32" alt="Zinc Sheet">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/main/docs/images/brass_ingot.png" width="32" alt="Brass Ingot">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_oxide.png" width="32" alt="Zinc Oxide">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_sheet.png" width="32" alt="Zinc Sheet">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot">
 </p>
 
 <h3>Processing Chain</h3>
@@ -121,6 +154,12 @@
 
 <p>The Zinc Smelter only accepts <b>Lava Buckets</b> and <b>Blaze Rods</b> as fuel — no coal or wood. Lava Buckets return an empty bucket after consumption.</p>
 
+<h3>GUI</h3>
+
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_zinc_smelter.jpg" width="200" alt="Zinc Smelter GUI"></p>
+
+<p><i>Steampunk-themed interface with copper input slots, a lava-bordered fuel slot, and brass output slot.</i></p>
+
 <hr>
 
 <h2>Redesigned Interface (Updated in 2.0)</h2>
@@ -142,16 +181,28 @@
 <table>
 <tr><td>Gold Ingot</td><td>Gold Ingot</td><td>Gold Ingot</td></tr>
 <tr><td>Redstone Dust</td><td>Redstone Dust</td><td>Redstone Dust</td></tr>
-<tr><td>Coal</td><td>Diamond</td><td>Coal</td></tr>
+<tr><td>Coal / Charcoal</td><td>Diamond</td><td>Coal / Charcoal</td></tr>
 </table>
 
-<p>Requires an <b>iron pickaxe</b> or better to mine.</p>
+<p>Requires an <b>iron pickaxe</b> or better to mine (the same applies to the Infusion Coil and the Zinc Smelter).</p>
 
 <hr>
 
 <h2>Compatibility</h2>
 
 <p><b>Worlds from 1.0.x are fully compatible.</b> Existing Transfer Tables keep working — the block ID hasn't changed. Old Magic Cards stored in chests retain their enchantment data. They will appear as the generic (blank) card variant; their functionality is unchanged. New cards extracted after updating will automatically use the color-coded system.</p>
+
+<hr>
+
+<h2>What's New in 3.0.0</h2>
+
+<ul>
+<li><b>Port to Minecraft 26.2</b> — Built against Fabric Loader 0.19.3 and Fabric API 0.158.0+26.2</li>
+<li><b>Java 25 required</b> — Minecraft 26.2 needs Java 25 (the 1.21.11 version keeps using Java 21)</li>
+<li><b>New render pipeline</b> — Block entity renderers and all GUI screens migrated to the 26.2 rendering system</li>
+<li><b>Creative tab</b> — The mod's creative tab is now populated correctly on 26.2</li>
+<li><b>No gameplay changes</b> — Same blocks, items, recipes, and mechanics as 2.0.2</li>
+</ul>
 
 <hr>
 

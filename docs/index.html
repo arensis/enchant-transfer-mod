@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Enchant Transfer — Minecraft Fabric Mod</title>
-<meta name="description" content="Extract, transfer, and combine enchantments through Magic Cards. Fabric mod for Minecraft 1.21.11 with colored cards, attachable modules, and an XP conversion system.">
+<meta name="description" content="Extract, transfer, and combine enchantments through Magic Cards. Fabric mod for Minecraft 26.2 and 1.21.11 with colored cards, attachable modules, and an XP conversion system.">
 <meta name="keywords" content="Minecraft, Fabric mod, enchantment, transfer, magic cards, Enchant Transfer, Minecraft mod, Fabric API">
 <meta name="author" content="arensis">
 <meta name="robots" content="index, follow">
@@ -26,7 +26,7 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Enchant Transfer — Minecraft Fabric Mod">
-<meta name="twitter:description" content="Extract, transfer, and combine enchantments through Magic Cards. Fabric mod for Minecraft 1.21.11.">
+<meta name="twitter:description" content="Extract, transfer, and combine enchantments through Magic Cards. Fabric mod for Minecraft 26.2 and 1.21.11.">
 <meta name="twitter:image" content="https://arensis.github.io/enchant-transfer-mod/images/og-image.png">
 
 <!-- Structured Data -->
@@ -38,11 +38,15 @@
   "description": "Extract, transfer, and combine enchantments through Magic Cards. Fabric mod for Minecraft with colored cards, attachable modules, and an XP conversion system.",
   "applicationCategory": "GameApplication",
   "operatingSystem": "Windows, macOS, Linux",
-  "softwareVersion": "2.0.0",
+  "softwareVersion": "3.0.0",
   "url": "https://arensis.github.io/enchant-transfer-mod/",
   "image": "https://arensis.github.io/enchant-transfer-mod/images/og-image.png",
   "downloadUrl": "https://www.curseforge.com/minecraft/mc-mods/enchant-transfer",
   "codeRepository": "https://github.com/arensis/enchant-transfer-mod",
+  "sameAs": [
+    "https://www.curseforge.com/minecraft/mc-mods/enchant-transfer",
+    "https://modrinth.com/mod/enchant-transfer"
+  ],
   "offers": {
     "@type": "Offer",
     "price": "0",
@@ -67,6 +71,7 @@
   <a href="#typed-cards">Typed Cards <span class="nav-badge">New</span></a>
   <a href="#zinc-smelter">Zinc Smelter <span class="nav-badge">New</span></a>
   <a href="#infusion-coil">Infusion Coil <span class="nav-badge">New</span></a>
+  <a href="#installation">Installation</a>
   <a href="#compatibility">Compatibility</a>
   <a href="#changelog">Changelog</a>
 </nav>
@@ -78,20 +83,40 @@
     <img class="header-logo" src="images/transfer_table_logo.png" alt="Transfer Table">
     <h1>Enchant Transfer</h1>
     <p class="subtitle">Extract, transfer, and combine enchantments through Magic Cards — now with colored cards, attachable modules, and an XP conversion system.</p>
-    <p class="requires"><strong>Requires:</strong> Fabric Loader and Fabric API · Minecraft 1.21.11</p>
+    <!-- AUTO:requires -->
+    <p class="requires"><strong>Requires:</strong> Fabric Loader and Fabric API · Minecraft 26.2 | 1.21.11</p>
+    <!-- /AUTO:requires -->
     <p class="links">
       <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a>
+      <span class="sep">·</span>
+      <a href="https://modrinth.com/mod/enchant-transfer">Modrinth</a>
       <span class="sep">·</span>
       <a href="https://github.com/arensis/enchant-transfer-mod">GitHub</a>
       <span class="sep">·</span>
       <a href="https://github.com/arensis/enchant-transfer-mod/issues">Issues</a>
     </p>
+    <!-- AUTO:badges -->
+    <p class="badges">
+      <img src="https://img.shields.io/badge/version-3.0.0-d2962a" alt="Version">
+      <img src="https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&amp;logoColor=white" alt="Minecraft">
+      <img src="https://img.shields.io/badge/fabric_loader-≥0.19.3_%7C_≥0.19.2-dbd0b4" alt="Fabric">
+      <img src="https://img.shields.io/badge/java-25_%7C_21-ED8B00?logo=openjdk&amp;logoColor=white" alt="Java">
+      <img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey" alt="License">
+      <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"><img src="https://img.shields.io/curseforge/dt/1540807?logo=curseforge&amp;label=curseforge&amp;color=F16436" alt="CurseForge"></a>
+      <a href="https://modrinth.com/mod/enchant-transfer"><img src="https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&amp;label=modrinth&amp;color=00AF5C" alt="Modrinth"></a>
+    </p>
+    <!-- /AUTO:badges -->
   </div>
 
   <!-- OVERVIEW -->
   <p><strong>Enchant Transfer</strong> adds a craftable block — the <strong>Transfer Table</strong> — that lets you extract enchantments from any item into individual <strong>Magic Cards</strong>, apply those cards to other compatible items, and combine two cards of the same enchantment and level to upgrade them. All operations are free (no XP cost), and vanilla enchantment compatibility rules are respected.</p>
 
-  <p>Version 2.0 introduces the <strong>Module System</strong>: specialized blocks that attach to the Transfer Table on any face, extending its capabilities.</p>
+  <p>Version 2.0 introduced the <strong>Module System</strong>: specialized blocks that attach to the Transfer Table on any face, extending its capabilities.</p>
+
+  <div class="callout">
+    <p class="label">Version support</p>
+    <p>New features and modules are developed for Minecraft 26.x only. The 1.21.11 version (v2.0.x) is in maintenance mode and will only receive critical bug fixes.</p>
+  </div>
 
   <!-- TRANSFER TABLE -->
   <h2 id="transfer-table"><span class="accent">Transfer</span> Table</h2>
@@ -108,9 +133,9 @@
         <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
         <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
         <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
-        <div class="recipe-cell"><img src="images/coal.png" alt="">Coal</div>
+        <div class="recipe-cell"><img src="images/coal.png" alt="">Coal / Charcoal</div>
         <div class="recipe-cell"><img src="images/diamond.png" alt="">Diamond</div>
-        <div class="recipe-cell"><img src="images/coal.png" alt="">Coal</div>
+        <div class="recipe-cell"><img src="images/coal.png" alt="">Coal / Charcoal</div>
       </div>
       <span class="recipe-arrow-large">→</span>
       <div class="recipe-output">
@@ -118,7 +143,7 @@
         <span>Transfer Table</span>
       </div>
     </div>
-    <p class="recipe-result">Requires an <strong>iron pickaxe</strong> or better to mine.</p>
+    <p class="recipe-result">Requires an <strong>iron pickaxe</strong> or better to mine (the same applies to the Infusion Coil and the Zinc Smelter).</p>
   </div>
 
   <p>The 3D model reflects its recipe — gold on the outer edge, redstone in the middle ring, carbon-black inner layer, and a blue diamond core that glows from every angle.</p>
@@ -250,7 +275,7 @@
   <!-- ZINC SMELTER -->
   <h2 id="zinc-smelter"><span class="accent">Zinc</span> Smelter <span class="badge badge-new">New</span></h2>
 
-  <p>A standalone steampunk furnace for zinc processing and brass alloy creation. The <strong>Zinc Smelter</strong> is an ornate kiln made of copper, iron, and glass with a viewport, decorative bands, and a chimney that emits smoke and lava particles when lit.</p>
+  <p>A standalone steampunk furnace for zinc processing and brass alloy creation. The <strong>Zinc Smelter</strong> is an ornate kiln made of copper, brass, iron, and glass with a viewport, decorative bands, and a chimney that emits smoke and lava particles when lit.</p>
 
   <div class="recipe">
     <div class="recipe-title">Crafting Recipe</div>
@@ -401,6 +426,59 @@
 
   <hr class="sep">
 
+  <!-- INSTALLATION -->
+  <h2 id="installation"><span class="accent">Installation</span></h2>
+
+  <!-- AUTO:installation -->
+  <div class="card-table-wrap">
+    <table class="card-table">
+      <thead>
+        <tr>
+          <th>Mod version</th>
+          <th>Minecraft</th>
+          <th>Java</th>
+          <th>Fabric Loader</th>
+          <th>Fabric API</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>3.0.x</strong></td>
+          <td>26.2</td>
+          <td>25</td>
+          <td>≥ 0.19.3</td>
+          <td>0.158.0+26.2</td>
+          <td>Active development</td>
+        </tr>
+        <tr>
+          <td><strong>2.0.x</strong></td>
+          <td>1.21.11</td>
+          <td>21</td>
+          <td>≥ 0.19.2</td>
+          <td>0.141.4+1.21.11</td>
+          <td>Maintenance (critical bug fixes only)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ol>
+    <li>Make sure Minecraft runs with the Java version listed for your Minecraft version</li>
+    <li>Install <a href="https://fabricmc.net/use/">Fabric Loader</a> for your Minecraft version</li>
+    <li>Download <a href="https://modrinth.com/mod/fabric-api">Fabric API</a> for the same Minecraft version and place it in the <code>mods/</code> folder</li>
+    <li>Download the matching Enchant Transfer file (3.0.x for 26.2, 2.0.x for 1.21.11) and place it in <code>mods/</code> as well</li>
+    <li>Launch Minecraft with the Fabric profile</li>
+  </ol>
+  <!-- /AUTO:installation -->
+
+  <div class="callout">
+    <p class="label">Fabric API is required</p>
+    <p>The mod will not start without it. Make sure the mod file, Fabric API, and Fabric Loader all match your Minecraft version.</p>
+  </div>
+
+  <hr class="sep">
+
   <!-- COMPATIBILITY -->
   <div class="compat" id="compatibility">
     <h3>Compatibility with 1.0.x worlds</h3>
@@ -409,8 +487,30 @@
   </div>
 
   <!-- CHANGELOG -->
-  <h2 id="changelog"><span class="accent">Changelog</span> — 2.0.0</h2>
+  <h2 id="changelog"><span class="accent">Changelog</span> — 3.0.0</h2>
 
+  <ul>
+    <li><strong>Port to Minecraft 26.2</strong> — Built against Fabric Loader 0.19.3 and Fabric API 0.158.0+26.2</li>
+    <li><strong>Java 25 required</strong> — Minecraft 26.2 needs Java 25 (the 1.21.11 version keeps using Java 21)</li>
+    <li><strong>Official Mojang mappings</strong> — Codebase migrated from Yarn to Mojang mappings (Fabric Loom 1.17)</li>
+    <li><strong>New render pipeline</strong> — Block entity renderers (Transfer Table, Infusion Coil, Zinc Smelter) and all GUI screens migrated to the 26.2 deferred rendering system</li>
+    <li><strong>Translucent blocks</strong> — Infusion Coil and Zinc Smelter now declare their translucent render type in their block models</li>
+    <li><strong>Fabric API dependency</strong> — Declared with the new <code>fabric-api</code> mod id (26.2 no longer provides the legacy <code>fabric</code> id)</li>
+    <li><strong>Creative tab</strong> — The mod's creative tab is now populated correctly on 26.2</li>
+    <li><strong>No gameplay changes</strong> — Same blocks, items, recipes, and mechanics as 2.0.2</li>
+  </ul>
+
+  <h3>2.0.2</h3>
+  <ul>
+    <li>Zinc Smelter can now be mined with a pickaxe; hardness adjusted</li>
+  </ul>
+
+  <h3>2.0.1</h3>
+  <ul>
+    <li>Added recipe book advancements for all crafting recipes</li>
+  </ul>
+
+  <h3>2.0.0</h3>
   <ul>
     <li><strong>Module System</strong> — The Transfer Table is now a modular hub that accepts specialized blocks on any of its 6 faces</li>
     <li><strong>Infusion Coil</strong> — First module: converts Magic Cards into XP, fills glass bottles into Bottles o' Enchanting</li>
@@ -425,7 +525,7 @@
 
   <div class="footer">
     <p>If you enjoy the mod, consider supporting its development — any contribution is greatly appreciated!</p>
-    <p style="margin-top: 0.5rem;"><a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a> <span class="sep">·</span> <a href="https://github.com/arensis/enchant-transfer-mod">GitHub</a></p>
+    <p style="margin-top: 0.5rem;"><a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a> <span class="sep">·</span> <a href="https://modrinth.com/mod/enchant-transfer">Modrinth</a> <span class="sep">·</span> <a href="https://github.com/arensis/enchant-transfer-mod">GitHub</a></p>
   </div>
 
 </div>

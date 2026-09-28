@@ -2,9 +2,8 @@
 
 <div align="center">
 
-<img src="docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;">
 
-<!-- AUTO:badges -->
 ![Version](https://img.shields.io/badge/version-3.0.0-d2962a)
 ![Minecraft](https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&logoColor=white)
 ![Fabric](https://img.shields.io/badge/fabric_loader-≥0.19.3_%7C_≥0.19.2-dbd0b4)
@@ -12,7 +11,6 @@
 ![License](https://img.shields.io/badge/license-CC0--1.0-lightgrey)
 [![CurseForge](https://img.shields.io/curseforge/dt/1540807?logo=curseforge&label=curseforge&color=F16436)](https://www.curseforge.com/minecraft/mc-mods/enchant-transfer)
 [![Modrinth](https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&label=modrinth&color=00AF5C)](https://modrinth.com/mod/enchant-transfer)
-<!-- /AUTO:badges -->
 
 **Extract, transfer, and combine enchantments through Magic Cards — now with colored cards, attachable modules, and an XP conversion system.**
 
@@ -29,12 +27,10 @@ Version 2.0 introduced the **Module System**: specialized blocks that attach to 
 > **Version support:** New features and modules are developed for Minecraft 26.x only.
 > The 1.21.11 version (v2.0.x) is in maintenance mode and will only receive critical bug fixes.
 
-<!-- AUTO:version-table -->
 | Mod version | Minecraft | Status |
 |-------------|-----------|--------|
 | **3.0.x** | 26.2 | Active development |
 | **2.0.x** | 1.21.11 | Maintenance (critical bug fixes only) |
-<!-- /AUTO:version-table -->
 
 **Requires:** Fabric Loader and Fabric API
 
@@ -62,7 +58,7 @@ All Transfer Table operations — extraction, application, and combination — a
 
 ## Typed Magic Cards
 
-<img src="docs/images/magic_card_blue.png" width="48" style="image-rendering: pixelated;" alt="Blue Card"> <img src="docs/images/magic_card_green.png" width="48" style="image-rendering: pixelated;" alt="Green Card"> <img src="docs/images/magic_card_red.png" width="48" style="image-rendering: pixelated;" alt="Red Card"> <img src="docs/images/magic_card_yellow.png" width="48" style="image-rendering: pixelated;" alt="Yellow Card"> <img src="docs/images/magic_card_purple.png" width="48" style="image-rendering: pixelated;" alt="Purple Card"> <img src="docs/images/magic_card_black.png" width="48" style="image-rendering: pixelated;" alt="Black Card">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_blue.png" width="48" style="image-rendering: pixelated;" alt="Blue Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_green.png" width="48" style="image-rendering: pixelated;" alt="Green Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_red.png" width="48" style="image-rendering: pixelated;" alt="Red Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_yellow.png" width="48" style="image-rendering: pixelated;" alt="Yellow Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_purple.png" width="48" style="image-rendering: pixelated;" alt="Purple Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_black.png" width="48" style="image-rendering: pixelated;" alt="Black Card">
 
 Magic Cards are now color-coded by enchantment category. When you extract an enchantment, the Transfer Table automatically produces a card of the matching color.
 
@@ -89,9 +85,9 @@ The Transfer Table now works as a **hub**. Specialized module blocks can be plac
 ### GUI Screens
 
 <p>
-<img src="docs/images/gui_selector.png" width="200" alt="Selector Screen">
-<img src="docs/images/gui_core.png" width="200" alt="Core Screen">
-<img src="docs/images/gui_infusor.jpg" width="200" alt="Infusor Screen">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_selector.png" width="200" alt="Selector Screen">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_core.png" width="200" alt="Core Screen">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_infusor.jpg" width="200" alt="Infusor Screen">
 </p>
 
 *From left to right: Selector (hub with module sockets), Transfer Table Core (enchantment operations), Infusion Coil (XP conversion). Dynamic elements like wires, tank fills, and module icons are drawn by code on top of these backgrounds.*
@@ -130,7 +126,7 @@ A standalone steampunk furnace for zinc processing and brass alloy creation. An 
 
 ### New Materials
 
-<img src="docs/images/zinc_oxide.png" width="48" style="image-rendering: pixelated;" alt="Zinc Oxide"> <img src="docs/images/zinc_sheet.png" width="48" style="image-rendering: pixelated;" alt="Zinc Sheet"> <img src="docs/images/brass_ingot.png" width="48" style="image-rendering: pixelated;" alt="Brass Ingot">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_oxide.png" width="48" style="image-rendering: pixelated;" alt="Zinc Oxide"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_sheet.png" width="48" style="image-rendering: pixelated;" alt="Zinc Sheet"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="48" style="image-rendering: pixelated;" alt="Brass Ingot">
 
 ### Processing Chain
 
@@ -158,7 +154,7 @@ The Zinc Smelter only accepts **Lava Buckets** and **Blaze Rods** as fuel — no
 
 ### GUI
 
-<img src="docs/images/gui_zinc_smelter.jpg" width="200" alt="Zinc Smelter GUI">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_zinc_smelter.jpg" width="200" alt="Zinc Smelter GUI">
 
 *Steampunk-themed interface with copper input slots, a lava-bordered fuel slot, and brass output slot.*
 
@@ -248,7 +244,6 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ## Installation
 
-<!-- AUTO:installation -->
 ### Minecraft 26.2 — mod v3.0.x
 
 1. Make sure Minecraft runs with **Java 25**
@@ -266,83 +261,16 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 5. Launch Minecraft with the Fabric profile
 
 > **Fabric API is required.** The mod will not start without it. Make sure the mod JAR, Fabric API, and Fabric Loader all match your Minecraft version.
-<!-- /AUTO:installation -->
 
 ---
 
 ## Requirements
 
-<!-- AUTO:requirements -->
 | Dependency | Minecraft 26.2 (v3.0.x) | Minecraft 1.21.11 (v2.0.x) |
 |------------|-------------------------|----------------------------|
 | Java | 25 | 21 |
 | Fabric Loader | ≥ 0.19.3 | ≥ 0.19.2 |
 | Fabric API | 0.158.0+26.2 | 0.141.4+1.21.11 |
-<!-- /AUTO:requirements -->
-
----
-
-## For Developers
-
-### IDE Setup (IntelliJ IDEA)
-
-1. Install the **Minecraft Development** plugin
-2. Change build mode:
-   - `Settings` → `Build, Execution, Deployment` → `Build Tools` → `Gradle`
-   - `Build and run using` → **IntelliJ IDEA**
-   - `Run test using` → **IntelliJ IDEA**
-3. Set compiler output:
-   - `File` → `Project Structure` → `Project Settings` → `Project`
-   - `Project compiler output` → `$PROJECT_DIR$/out`
-
-### Gradle Tasks
-
-| Task | Description |
-|------|-------------|
-| `./gradlew build` | Compile and generate JAR in `build/libs/` |
-| `./gradlew runClient` | Launch Minecraft with the mod loaded (client) |
-| `./gradlew runServer` | Launch a Minecraft server with the mod |
-
-> `runClient` and `runServer` don't require a separate Minecraft installation; Fabric Loom downloads assets automatically.
-
-### Updating Dependencies
-
-<!-- AUTO:gradle-properties -->
-All versions are centralized in `gradle.properties` (current values on `master`, Minecraft 26.2):
-
-```properties
-# Java version required to build and run this mod
-java_version=25
-
-# Fabric Properties
-minecraft_version = 26.2
-loader_version=0.19.3
-loom_version=1.17-SNAPSHOT
-
-# Dependencies
-fabric_version=0.158.0+26.2
-```
-
-> Minecraft 26.2 uses the official **Mojang mappings**, so there is no `yarn_mappings` property. The 1.21.11 version (tag `v2.0.2`) uses Yarn (`yarn_mappings=1.21.11+build.3`), Fabric Loom 1.14, and Java 21.
-<!-- /AUTO:gradle-properties -->
-
-Reference: https://fabricmc.net/versions.html
-
-### Release Docs Automation
-
-Version numbers in this README, the website (`docs/index.html`) and the CurseForge description live inside `<!-- AUTO:... -->` blocks. They are generated by `scripts/sync-release-docs.py` from:
-
-- **Active line:** `gradle.properties` and `build.gradle` on `master`
-- **Maintenance line:** the latest tag matching `v2.0.*` (configurable with `MAINTENANCE_TAG_GLOB`)
-
-The release workflows (`pr-automation.yml` and `manual-release.yml`) run it right after bumping `mod_version`, so the updated docs are part of the tagged release commit, and then redeploy the website. Don't edit the `AUTO` blocks by hand; the changelog and the rest of the text are still written manually.
-
-`docs/modrinth-description.md` is generated from this README (absolute image URLs, no "For Developers" section). The sync script regenerates it too.
-
-```bash
-python3 scripts/sync-release-docs.py          # update the docs locally
-python3 scripts/sync-release-docs.py --check  # exit 1 if they are out of date
-```
 
 ---
 

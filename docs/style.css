@@ -116,6 +116,16 @@ h1 {
 
 .links .sep { color: var(--text-dim); margin: 0 0.5rem; }
 
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
+}
+
+.badges img { display: block; height: 20px; }
+
 h2 {
   font-size: 1.35rem;
   font-weight: 600;
