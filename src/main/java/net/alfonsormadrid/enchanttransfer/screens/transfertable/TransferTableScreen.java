@@ -3,6 +3,7 @@ package net.alfonsormadrid.enchanttransfer.screens.transfertable;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
+import net.alfonsormadrid.enchanttransfer.screens.ModuleTooltips;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.slot.MagicCardSlot;
 import net.fabricmc.api.EnvType;
@@ -324,28 +325,14 @@ public class TransferTableScreen extends AbstractContainerScreen<TransferTableSc
             int cx = gx + NAV_X0 + i * NAV_STEP;
             if (sq(mouseX - cx) + sq(mouseY - hy) > hitR * hitR) continue;
             Direction dir = Direction.values()[i - 1];
-            String dirName = dir.name();
             if (!connected[i - 1]) {
-                ctx.setTooltipForNextFrame(font,
-                        Component.literal("§7Empty (" + dirName + ")"),
-                        mouseX, mouseY);
+                ctx.setTooltipForNextFrame(font, ModuleTooltips.empty(dir), mouseX, mouseY);
                 return;
             }
             BlockPos coilPos = tablePos.relative(dir);
-            String state  = "Idle";
-            String levelS = "?";
-            var be = minecraft.level.getBlockEntity(coilPos);
-            if (be instanceof InfusionCoilBlockEntity coil) {
-                state  = coil.isProcessing() ? "§eInfusing" : "§aIdle";
-                int stored   = coil.getStored();
-                int capacity = coil.getCapacity();
-                levelS = stored + " / " + capacity + " XP";
-            }
-            ctx.setComponentTooltipForNextFrame(font, List.of(
-                    Component.literal("§fInfusion Coil §7(" + dirName + ")"),
-                    Component.literal("§7" + levelS),
-                    Component.literal(state)
-            ), mouseX, mouseY);
+            var coil = minecraft.level.getBlockEntity(coilPos) instanceof InfusionCoilBlockEntity c ? c : null;
+            ctx.setComponentTooltipForNextFrame(font,
+                    ModuleTooltips.infusionCoil(dir, coil, false), mouseX, mouseY);
             return;
         }
     }
