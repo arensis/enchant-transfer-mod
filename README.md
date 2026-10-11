@@ -236,6 +236,8 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ## Compatibility
 
+> **Worlds from 3.0.x are fully compatible:** nothing in them changes, and an Enchanting Table without Deck Lecterns nearby works exactly like vanilla. Cards extracted before 3.1 keep their color (e.g. yellow Mending, green Soul Speed, or blank Knockback cards) but still go into the deck of their current category — decks check the enchantment, not the card color.
+
 > **Worlds from 1.0.x are fully compatible.** Existing Transfer Tables keep working — the block ID hasn't changed. Old Magic Cards stored in chests retain their enchantment data. They will appear as the generic (blank) card variant; their functionality is unchanged. New cards extracted after updating will automatically use the color-coded system.
 
 ---

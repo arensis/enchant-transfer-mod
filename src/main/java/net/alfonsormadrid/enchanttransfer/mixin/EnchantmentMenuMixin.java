@@ -1,5 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import java.util.List;
 import java.util.stream.Stream;
 import net.alfonsormadrid.enchanttransfer.library.LibraryProfile;
@@ -13,7 +15,6 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -22,7 +23,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyArg;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /**
@@ -69,15 +69,19 @@ public abstract class EnchantmentMenuMixin {
         return bookshelves + this.access.evaluate(enchanttransfer$libraries::deckPower, 0);
     }
 
-    @Redirect(
+    // WrapOperation (MixinExtras, bundled with Fabric Loader) instead of
+    // @Redirect so other mods wrapping the same call chain with ours
+    // instead of failing to load.
+    @WrapOperation(
             method = "getEnchantmentList",
             at = @At(value = "INVOKE",
                     target = "Lnet/minecraft/world/item/enchantment/EnchantmentHelper;selectEnchantment(Lnet/minecraft/util/RandomSource;Lnet/minecraft/world/item/ItemStack;ILjava/util/stream/Stream;)Ljava/util/List;"))
     private List<EnchantmentInstance> enchanttransfer$selectWithDecks(RandomSource random, ItemStack stack, int cost,
-                                                                      Stream<Holder<Enchantment>> pool) {
+                                                                      Stream<Holder<Enchantment>> pool,
+                                                                      Operation<List<EnchantmentInstance>> original) {
         LibraryProfile profile = this.access.evaluate(enchanttransfer$libraries::scan, LibraryProfile.EMPTY);
         List<EnchantmentInstance> result = profile.isEmpty()
-                ? EnchantmentHelper.selectEnchantment(random, stack, cost, pool)
+                ? original.call(random, stack, cost, pool)
                 : enchanttransfer$selector.select(random, stack, cost, pool, profile);
         this.enchanttransfer$profile = profile;
         // Same reference the menu keeps using: for books it removes all but
