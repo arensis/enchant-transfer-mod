@@ -30,7 +30,7 @@ LAMPS = {'none': '4a1e10', 'empty': 'fff1b8', 'full': '2bdc6b'}
 LAMP_X = [2, 7, 11]          # left edge of each slot's 3-px lamp on the front
 SLOTS = 3
 # Tray centre (px) and tilt: its front edge rests just on top of the 5-px base
-TRAY_CENTER = [8, 7.6, 8.5]
+TRAY_CENTER = [8, 7.6, 8]
 TRAY_TILT = 18
 
 GUI = dict(frame='8a6030', inner='5a3a18', bg='1e160e', title='c89030', title_line='8a6020',
@@ -102,17 +102,32 @@ def glass(x, y):
     return (190, 225, 255, 41)
 
 
-def amethyst(palette):
+# Amethyst cluster for the finial: three pointed shards (centre, left, right),
+# drawn on two crossed planes like the vanilla amethyst cluster.
+SHARDS = [(8.0, 1, 2.0), (4.0, 7, 1.5), (12.0, 5, 1.5)]   # (centre x, top y, max half width)
+
+
+def crystal(palette):
     def at(x, y):
-        d = abs(x - 7.5) + abs(y - 7.5)
-        if d < 3:
-            return palette[0]
-        if d < 6:
-            return palette[1]
-        if d < 9:
+        for cx, top, half in SHARDS:
+            if y < top:
+                continue
+            hw = min(half, 0.5 + (y - top) * 0.5)
+            dx = x + 0.5 - cx
+            if abs(dx) > hw:
+                continue
+            if abs(dx) > hw - 1:
+                return palette[3]                        # outline
+            if dx < 0:
+                return palette[0] if y - top < 4 else palette[1]
             return palette[2]
-        return palette[3]
+        return None
     return at
+
+
+def halo(x, y):
+    edge = min(x, y, 15 - x, 15 - y)
+    return (200, 140, 255, 30 if edge == 0 else 60)
 
 
 def lamp(color):
@@ -194,23 +209,23 @@ def base_model():
     tray_faces = faces('#brass', [14, 1, 13])
     tray_faces['up'] = {'uv': [0, 0, 14, 13], 'texture': '#tray'}
     cy = TRAY_CENTER[1]
-    tray_el = element('tray', [1, cy - 0.5, 2], [15, cy + 0.5, 15], tray_faces,
+    tray_el = element('tray', [1, cy - 0.5, 1.5], [15, cy + 0.5, 14.5], tray_faces,
                       rotation={'origin': TRAY_CENTER, 'axis': 'x', 'angle': TRAY_TILT})
     elements = [
         base, tray_el,
-        brass_box('ring_base', [0.6, 5, 1.3], [15.4, 5.5, 15.7], skip=('down',)),
-        glass_box('bell_lower', [0.8, 5.5, 1.5], [15.2, 12, 15.5]),
-        brass_box('rib_sw', [0.8, 5.5, 15.1], [1.2, 12, 15.5]),
-        brass_box('rib_se', [14.8, 5.5, 15.1], [15.2, 12, 15.5]),
-        brass_box('rib_ne', [14.8, 5.5, 1.5], [15.2, 12, 1.9]),
-        brass_box('rib_nw', [0.8, 5.5, 1.5], [1.2, 12, 1.9]),
+        brass_box('ring_base', [0.6, 5, 0.6], [15.4, 5.5, 15.4], skip=('down',)),
+        glass_box('bell_lower', [0.8, 5.5, 0.8], [15.2, 12, 15.2]),
+        brass_box('rib_sw', [0.8, 5.5, 14.8], [1.2, 12, 15.2]),
+        brass_box('rib_se', [14.8, 5.5, 14.8], [15.2, 12, 15.2]),
+        brass_box('rib_ne', [14.8, 5.5, 0.8], [15.2, 12, 1.2]),
+        brass_box('rib_nw', [0.8, 5.5, 0.8], [1.2, 12, 1.2]),
         # Hollow brass frame between the two glass tiers
-        brass_box('ring_middle_front', [2.6, 12, 13.3], [13.4, 12.4, 13.7]),
-        brass_box('ring_middle_back', [2.6, 12, 3.3], [13.4, 12.4, 3.7]),
-        brass_box('ring_middle_left', [2.6, 12, 3.7], [3.0, 12.4, 13.3]),
-        brass_box('ring_middle_right', [13.0, 12, 3.7], [13.4, 12.4, 13.3]),
-        glass_box('bell_upper', [3, 12.4, 3.7], [13, 14.4, 13.3]),
-        brass_box('ring_top', [5.6, 14.4, 6.3], [10.4, 14.7, 10.7]),
+        brass_box('ring_middle_front', [2.6, 12, 13.0], [13.4, 12.4, 13.4]),
+        brass_box('ring_middle_back', [2.6, 12, 2.6], [13.4, 12.4, 3.0]),
+        brass_box('ring_middle_left', [2.6, 12, 3.0], [3.0, 12.4, 13.0]),
+        brass_box('ring_middle_right', [13.0, 12, 3.0], [13.4, 12.4, 13.0]),
+        glass_box('bell_upper', [3, 12.4, 3], [13, 14.4, 13]),
+        brass_box('ring_top', [5.8, 14.4, 5.8], [10.2, 14.7, 10.2]),
     ]
     return {
         'parent': 'minecraft:block/block',
@@ -245,17 +260,32 @@ def lamp_model(slot, state):
 
 
 def finial_model(on):
-    el = element('finial', [7.2, 14.7, 7.9], [8.8, 16.3, 9.5],
-                 faces('#amethyst', [1.6, 1.6, 1.6], skip=('down',)))
+    """Amethyst crystal on two crossed planes, centred on the block; lit with a glowing halo."""
+    def plane(name, f, t, sides):
+        el = element(name, f, t, {k: {'uv': [0, 0, 16, 16], 'texture': '#crystal'} for k in sides},
+                     rotation={'origin': [8, 14.7, 8], 'axis': 'y', 'angle': 45}, shade=False)
+        if on:
+            el['light_emission'] = 15
+        return el
+
+    elements = [
+        plane('crystal_a', [5.5, 14.7, 8], [10.5, 19.7, 8], ('north', 'south')),
+        plane('crystal_b', [8, 14.7, 5.5], [8, 19.7, 10.5], ('east', 'west')),
+    ]
     if on:
-        el['light_emission'] = 14
+        halo_faces = {k: {'uv': [0, 0, 16, 16], 'texture': '#halo'} for k in ('north', 'south', 'east', 'west', 'up')}
+        elements.append(element('halo', [6.2, 14.8, 6.2], [9.8, 19.4, 9.8], halo_faces, light_emission=15))
+    textures = {
+        'particle': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',
+        'crystal': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',
+    }
+    if on:
+        textures['halo'] = f'{NS}:block/deck_lectern_halo'
     return {
         'parent': 'minecraft:block/block',
-        'textures': {
-            'particle': f'{NS}:block/deck_lectern_side',
-            'amethyst': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',
-        },
-        'elements': [el],
+        'render_type': 'minecraft:translucent',
+        'textures': textures,
+        'elements': elements,
     }
 
 
@@ -308,8 +338,9 @@ if __name__ == '__main__':
     write_texture('textures/block/deck_lectern_bottom.png', grid(planks(True)))
     write_texture('textures/block/deck_lectern_tray.png', grid(tray))
     write_texture('textures/block/deck_lectern_glass.png', grid(glass))
-    write_texture('textures/block/deck_lectern_amethyst_on.png', grid(amethyst(AM_ON)))
-    write_texture('textures/block/deck_lectern_amethyst_off.png', grid(amethyst(AM_OFF)))
+    write_texture('textures/block/deck_lectern_amethyst_on.png', grid(crystal(AM_ON)))
+    write_texture('textures/block/deck_lectern_amethyst_off.png', grid(crystal(AM_OFF)))
+    write_texture('textures/block/deck_lectern_halo.png', grid(halo))
     for state, color in LAMPS.items():
         write_texture(f'textures/block/deck_lectern_lamp_{state}.png', grid(lamp(color)))
     write_texture('textures/gui/container/deck_lectern_gui.png', gui())

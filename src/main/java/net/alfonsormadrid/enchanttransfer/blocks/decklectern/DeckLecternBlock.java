@@ -3,10 +3,13 @@ package net.alfonsormadrid.enchanttransfer.blocks.decklectern;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
@@ -16,6 +19,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.EnchantingTableBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -58,9 +63,9 @@ public class DeckLecternBlock extends BaseEntityBlock {
     /** Base + glass bell, approximated with the bell's tiers. */
     private static final VoxelShape SHAPE = Shapes.or(
             Block.box(0, 0, 0, 16, 5, 16),
-            Block.box(1, 5, 1.5, 15, 12, 15.5),
-            Block.box(3, 12, 3.5, 13, 14.7, 13.5),
-            Block.box(7, 14.7, 7, 9, 16, 9));
+            Block.box(1, 5, 1, 15, 12, 15),
+            Block.box(3, 12, 3, 13, 14.7, 13),
+            Block.box(6, 14.7, 6, 10, 16, 10));
 
     public DeckLecternBlock(ResourceKey<Block> registryKey) {
         this(BlockBehaviour.Properties.of()
@@ -132,6 +137,37 @@ public class DeckLecternBlock extends BaseEntityBlock {
             player.openMenu(factory);
         }
         return InteractionResult.CONSUME;
+    }
+
+    /**
+     * Client-side effects while active: sparkles rising from the amethyst and,
+     * if a deck has cards, the same runes vanilla bookshelves send to a nearby
+     * enchanting table (same positions, air gap and 1-in-16 chance per tick).
+     */
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(ACTIVE)) return;
+
+        if (random.nextInt(6) == 0) {
+            level.addParticle(ParticleTypes.END_ROD,
+                    pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2, pos.getY() + 1.2,
+                    pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2,
+                    0, 0.02, 0);
+        }
+
+        if (SLOTS.stream().noneMatch(slot -> state.getValue(slot) == LampState.FULL)) return;
+        for (BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+            if (random.nextInt(16) != 0) continue;
+            BlockPos table = pos.subtract(offset);
+            if (!level.getBlockState(table).is(Blocks.ENCHANTING_TABLE)) continue;
+            BlockPos between = table.offset(offset.getX() / 2, offset.getY() / 2, offset.getZ() / 2);
+            if (!level.getBlockState(between).is(BlockTags.ENCHANTMENT_POWER_TRANSMITTER)) continue;
+            level.addParticle(ParticleTypes.ENCHANT,
+                    table.getX() + 0.5, table.getY() + 2.0, table.getZ() + 0.5,
+                    offset.getX() + random.nextFloat() - 0.5,
+                    offset.getY() - random.nextFloat() - 1.0,
+                    offset.getZ() + random.nextFloat() - 0.5);
+        }
     }
 
     @Override
