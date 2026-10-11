@@ -8,7 +8,7 @@ Sources of truth:
 
 Rewrites every block between `<!-- AUTO:<name> -->` and `<!-- /AUTO:<name> -->`
 in README.md and docs/index.html, updates the schema.org version and meta
-descriptions of the website, and regenerates docs/modrinth-description.md —
+descriptions of the website, and regenerates docs/curseforge-modrinth-description.md —
 the store description pasted into both Modrinth and CurseForge.
 
 Usage:
@@ -31,7 +31,7 @@ MAINTENANCE_TAG_GLOB = os.environ.get("MAINTENANCE_TAG_GLOB", "v2.0.*")
 ROOT = Path(__file__).resolve().parent.parent
 README = ROOT / "README.md"
 INDEX = ROOT / "docs" / "index.html"
-MODRINTH_SCRIPT = ROOT / "scripts" / "build-modrinth-description.sh"
+MODRINTH_SCRIPT = ROOT / "scripts" / "build-curseforge-modrinth-description.sh"
 
 CURSEFORGE_URL = "https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"
 CURSEFORGE_ID = "1540807"
@@ -305,7 +305,7 @@ def main() -> None:
         # The Modrinth description derives from README.md, so it can only be
         # compared once the README itself is up to date.
         if README not in changed:
-            modrinth = ROOT / "docs" / "modrinth-description.md"
+            modrinth = ROOT / "docs" / "curseforge-modrinth-description.md"
             with tempfile.NamedTemporaryFile(suffix=".md") as expected:
                 subprocess.run([str(MODRINTH_SCRIPT), expected.name], check=True, capture_output=True)
                 if not modrinth.exists() or Path(expected.name).read_text() != modrinth.read_text():
