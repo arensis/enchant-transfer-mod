@@ -7,9 +7,9 @@ Sources of truth:
                       matching MAINTENANCE_TAG_GLOB (e.g. v2.0.2)
 
 Rewrites every block between `<!-- AUTO:<name> -->` and `<!-- /AUTO:<name> -->`
-in README.md, docs/index.html and docs/curseforge-description.html, updates the
-schema.org version and meta descriptions of the website, and regenerates
-docs/modrinth-description.md.
+in README.md and docs/index.html, updates the schema.org version and meta
+descriptions of the website, and regenerates docs/modrinth-description.md —
+the store description pasted into both Modrinth and CurseForge.
 
 Usage:
   scripts/sync-release-docs.py           # rewrite files in place
@@ -31,7 +31,6 @@ MAINTENANCE_TAG_GLOB = os.environ.get("MAINTENANCE_TAG_GLOB", "v2.0.*")
 ROOT = Path(__file__).resolve().parent.parent
 README = ROOT / "README.md"
 INDEX = ROOT / "docs" / "index.html"
-CURSEFORGE = ROOT / "docs" / "curseforge-description.html"
 MODRINTH_SCRIPT = ROOT / "scripts" / "build-modrinth-description.sh"
 
 CURSEFORGE_URL = "https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"
@@ -255,19 +254,6 @@ def html_installation(lines: list) -> str:
     return "\n".join(out)
 
 
-def curseforge_versions_table(lines: list) -> str:
-    rows = "\n".join(
-        f"<tr><td><b>{l.series}</b></td><td>{l.minecraft}</td><td>{l.java}</td>"
-        f"<td>≥ {l.loader}</td><td>{l.fabric_api}</td><td>{l.status}</td></tr>"
-        for l in lines
-    )
-    return (
-        "<table>\n<thead>\n"
-        "<tr><th>Mod version</th><th>Minecraft</th><th>Java</th><th>Fabric Loader</th><th>Fabric API</th><th>Status</th></tr>\n"
-        "</thead>\n<tbody>\n" + rows + "\n</tbody>\n</table>"
-    )
-
-
 # ── File rewriting ───────────────────────────────────────────────────────────
 
 def replace_block(text: str, name: str, content: str, path: Path) -> str:
@@ -306,10 +292,7 @@ def render(lines: list) -> dict:
     index = replace_regex(index, r'"softwareVersion": "[^"]*"', f'"softwareVersion": "{cur.mod}"', INDEX)
     index = replace_regex(index, r"Fabric mod for Minecraft \d+(?:\.\d+)+(?: and \d+(?:\.\d+)+)*", f"Fabric mod for Minecraft {mc_list}", INDEX)
 
-    curseforge = CURSEFORGE.read_text()
-    curseforge = replace_block(curseforge, "versions-table", curseforge_versions_table(lines), CURSEFORGE)
-
-    return {README: readme, INDEX: index, CURSEFORGE: curseforge}
+    return {README: readme, INDEX: index}
 
 
 def main() -> None:
