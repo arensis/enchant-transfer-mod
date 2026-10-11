@@ -69,11 +69,43 @@ Magic Cards are now color-coded by enchantment category. When you extract an enc
 | Card | Category | Enchantments |
 |------|----------|-------------|
 | 🔵 Blue | Protection | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
-| 🟢 Green | Nature | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune |
-| 🔴 Red | Combat | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge |
-| 🟡 Yellow | Utility | Efficiency, Unbreaking, Mending, Swift Sneak, Infinity, Power, Punch |
-| 🟣 Purple | Arcane | Channeling, Riptide, Loyalty, Frost Walker |
+| 🟢 Green | Nature | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure |
+| 🔴 Red | Combat | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge |
+| 🟡 Yellow | Utility | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge |
+| 🟣 Purple | Arcane | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed |
 | ⚫ Black | Curse | Curse of Vanishing, Curse of Binding |
+
+---
+
+## Card Decks
+
+<img src="docs/images/card_deck_blue.png" height="56" alt="Protection Deck"> <img src="docs/images/card_deck_green.png" height="56" alt="Nature Deck"> <img src="docs/images/card_deck_red.png" height="56" alt="Combat Deck"> <img src="docs/images/card_deck_yellow.png" height="56" alt="Utility Deck"> <img src="docs/images/card_deck_purple.png" height="56" alt="Arcane Deck"> <img src="docs/images/card_deck_rare.png" height="56" alt="Rarity Deck">
+
+A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place decks in a **Chiseled Bookshelf** within an Enchanting Table's normal bookshelf range (same positions and air gap as regular bookshelves) and the table's rolls shift according to what you've stored.
+
+| Deck | Stores | Effect on nearby Enchanting Tables |
+|------|--------|-----------------------------------|
+| Protection / Nature / Combat / Utility / Arcane | Cards of that color | Favors that category, and even more the exact enchantments stored |
+| Rarity (wildcard) | Curse cards | Favors rare (low-weight) enchantments |
+
+### Crafting Recipe
+
+|   |   |   |
+|---|---|---|
+|   | Brass Ingot |   |
+| Leather | Card of the deck's type | Leather |
+|   | Brass Ingot |   |
+
+→ **Card Deck** × 1 — the card is consumed and sets the deck's type (Rarity: a Curse card)
+
+### How it works
+
+- **Storing**: right-click a card onto the deck (or the deck onto a card), like a bundle. Right-click with an empty cursor to take the last stack back out.
+- **Points**: a level N card is worth 2^(N-1) points (same ratio as combining). Each deck holds up to 64 points.
+- **Enchanting power**: every 3 decks holding cards count as one bookshelf (a full Chiseled Bookshelf = 2 bookshelves). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves.
+- **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its enchantments up to ×3 more likely.
+- **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers and Fortune/Silk Touch ×1.5 in forests, jungles and taigas. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
+- **Wear**: each enchantment helped by the library has a 20% chance to consume one card (the cheapest) from a matching deck.
 
 ---
 
@@ -188,7 +220,22 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.0.0
+## Changelog — 3.1.0
+
+- **Card Decks** — New brass-bound decks that store Magic Cards of one type: Protection, Nature, Combat, Utility, Arcane, and a Rarity wildcard filled with Curse cards. Crafted with 2 Brass Ingots, 2 Leather and 1 card of the deck's type (the card is consumed). Store and take cards with right-click, like a bundle
+- **Libraries that enchant** — Decks in a Chiseled Bookshelf near an Enchanting Table add power: every 3 decks holding cards count as one bookshelf (a full shelf = 2), adding up with regular bookshelves (vanilla cap of 15 still applies)
+- **Steered enchanting** — Decks make the table favor their category, and even more the exact enchantments stored (up to ×3 with a specialized library). The Rarity wildcard favors rare, low-weight enchantments
+- **Location affinity** — Decks resonate with where the table is: Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments in oceans and rivers, Fortune and Silk Touch in forests, jungles and taigas
+- **Datapack-driven affinities** — Affinity rules are JSON files in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add rules for any dimension or biome; they reload with `/reload`
+- **Deck wear** — Each enchantment the library helps with has a 20% chance to consume the cheapest matching card
+- **26.2 enchantments categorized** — Knockback, Density, Breach, Lunge, Flame, Multishot, Piercing, Quick Charge, Luck of the Sea, Lure and Wind Burst now have card colors
+- **Arcane = rare magic** — All treasure enchantments (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) are now Arcane cards. Cards already extracted keep their color and still go into the matching deck
+- **Lighter website** — 3D block previews are now static images, much faster on phones
+
+<details>
+<summary>Previous versions</summary>
+
+### 3.0.0
 
 - **Port to Minecraft 26.2** — Built against Fabric Loader 0.19.3 and Fabric API 0.158.0+26.2
 - **Java 25 required** — Minecraft 26.2 needs Java 25 (the 1.21.11 version keeps using Java 21)
@@ -198,9 +245,6 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 - **Fabric API dependency** — Declared with the new `fabric-api` mod id (26.2 no longer provides the legacy `fabric` id)
 - **Creative tab** — The mod's creative tab is now populated correctly on 26.2
 - **No gameplay changes** — Same blocks, items, recipes, and mechanics as 2.0.2
-
-<details>
-<summary>Previous versions</summary>
 
 ### 2.0.2
 

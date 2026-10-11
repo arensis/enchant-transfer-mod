@@ -59,13 +59,53 @@ The 1.21.11 version (v2.0.x) is in maintenance mode and will only receive critic
 </thead>
 <tbody>
 <tr><td>🔵 Blue</td><td>Protection</td><td>Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling</td></tr>
-<tr><td>🟢 Green</td><td>Nature</td><td>Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune</td></tr>
-<tr><td>🔴 Red</td><td>Combat</td><td>Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge</td></tr>
-<tr><td>🟡 Yellow</td><td>Utility</td><td>Efficiency, Unbreaking, Mending, Swift Sneak, Infinity, Power, Punch</td></tr>
-<tr><td>🟣 Purple</td><td>Arcane</td><td>Channeling, Riptide, Loyalty, Frost Walker</td></tr>
+<tr><td>🟢 Green</td><td>Nature</td><td>Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure</td></tr>
+<tr><td>🔴 Red</td><td>Combat</td><td>Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge</td></tr>
+<tr><td>🟡 Yellow</td><td>Utility</td><td>Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge</td></tr>
+<tr><td>🟣 Purple</td><td>Arcane</td><td>Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed</td></tr>
 <tr><td>⚫ Black</td><td>Curse</td><td>Curse of Vanishing, Curse of Binding</td></tr>
 </tbody>
 </table>
+
+<hr>
+
+<h2>Card Decks (New in 3.1)</h2>
+
+<p>
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_blue.png" height="56" alt="Protection Deck">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_green.png" height="56" alt="Nature Deck">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_red.png" height="56" alt="Combat Deck">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_yellow.png" height="56" alt="Utility Deck">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_purple.png" height="56" alt="Arcane Deck">
+<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_rare.png" height="56" alt="Rarity Deck">
+</p>
+
+<p>Brass-bound decks that store Magic Cards of one type. Place them in a <b>Chiseled Bookshelf</b> near an Enchanting Table and the table gains power and starts favoring what you've stored.</p>
+
+<h3>How to use</h3>
+<ul>
+<li><b>Right-click</b> a card onto the deck (or the deck onto a card) to store it, like a bundle; right-click with an empty cursor to take the last stack out</li>
+<li>Each deck only takes cards of its own type; the Rarity wildcard takes Curse cards</li>
+<li>A level N card is worth 2<sup>N-1</sup> points; each deck holds up to 64 points</li>
+</ul>
+
+<h3>At the Enchanting Table</h3>
+<ul>
+<li><b>Power</b> — Every 3 decks holding cards count as one bookshelf (a full Chiseled Bookshelf = 2), adding up with regular bookshelves (cap of 15)</li>
+<li><b>Category decks</b> — Favor their category, and even more the exact enchantments stored (up to ×3)</li>
+<li><b>Rarity wildcard</b> — Favors rare, low-weight enchantments</li>
+<li><b>Location affinity</b> — Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature depends on the biome</li>
+<li><b>Wear</b> — Each enchantment the library helps with has a 20% chance to consume a card</li>
+<li><b>Modpack friendly</b> — Affinities are datapack JSON (<code>data/&lt;namespace&gt;/enchanttransfer/library_affinity/</code>) for any dimension or biome</li>
+</ul>
+
+<h3>Crafting Recipe — Card Deck</h3>
+<table>
+<tr><td></td><td>Brass Ingot</td><td></td></tr>
+<tr><td>Leather</td><td>Card of the deck's type</td><td>Leather</td></tr>
+<tr><td></td><td>Brass Ingot</td><td></td></tr>
+</table>
+<p><i>The card is consumed and sets the deck's type. The Rarity wildcard uses a Curse (black) card.</i></p>
 
 <hr>
 
@@ -194,14 +234,13 @@ The 1.21.11 version (v2.0.x) is in maintenance mode and will only receive critic
 
 <hr>
 
-<h2>What's New in 3.0.0</h2>
+<h2>What's New in 3.1.0</h2>
 
 <ul>
-<li><b>Port to Minecraft 26.2</b> — Built against Fabric Loader 0.19.3 and Fabric API 0.158.0+26.2</li>
-<li><b>Java 25 required</b> — Minecraft 26.2 needs Java 25 (the 1.21.11 version keeps using Java 21)</li>
-<li><b>New render pipeline</b> — Block entity renderers and all GUI screens migrated to the 26.2 rendering system</li>
-<li><b>Creative tab</b> — The mod's creative tab is now populated correctly on 26.2</li>
-<li><b>No gameplay changes</b> — Same blocks, items, recipes, and mechanics as 2.0.2</li>
+<li><b>Card Decks</b> — Store Magic Cards in brass-bound decks: Protection, Nature, Combat, Utility, Arcane and a Rarity wildcard</li>
+<li><b>Libraries that enchant</b> — Decks in Chiseled Bookshelves add enchanting power and steer the table toward their enchantments</li>
+<li><b>Location affinity</b> — Decks work better in the right dimension or biome; configurable by datapack</li>
+<li><b>26.2 enchantments categorized</b> — 11 enchantments that had no card color now have one; treasure enchantments are now Arcane</li>
 </ul>
 
 <hr>
