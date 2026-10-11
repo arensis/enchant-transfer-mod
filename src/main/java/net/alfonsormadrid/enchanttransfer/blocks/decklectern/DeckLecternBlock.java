@@ -75,7 +75,7 @@ public class DeckLecternBlock extends BaseEntityBlock {
                 .mapColor(MapColor.WOOD)
                 .sound(SoundType.WOOD)
                 .strength(2.5f)
-                .lightLevel(state -> state.getValue(ACTIVE) ? 5 : 0)
+                .lightLevel(state -> isLit(state) ? 5 : 0)
                 .noOcclusion());
     }
 
@@ -102,6 +102,16 @@ public class DeckLecternBlock extends BaseEntityBlock {
 
     public static boolean hasCards(BlockState state) {
         return SLOTS.stream().anyMatch(slot -> state.getValue(slot) == LampState.FULL);
+    }
+
+    /**
+     * Whether the lectern is effectively on: switched on <em>and</em> holding a
+     * deck with cards.  Everything that shows or applies its effect checks
+     * this, so a stale {@code active=true} without cards (e.g. from an older
+     * world) never lights up or counts.
+     */
+    public static boolean isLit(BlockState state) {
+        return state.getValue(ACTIVE) && hasCards(state);
     }
 
     /** Switches the lectern off once no deck has cards left (it never switches itself on). */
@@ -160,7 +170,7 @@ public class DeckLecternBlock extends BaseEntityBlock {
      */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (!state.getValue(ACTIVE)) return;
+        if (!isLit(state)) return;
         for (BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
             if (random.nextInt(16) != 0) continue;
             BlockPos table = pos.subtract(offset);

@@ -87,7 +87,7 @@ public class DeckLecternBlockEntity extends BlockEntity implements Container, Me
 
     @Override
     public boolean isActive() {
-        return getBlockState().getValue(DeckLecternBlock.ACTIVE);
+        return DeckLecternBlock.isLit(getBlockState());
     }
 
     // ── Change propagation: lamps + client sync ────────────────────────────

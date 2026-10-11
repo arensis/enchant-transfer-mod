@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/block",
-  "render_type": "minecraft:translucent",
+  "render_type": "minecraft:cutout",
   "textures": {
     "particle": "enchanttransfer:block/deck_lectern_amethyst_off",
     "crystal": "enchanttransfer:block/deck_lectern_amethyst_off"

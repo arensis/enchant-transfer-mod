@@ -11,6 +11,8 @@ import net.minecraft.core.Direction;
  */
 public class DeckLecternRenderState extends BlockEntityRenderState {
     public Direction facing = Direction.NORTH;
+    /** Lit lecterns draw the amethyst halo. */
+    public boolean lit = false;
     public final ItemStackRenderState[] decks = new ItemStackRenderState[DeckLecternBlockEntity.SLOT_COUNT];
 
     public DeckLecternRenderState() {

@@ -219,10 +219,11 @@ def base_model():
         base, tray_el,
         brass_box('ring_base', [0.6, 5, 0.6], [15.4, 5.5, 15.4], skip=('down',)),
         glass_box('bell_lower', [0.8, 5.5, 0.8], [15.2, 12, 15.2]),
-        brass_box('rib_sw', [0.8, 5.5, 14.8], [1.2, 12, 15.2]),
-        brass_box('rib_se', [14.8, 5.5, 14.8], [15.2, 12, 15.2]),
-        brass_box('rib_ne', [14.8, 5.5, 0.8], [15.2, 12, 1.2]),
-        brass_box('rib_nw', [0.8, 5.5, 0.8], [1.2, 12, 1.2]),
+        # Ribs sit just outside the glass corners: sharing its planes made them z-fight
+        brass_box('rib_sw', [0.6, 5.5, 14.9], [1.1, 12, 15.4]),
+        brass_box('rib_se', [14.9, 5.5, 14.9], [15.4, 12, 15.4]),
+        brass_box('rib_ne', [14.9, 5.5, 0.6], [15.4, 12, 1.1]),
+        brass_box('rib_nw', [0.6, 5.5, 0.6], [1.1, 12, 1.1]),
         # Hollow brass frame between the two glass tiers
         brass_box('ring_middle_front', [2.6, 12, 13.0], [13.4, 12.4, 13.4]),
         brass_box('ring_middle_back', [2.6, 12, 2.6], [13.4, 12.4, 3.0]),
@@ -264,7 +265,7 @@ def lamp_model(slot, state):
 
 
 def finial_model(on):
-    """Amethyst crystal on two crossed planes, centred on the block; lit with a glowing halo."""
+    """Amethyst crystal on two crossed planes, centred on the block (the halo is drawn by the BER)."""
     def plane(name, f, t, sides):
         el = element(name, f, t, {k: {'uv': [0, 0, 16, 16], 'texture': '#crystal'} for k in sides},
                      rotation={'origin': [8, 14.7, 8], 'axis': 'y', 'angle': 45}, shade=False)
@@ -276,23 +277,13 @@ def finial_model(on):
         plane('crystal_a', [5.5, 14.7, 8], [10.5, 19.7, 8], ('north', 'south')),
         plane('crystal_b', [8, 14.7, 5.5], [8, 19.7, 10.5], ('east', 'west')),
     ]
-    if on:
-        # Glow sprite on two crossed planes around the crystal, larger than it
-        for name, f, t, sides in (('halo_a', [3.5, 12.7, 8], [12.5, 21.7, 8], ('north', 'south')),
-                                  ('halo_b', [8, 12.7, 3.5], [8, 21.7, 12.5], ('east', 'west'))):
-            elements.append(element(name, f, t,
-                                    {k: {'uv': [0, 0, 16, 16], 'texture': '#halo'} for k in sides},
-                                    rotation={'origin': [8, 17.2, 8], 'axis': 'y', 'angle': 45},
-                                    shade=False, light_emission=15))
     textures = {
         'particle': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',
         'crystal': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',
     }
-    if on:
-        textures['halo'] = f'{NS}:block/deck_lectern_halo'
     return {
         'parent': 'minecraft:block/block',
-        'render_type': 'minecraft:translucent',
+        'render_type': 'minecraft:cutout',
         'textures': textures,
         'elements': elements,
     }
@@ -310,10 +301,12 @@ def blockstate():
             for state in LAMPS:
                 parts.append({'when': {'facing': facing, f'slot_{slot}': state},
                               'apply': {'model': f'{NS}:block/deck_lectern_lamp_{slot}_{state}', **rot}})
-        for active in ('true', 'false'):
-            model = 'deck_lectern_finial_on' if active == 'true' else 'deck_lectern_finial_off'
-            parts.append({'when': {'facing': facing, 'active': active},
-                          'apply': {'model': f'{NS}:block/{model}', **rot}})
+    # The crystal is centred, so it ignores facing. Lit = active and a deck with cards,
+    # matching DeckLecternBlock.isLit (a stale active=true without cards stays dark).
+    lit = [{'active': 'true', f'slot_{s}': 'full'} for s in range(SLOTS)]
+    dark = [{'active': 'false'}, {f'slot_{s}': 'none|empty' for s in range(SLOTS)}]
+    parts.append({'when': {'OR': lit}, 'apply': {'model': f'{NS}:block/deck_lectern_finial_on'}})
+    parts.append({'when': {'OR': dark}, 'apply': {'model': f'{NS}:block/deck_lectern_finial_off'}})
     return {'multipart': parts}
 
 
