@@ -110,8 +110,6 @@ public class DeckLecternRenderer
             // Lay the deck face up, its top towards the back of the tray
             matrices.mulPose(Axis.XP.rotationDegrees(-90f));
             matrices.scale(DECK_SCALE, DECK_SCALE, DECK_SCALE);
-            // The item model spans 0..1; centre it on the pose (NONE applies no display transform)
-            matrices.translate(-0.5f, -0.5f, -0.5f);
             deck.submit(matrices, queue, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             matrices.popPose();
         }
