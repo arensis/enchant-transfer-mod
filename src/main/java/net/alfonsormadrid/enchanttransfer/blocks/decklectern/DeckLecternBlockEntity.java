@@ -38,20 +38,15 @@ public class DeckLecternBlockEntity extends BlockEntity implements Container, Me
     public static final int SLOT_COUNT = 3;
 
     public static final int PROP_ACTIVE = 0;
-    public static final int PROP_ENABLED = 1;
-    public static final int PROPERTY_COUNT = 2;
+    public static final int PROPERTY_COUNT = 1;
 
     private final NonNullList<ItemStack> items = NonNullList.withSize(SLOT_COUNT, ItemStack.EMPTY);
 
-    /** Mirrors {@code active} / {@code enabled} to the open screen (the gem next to the slots). */
+    /** Mirrors {@code active} to the open screen (the gem next to the slots). */
     private final ContainerData propertyDelegate = new ContainerData() {
         @Override
         public int get(int index) {
-            return switch (index) {
-                case PROP_ACTIVE -> isActive() ? 1 : 0;
-                case PROP_ENABLED -> getBlockState().getValue(DeckLecternBlock.ENABLED) ? 1 : 0;
-                default -> 0;
-            };
+            return index == PROP_ACTIVE && isActive() ? 1 : 0;
         }
 
         @Override
@@ -107,7 +102,7 @@ public class DeckLecternBlockEntity extends BlockEntity implements Container, Me
         for (int i = 0; i < SLOT_COUNT; i++) {
             updated = updated.setValue(DeckLecternBlock.SLOTS.get(i), LampState.of(items.get(i)));
         }
-        updated = DeckLecternBlock.withDerivedActive(updated);
+        updated = DeckLecternBlock.switchOffIfEmpty(updated);
         if (updated != state) {
             serverLevel.setBlock(worldPosition, updated, Block.UPDATE_CLIENTS);
         }

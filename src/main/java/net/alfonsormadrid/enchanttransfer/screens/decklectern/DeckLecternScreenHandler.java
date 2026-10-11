@@ -66,8 +66,11 @@ public class DeckLecternScreenHandler extends AbstractContainerMenu {
         return propertyDelegate.get(DeckLecternBlockEntity.PROP_ACTIVE) != 0;
     }
 
-    public boolean isEnabled() {
-        return propertyDelegate.get(DeckLecternBlockEntity.PROP_ENABLED) != 0;
+    public boolean hasCards() {
+        for (int i = 0; i < DeckLecternBlockEntity.SLOT_COUNT; i++) {
+            if (lampState(i) == LampState.FULL) return true;
+        }
+        return false;
     }
 
     /** Lamp shown under a deck slot, from the synced slot contents. */

@@ -78,8 +78,8 @@ public class DeckLecternScreen extends AbstractContainerScreen<DeckLecternScreen
         if (mouseX >= gx + GEM_X && mouseX < gx + GEM_X + GEM_SIZE
                 && mouseY >= gy + GEM_Y && mouseY < gy + GEM_Y + GEM_SIZE) {
             String key = menu.isActive() ? "enchanttransfer.deck_lectern.active"
-                    : menu.isEnabled() ? "enchanttransfer.deck_lectern.no_cards"
-                    : "enchanttransfer.deck_lectern.inactive";
+                    : menu.hasCards() ? "enchanttransfer.deck_lectern.inactive"
+                    : "enchanttransfer.deck_lectern.no_cards";
             ctx.setTooltipForNextFrame(font, Component.translatable(key), mouseX, mouseY);
         }
     }

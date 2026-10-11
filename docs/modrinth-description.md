@@ -111,8 +111,7 @@ The block that holds your decks: a low brass base with a tilted velvet tray for 
 
 - **Right-click** opens a small screen with 3 deck slots.
 - **Lamps**: one per slot — dark brown (no deck), light (deck without cards), emerald (deck with cards).
-- **Active** only when it has at least one deck with cards: the amethyst on top of the bell glows. Empty lecterns, or ones whose decks run out of cards, switch off on their own.
-- **Shift + right-click** switches a lectern off (or back on), so you can choose which ones count; switched-off lecterns are ignored by enchanting tables.
+- **Off by default.** Shift + right-click switches it on (it needs at least one deck with cards) or off, so you choose which lecterns count; the amethyst on top of the bell glows while it's on. It switches itself off when its decks run out of cards, but never on.
 - While active, runes fly from the lectern to the enchanting table, like with bookshelves.
 - Place lecterns where regular bookshelves would go around an Enchanting Table (same positions and air gap). One ring of 16 at table height already reaches the cap of 15, so they don't need to be stacked.
 

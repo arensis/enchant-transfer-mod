@@ -52,7 +52,7 @@
   "enchanttransfer.deck.hint.purple": "Right-click an Arcane card onto it to store it",
   "enchanttransfer.deck.hint.rare": "Stores Curse cards",
   "block.enchanttransfer.deck_lectern": "Deck Lectern",
-  "enchanttransfer.deck_lectern.active": "Active: adds its decks to nearby enchanting tables (Shift + right-click to switch off)",
-  "enchanttransfer.deck_lectern.inactive": "Switched off: ignored by nearby enchanting tables (Shift + right-click to switch on)",
-  "enchanttransfer.deck_lectern.no_cards": "Off: no deck with cards (it lights up as soon as one has cards)"
+  "enchanttransfer.deck_lectern.active": "On: adds its decks to nearby enchanting tables (Shift + right-click to switch off)",
+  "enchanttransfer.deck_lectern.inactive": "Off: Shift + right-click to switch it on",
+  "enchanttransfer.deck_lectern.no_cards": "Off: needs a deck with cards before it can be switched on"
 }
