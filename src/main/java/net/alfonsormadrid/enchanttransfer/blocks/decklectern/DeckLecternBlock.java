@@ -1,6 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.blocks.decklectern;
 
 import com.mojang.serialization.MapCodec;
+import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +25,8 @@ import net.minecraft.world.level.block.EnchantingTableBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -54,6 +57,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class DeckLecternBlock extends BaseEntityBlock {
 
     public static final MapCodec<DeckLecternBlock> CODEC = simpleCodec(DeckLecternBlock::new);
+
+    /** One rune every this many client ticks (on average, ~1.5 s) while lit. */
+    private static final int RUNE_CHANCE = 30;
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
@@ -164,15 +170,24 @@ public class DeckLecternBlock extends BaseEntityBlock {
         return InteractionResult.CONSUME;
     }
 
-    /**
-     * While active, the same runes vanilla bookshelves send to a nearby
-     * enchanting table (same positions, air gap and 1-in-16 chance per tick).
-     */
+    /** Client-side ticker for the runes; nothing ticks on the server. */
     @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (!isLit(state)) return;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (!level.isClientSide()) return null;
+        return createTickerHelper(type, EnchantTransferMod.DECK_LECTERN_BLOCK_ENTITY,
+                (lvl, pos, st, be) -> spawnRunes(lvl, pos, st, lvl.getRandom()));
+    }
+
+    /**
+     * While lit, sends the same runes vanilla bookshelves send to a nearby
+     * enchanting table (same positions and air gap).  Runs every client tick
+     * — unlike animateTick, which only reaches randomly sampled blocks — so
+     * one in {@value #RUNE_CHANCE} ticks gives about one rune every 1.5 s per lectern
+     * (several lecterns around a table add up, like bookshelves).
+     */
+    private static void spawnRunes(Level level, BlockPos pos, BlockState state, RandomSource random) {
+        if (!isLit(state) || random.nextInt(RUNE_CHANCE) != 0) return;
         for (BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
-            if (random.nextInt(16) != 0) continue;
             BlockPos table = pos.subtract(offset);
             if (!level.getBlockState(table).is(Blocks.ENCHANTING_TABLE)) continue;
             BlockPos between = table.offset(offset.getX() / 2, offset.getY() / 2, offset.getZ() / 2);
