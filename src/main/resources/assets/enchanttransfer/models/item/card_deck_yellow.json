@@ -1,0 +1,6 @@
+{
+  "parent": "enchanttransfer:item/card_deck_base",
+  "textures": {
+    "deck": "enchanttransfer:item/card_deck_yellow"
+  }
+}

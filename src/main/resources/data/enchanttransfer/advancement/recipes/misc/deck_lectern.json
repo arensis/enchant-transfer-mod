@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_brass_ingot": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          { "items": "enchanttransfer:brass_ingot" }
+        ]
+      }
+    },
+    "has_card_deck": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          { "items": "#enchanttransfer:card_decks" }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "enchanttransfer:deck_lectern"
+      }
+    }
+  },
+  "requirements": [
+    ["has_brass_ingot", "has_card_deck", "has_the_recipe"]
+  ],
+  "rewards": {
+    "recipes": ["enchanttransfer:deck_lectern"]
+  }
+}

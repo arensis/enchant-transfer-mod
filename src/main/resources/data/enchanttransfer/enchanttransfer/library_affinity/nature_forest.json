@@ -1,0 +1,6 @@
+{
+  "deck": "enchanttransfer:card_deck_green",
+  "biome": "#minecraft:is_forest",
+  "enchantments": ["minecraft:fortune", "minecraft:silk_touch"],
+  "multiplier": 1.5
+}

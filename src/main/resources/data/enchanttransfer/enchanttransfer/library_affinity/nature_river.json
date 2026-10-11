@@ -1,0 +1,6 @@
+{
+  "deck": "enchanttransfer:card_deck_green",
+  "biome": "#minecraft:is_river",
+  "enchantments": ["minecraft:respiration", "minecraft:aqua_affinity", "minecraft:depth_strider", "minecraft:luck_of_the_sea", "minecraft:lure"],
+  "multiplier": 1.5
+}

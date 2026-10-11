@@ -1,0 +1,27 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "enchanttransfer:block/deck_lectern"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_none"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_none"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_none"
+      },
+      {
+        "type": "minecraft:model",
+        "model": "enchanttransfer:block/deck_lectern_finial_on"
+      }
+    ]
+  }
+}

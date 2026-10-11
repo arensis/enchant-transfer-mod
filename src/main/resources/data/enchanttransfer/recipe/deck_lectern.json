@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GAG",
+    "BRB",
+    "PPP"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "A": "minecraft:amethyst_shard",
+    "B": "enchanttransfer:brass_ingot",
+    "R": "minecraft:redstone",
+    "P": "#minecraft:planks"
+  },
+  "result": {
+    "id": "enchanttransfer:deck_lectern",
+    "count": 1
+  }
+}

@@ -1,4 +1,5 @@
 :root {
+  color-scheme: dark;
   --ground: #0d0f1a;
   --surface: #151829;
   --surface-raised: #1c2038;
@@ -15,27 +16,6 @@
   --text-dim: #887e70;
   --text-bright: #eae4da;
   --border: #2a2d44;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --ground: #f0ece4;
-    --surface: #e8e2d6;
-    --surface-raised: #ddd6c8;
-    --gold: #a07020;
-    --gold-dim: #8a6018;
-    --cyan: #1a8a8a;
-    --purple: #6d3fcf;
-    --red: #c03030;
-    --green: #2d8030;
-    --yellow: #9a7020;
-    --blue-card: #3a6ab8;
-    --black-card: #444;
-    --text: #3a3428;
-    --text-dim: #6a6050;
-    --text-bright: #1a1610;
-    --border: #c8c0b0;
-  }
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -239,6 +219,12 @@ ul li::before {
   image-rendering: pixelated;
 }
 
+.card-sprite img.deck-sprite {
+  width: auto;
+  height: 64px;
+  image-rendering: auto;
+}
+
 .card-sprite span {
   font-size: 0.7rem;
   color: var(--text-dim);
@@ -282,6 +268,12 @@ ul li::before {
   image-rendering: pixelated;
   vertical-align: middle;
   margin-right: 0.4rem;
+}
+
+.card-table .card-icon.deck-icon {
+  width: auto;
+  height: 28px;
+  image-rendering: auto;
 }
 
 /* GUI showcase */
@@ -371,6 +363,11 @@ ul li::before {
   image-rendering: pixelated;
 }
 
+/* Rendered 3D block icons (antialiased): scale smoothly */
+.recipe-cell img.render-block {
+  image-rendering: auto;
+}
+
 .recipe-cell.recipe-arrow {
   background: none;
   border: none;
@@ -423,29 +420,12 @@ ul li::before {
 
 .recipe-result strong { color: var(--text); }
 
-/* 3D block recipe icons */
-.block-3d-wrap {
-  width: 140px;
-  height: 210px;
-  perspective: 800px;
-  position: relative;
-}
-.block-3d-wrap .world {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-style: preserve-3d;
-}
-.block-3d-wrap .box {
-  position: absolute;
-  transform-style: preserve-3d;
-  left: 0;
-  top: 0;
-}
-.block-3d-wrap .face {
-  position: absolute;
-  left: 50%;
-  top: 50%;
+/* Rendered 3D model icons (scripts/render_model_icons.py) */
+.recipe-output .render-icon {
+  display: block;
+  width: auto;
+  height: 150px;
+  image-rendering: auto;
 }
 
 @media (max-width: 500px) {
@@ -459,10 +439,8 @@ ul li::before {
     font-size: 1.8rem;
     margin: 0.3rem 0;
   }
-  .block-3d-wrap {
-    width: 120px;
-    height: 180px;
-    perspective: 600px;
+  .recipe-output .render-icon {
+    height: 120px;
   }
   .recipe-grid {
     max-width: 100% !important;
@@ -636,6 +614,7 @@ hr.sep {
   .card-table th, .card-table td { padding: 0.4rem 0.5rem; }
   .card-sprites { gap: 0.4rem; justify-content: center; }
   .card-sprite img { width: 40px; height: 40px; }
+  .card-sprite img.deck-sprite { width: auto; height: 52px; }
   .card-sprite span { font-size: 0.6rem; }
   .subtitle { font-size: 0.85rem; }
   .recipe { padding: 1rem; }

@@ -80,6 +80,29 @@
 
 ---
 
+## Barajas de cartas
+
+Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En un atril de barajas al alcance de una mesa de encantamientos (mismas posiciones y hueco de aire que las librerías normales), modifica lo que ofrece la mesa.
+
+| Baraja | Guarda | Efecto |
+|---|---|---|
+| Protección / Naturaleza / Combate / Utilidad / Arcano | Cartas de su color | Sesgo hacia su categoría y, más aún, hacia los encantamientos guardados |
+| Comodín de Rareza | Cartas de maldición | Favorece encantamientos de peso bajo |
+
+Arcano agrupa los encantamientos de tesoro (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) como "magia rara": la mesa nunca los da, pero sus cartas suman fuerza a la baraja Arcana.
+
+- **Receta**: 2 latón + 2 cuero + 1 carta del tipo (se consume). Rareza: carta negra.
+- **Puntos**: carta de nivel N = 2^(N-1) puntos (misma equivalencia que combinar). Máximo 64 por baraja.
+- **Resonancia** `R = min(1, puntos de categoría / 128)`; comodín `Rr = min(1, puntos / 64)`.
+- **Peso** de cada candidato `e`: `w · (1 + 2·R·(½·cuotaCategoría + ½·cuotaEncantamiento)) · (1 + 2·Rr·(10 − w)/9)`. El sesgo es relativo: una librería equilibrada ≈ vanilla.
+- **Poder de la mesa**: cada 3 barajas con cartas cuentan como 1 librería (un atril lleno = 1). Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
+- **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2 (Fire Aspect ×3), Fire/Blast Protection ×1,5, Flame ×1,5, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5.
+- **Desgaste**: por cada encantamiento aplicado y cada tipo de baraja presente que le afecte (su categoría, o el comodín): 20 % de quitar la carta más barata, preferiblemente del mismo encantamiento.
+- Código: paquete `library/` (`DeckEffect` y sus implementaciones, `CardStorage`, `DeckLibrary`, `LibraryProfile`), servicios `LibraryResonanceService`, `DeckEnchantmentSelector`, `DeckWearService` y mixin `EnchantmentMenuMixin`.
+- **Atril de barajas** (`DeckLecternBlock`): base baja de latón y madera, bandeja inclinada de terciopelo con 3 barajas (las dibuja un BER con su modelo 3D) y campana de cristal escalonada. Un piloto por hueco (marrón: sin baraja; claro: sin cartas; esmeralda: con cartas) y una amatista en la cúspide que se enciende (con halo y runas hacia la mesa) cuando el atril está encendido. Apagado por defecto: Shift + clic derecho lo enciende (solo con alguna baraja con cartas) o lo apaga; se apaga solo cuando las barajas se quedan sin cartas, pero nunca se enciende solo. Los atriles apagados no cuentan. Clic derecho abre una ventana con 3 huecos. Receta: cristal, amatista, cristal / latón, redstone, latón / tablones ×3. Recursos generados con `scripts/gen_deck_lectern_assets.py`.
+
+---
+
 ## Nuevos encantamientos
 
 ### Categorías de encantamientos (por color de cristal/gema)
@@ -87,10 +110,10 @@
 | Color | Categoría | Encantamientos vanilla incluidos |
 |---|---|---|
 | Azul | Protección | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
-| Verde | Naturaleza | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Harvesting* |
-| Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Momentum* |
-| Amarillo | Utilidad | Efficiency, Unbreaking, Mending, Swift Sneak, Infinity, Power, Punch |
-| Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Freezing* + encantamientos propios del mod |
+| Verde | Naturaleza | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, Harvesting* |
+| Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Momentum* |
+| Amarillo | Utilidad | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge |
+| Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed, Freezing* + encantamientos propios del mod |
 | Negro | Maldición | Curse of Vanishing, Curse of Binding + maldiciones propias del mod |
 
 > *Encantamientos nuevos del mod

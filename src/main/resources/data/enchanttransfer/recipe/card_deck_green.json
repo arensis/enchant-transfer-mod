@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " B ",
+    "LCL",
+    " B "
+  ],
+  "key": {
+    "B": "enchanttransfer:brass_ingot",
+    "L": "minecraft:leather",
+    "C": "enchanttransfer:magic_card_green"
+  },
+  "result": {
+    "id": "enchanttransfer:card_deck_green",
+    "count": 1
+  }
+}

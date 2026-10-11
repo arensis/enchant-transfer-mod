@@ -1,0 +1,42 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "enchanttransfer:block/deck_lectern_side",
+    "lamp": "enchanttransfer:block/deck_lectern_lamp_empty"
+  },
+  "elements": [
+    {
+      "name": "lamp_2",
+      "from": [
+        11,
+        2,
+        15.9
+      ],
+      "to": [
+        14,
+        3,
+        16.05
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            0,
+            0,
+            3,
+            1
+          ],
+          "texture": "#lamp"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            3,
+            1
+          ],
+          "texture": "#lamp"
+        }
+      }
+    }
+  ]
+}

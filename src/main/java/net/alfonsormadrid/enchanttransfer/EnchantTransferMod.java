@@ -1,5 +1,7 @@
 package net.alfonsormadrid.enchanttransfer;
 
+import net.alfonsormadrid.enchanttransfer.blocks.decklectern.DeckLecternBlock;
+import net.alfonsormadrid.enchanttransfer.blocks.decklectern.DeckLecternBlockEntity;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilItem;
@@ -8,9 +10,17 @@ import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlockEntity;
 import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
+import net.alfonsormadrid.enchanttransfer.screens.decklectern.DeckLecternScreenHandler;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreenHandler;
 import net.alfonsormadrid.enchanttransfer.screens.zincsmelter.ZincSmelterScreenHandler;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+import net.alfonsormadrid.enchanttransfer.item.CardDeckItem;
 import net.alfonsormadrid.enchanttransfer.item.CardType;
+import net.alfonsormadrid.enchanttransfer.item.DeckKind;
+import net.alfonsormadrid.enchanttransfer.library.LibraryAffinities;
+import net.fabricmc.fabric.api.resource.v1.DataResourceLoader;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableItem;
@@ -92,6 +102,44 @@ public class EnchantTransferMod implements ModInitializer {
 	public static final MagicCardItem MAGIC_CARD_PURPLE = new MagicCardItem(MAGIC_CARD_PURPLE_KEY, CardType.PURPLE);
 	public static final MagicCardItem MAGIC_CARD_BLACK  = new MagicCardItem(MAGIC_CARD_BLACK_KEY,  CardType.BLACK);
 
+	// ── Card decks ─────────────────────────────────────────────────────────
+	// One item per DeckKind ("card_deck_<id>"); the recipe consumes a card of
+	// that kind, so a deck's type is fixed from the moment it's crafted.
+	public static final Map<DeckKind, CardDeckItem> CARD_DECKS = createCardDecks();
+
+	private static Map<DeckKind, CardDeckItem> createCardDecks() {
+		Map<DeckKind, CardDeckItem> decks = new EnumMap<>(DeckKind.class);
+		for (DeckKind kind : DeckKind.values()) {
+			ResourceKey<Item> key = ResourceKey.create(Registries.ITEM, cardDeckId(kind));
+			decks.put(kind, new CardDeckItem(key, kind));
+		}
+		return Collections.unmodifiableMap(decks);
+	}
+
+	public static Identifier cardDeckId(DeckKind kind) {
+		return Identifier.fromNamespaceAndPath(MOD_ID, "card_deck_" + kind.id());
+	}
+
+	// ── Deck Lectern ───────────────────────────────────────────────────────
+	// Holds 3 Card Decks for nearby enchanting tables (the mod's own DeckLibrary).
+	public static final Identifier DECK_LECTERN_IDENTIFIER = Identifier.fromNamespaceAndPath(MOD_ID, "deck_lectern");
+
+	public static final ResourceKey<Block> DECK_LECTERN_BLOCK_KEY =
+			ResourceKey.create(Registries.BLOCK, DECK_LECTERN_IDENTIFIER);
+	public static final ResourceKey<Item> DECK_LECTERN_ITEM_KEY =
+			ResourceKey.create(Registries.ITEM, DECK_LECTERN_IDENTIFIER);
+
+	public static final DeckLecternBlock DECK_LECTERN_BLOCK = new DeckLecternBlock(DECK_LECTERN_BLOCK_KEY);
+	public static final Item DECK_LECTERN_ITEM = new net.minecraft.world.item.BlockItem(
+			DECK_LECTERN_BLOCK, new Item.Properties().setId(DECK_LECTERN_ITEM_KEY).useBlockDescriptionPrefix());
+	public static BlockEntityType<DeckLecternBlockEntity> DECK_LECTERN_BLOCK_ENTITY =
+			FabricBlockEntityTypeBuilder.create(DeckLecternBlockEntity::new, DECK_LECTERN_BLOCK).build();
+
+	public static final net.minecraft.world.inventory.MenuType<DeckLecternScreenHandler> DECK_LECTERN_SCREEN_HANDLER =
+			Registry.register(BuiltInRegistries.MENU, DECK_LECTERN_IDENTIFIER,
+					new net.minecraft.world.inventory.MenuType<>(DeckLecternScreenHandler::new,
+							net.minecraft.world.flag.FeatureFlags.VANILLA_SET));
+
 	// ── Zinc Smelter ───────────────────────────────────────────────────────
 	public static final Identifier ZINC_SMELTER_BLOCK_IDENTIFIER = Identifier.fromNamespaceAndPath(MOD_ID, "zinc_smelter");
 
@@ -158,6 +206,11 @@ public class EnchantTransferMod implements ModInitializer {
 		Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "magic_card_purple"), MAGIC_CARD_PURPLE);
 		Registry.register(BuiltInRegistries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "magic_card_black"),  MAGIC_CARD_BLACK);
 
+		CARD_DECKS.forEach((kind, deck) -> Registry.register(BuiltInRegistries.ITEM, cardDeckId(kind), deck));
+		Registry.register(BuiltInRegistries.BLOCK, DECK_LECTERN_IDENTIFIER, DECK_LECTERN_BLOCK);
+		Registry.register(BuiltInRegistries.ITEM, DECK_LECTERN_IDENTIFIER, DECK_LECTERN_ITEM);
+		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, DECK_LECTERN_IDENTIFIER, DECK_LECTERN_BLOCK_ENTITY);
+
 		Registry.register(BuiltInRegistries.BLOCK, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_BLOCK);
 		Registry.register(BuiltInRegistries.ITEM, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_ITEM);
 		Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, INFUSION_COIL_BLOCK_IDENTIFIER, INFUSION_COIL_BLOCK_ENTITY);
@@ -185,12 +238,17 @@ public class EnchantTransferMod implements ModInitializer {
 					entries.accept(MAGIC_CARD_YELLOW);
 					entries.accept(MAGIC_CARD_PURPLE);
 					entries.accept(MAGIC_CARD_BLACK);
+					CARD_DECKS.values().forEach(entries::accept);
+					entries.accept(DECK_LECTERN_ITEM);
 					entries.accept(ZINC_SMELTER_ITEM);
 					entries.accept(ZINC_OXIDE_ITEM);
 					entries.accept(ZINC_SHEET_ITEM);
 					entries.accept(BRASS_INGOT_ITEM);
 				})
 				.build());
+
+		// Deck affinities per dimension/biome, from datapacks (reloads with /reload)
+		DataResourceLoader.get().registerReloadListener(LibraryAffinities.ID, LibraryAffinities::new);
 
 		// ── Custom networking ──────────────────────────────────────────────────
 		// S2C: server → client to open the Selector screen
@@ -202,7 +260,7 @@ public class EnchantTransferMod implements ModInitializer {
 		ServerPlayNetworking.registerGlobalReceiver(RequestOpenGuiPayload.ID, (payload, context) -> {
 			context.server().execute(() -> {
 				ServerPlayer player = context.player();
-				ServerLevel world = (ServerLevel) player.level();
+				ServerLevel world = player.level();
 				BlockPos targetPos = payload.blockPos();
 				// Validate that the player is close enough
 				double dx = player.getX() - targetPos.getX();

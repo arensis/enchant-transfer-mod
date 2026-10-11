@@ -1,11 +1,16 @@
 package net.alfonsormadrid.enchanttransfer.item;
 
+import java.util.Optional;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
@@ -52,6 +57,32 @@ public class MagicCardItem extends Item {
      */
     public @Nullable CardType getCardType() {
         return cardType;
+    }
+
+    // ── Card data (shared by the Transfer Table, decks and libraries) ──────
+
+    /** El encantamiento de una carta, si es una carta con exactamente uno. */
+    public static Optional<Holder<Enchantment>> enchantmentOf(ItemStack stack) {
+        if (!(stack.getItem() instanceof MagicCardItem)) return Optional.empty();
+        ItemEnchantments enchants = stack.getEnchantments();
+        if (enchants.size() != 1) return Optional.empty();
+        return enchants.keySet().stream().findFirst();
+    }
+
+    /** Nivel del encantamiento de la carta (0 si no tiene). */
+    public static int levelOf(ItemStack stack) {
+        return enchantmentOf(stack).map(e -> stack.getEnchantments().getLevel(e)).orElse(0);
+    }
+
+    /**
+     * Valor de una sola carta en puntos: {@code 2^(nivel-1)}.  Es la misma
+     * equivalencia que aplica {@code CombineCardService} (dos cartas de
+     * nivel N dan una de nivel N+1), así que guardar cartas combinadas o
+     * sin combinar vale lo mismo.
+     */
+    public static int pointsOf(ItemStack stack) {
+        int level = levelOf(stack);
+        return level <= 0 ? 0 : 1 << Math.clamp(level - 1, 0, 10);
     }
 
     @Override
