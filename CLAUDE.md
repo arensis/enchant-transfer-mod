@@ -28,6 +28,9 @@ Modules are placed adjacent to the table; the server scans neighbours each tick.
 | `SelectorScreen` | L1 GUI (plain `Screen`); opened via `OpenSelectorPayload` S2C |
 | `InfusionCoilScreen` | L2 GUI (`AbstractContainerScreen`) |
 | `TransferTableScreen` | L2 GUI (`AbstractContainerScreen`) |
+| `CardDeckItem` / `DeckKind` / `DeckContents` | Card decks: one item per kind; `DeckKind` is composed with a `DeckEffect`; cards live in the `deck_contents` component (`ItemStackTemplate` list) |
+| `library/` | Deck architecture, mirroring `modules/` + `energy/`: `CardStorage` (like `ExperienceStorage`) → `DeckCardStorage` (like `SimpleExperienceTank`); `DeckLibrary` (like `TransferTableModule`) → `ContainerDeckLibrary` adapter for the chiseled bookshelf; `DeckEffect` → `CategoryDeckEffect`, `WildcardDeckEffect` → `RarityDeckEffect`; `LibraryProfile` aggregates them (like `ModuleConnectionRegistry`) |
+| `EnchantmentMenuMixin` | Wires the instance services in: adds deck power to the bookshelf count, redirects `selectEnchantment` → `DeckEnchantmentSelector`, wear on `clickMenuButton` |
 
 ---
 
@@ -122,6 +125,17 @@ XP tank: pos(130,32), 14×56 px, fills bottom-up.
 **Fixed 7 positions** at GUI-local `x = 52 + i*12`, `y = 21`.  
 i=0 = hub (golden), i=1..6 = module slots mapped to `Direction.values()[i-1]`.  
 Empty → dim dot. Active screen → filled dot + cyan ring (border at radius 5).
+
+---
+
+## Card decks
+
+- Formulas and balance live in `DESIGN.md` ("Barajas de cartas"); each formula sits in its `DeckEffect`; services (`LibraryResonanceService`, `DeckEnchantmentSelector`, `DeckWearService`) only orchestrate.
+- Location affinities: `AffinityRule` (codec) loaded by `LibraryAffinities` (a `SimpleJsonResourceReloadListener` registered via Fabric `DataResourceLoader`) from `data/<ns>/enchanttransfer/library_affinity/`; `LibraryProfile.weightMultiplier` scales each effect's extra by them.
+- New deck kind = new `DeckEffect` + enum constant; new library block = implement `DeckLibrary` on its block entity (`LibraryResonanceService.libraryAt` picks it up).
+- Textures are generated: edit and run `python scripts/gen_deck_textures.py` (32×32 sheet: front, side, top, bottom of a 10×14×4 cuboid, model `card_deck_base.json`).
+- Website images of 3D models (blocks and decks) are rendered from the real model JSONs by `python scripts/render_model_icons.py` into `docs/images/` — static PNGs instead of live CSS 3D, which was slow on phones. Vanilla block icons (blast furnace, glass) come from Loom's cached client jar, in the inventory view; add more in its `TARGETS`.
+- 26.2 bundles store `ItemStackTemplate`, not `ItemStack`, in components — do the same for any item-holding component.
 
 ---
 

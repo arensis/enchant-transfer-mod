@@ -1,0 +1,6 @@
+{
+  "deck": "enchanttransfer:card_deck_blue",
+  "dimension": "minecraft:the_nether",
+  "enchantments": ["minecraft:fire_protection", "minecraft:blast_protection"],
+  "multiplier": 1.5
+}

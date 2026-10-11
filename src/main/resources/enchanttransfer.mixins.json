@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.alfonsormadrid.enchanttransfer.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "EnchantmentMenuMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
