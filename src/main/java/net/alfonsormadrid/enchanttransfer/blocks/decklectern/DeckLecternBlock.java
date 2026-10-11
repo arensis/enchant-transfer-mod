@@ -44,8 +44,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
  * <ul>
  *   <li>{@code facing} — oriented by the player, like a furnace.</li>
  *   <li>{@code slot_0..2} — one indicator lamp per slot ({@link LampState}).</li>
- *   <li>{@code active} — the amethyst on top of the bell; Shift + right-click
- *       toggles it. Only active lecterns count for nearby enchanting tables.</li>
+ *   <li>{@code enabled} — the player's switch, toggled with Shift + right-click.</li>
+ *   <li>{@code active} — derived: enabled <em>and</em> at least one deck with
+ *       cards. Lights the amethyst on top of the bell; only active lecterns
+ *       count for nearby enchanting tables.</li>
  * </ul>
  * The decks on the tray are drawn by the block entity renderer.
  */
@@ -54,6 +56,7 @@ public class DeckLecternBlock extends BaseEntityBlock {
     public static final MapCodec<DeckLecternBlock> CODEC = simpleCodec(DeckLecternBlock::new);
 
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final BooleanProperty ENABLED = BooleanProperty.create("enabled");
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
     public static final EnumProperty<LampState> SLOT_0 = EnumProperty.create("slot_0", LampState.class);
     public static final EnumProperty<LampState> SLOT_1 = EnumProperty.create("slot_1", LampState.class);
@@ -81,7 +84,8 @@ public class DeckLecternBlock extends BaseEntityBlock {
         super(settings);
         registerDefaultState(getStateDefinition().any()
                 .setValue(FACING, Direction.NORTH)
-                .setValue(ACTIVE, true)
+                .setValue(ENABLED, true)
+                .setValue(ACTIVE, false)
                 .setValue(SLOT_0, LampState.NONE)
                 .setValue(SLOT_1, LampState.NONE)
                 .setValue(SLOT_2, LampState.NONE));
@@ -90,12 +94,18 @@ public class DeckLecternBlock extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(FACING, ACTIVE, SLOT_0, SLOT_1, SLOT_2);
+        builder.add(FACING, ENABLED, ACTIVE, SLOT_0, SLOT_1, SLOT_2);
     }
 
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
+    }
+
+    /** {@code active} = enabled and at least one deck with cards. */
+    public static BlockState withDerivedActive(BlockState state) {
+        boolean hasCards = SLOTS.stream().anyMatch(slot -> state.getValue(slot) == LampState.FULL);
+        return state.setValue(ACTIVE, state.getValue(ENABLED) && hasCards);
     }
 
     @Override
@@ -118,7 +128,7 @@ public class DeckLecternBlock extends BaseEntityBlock {
         return RenderShape.MODEL;
     }
 
-    /** Right-click opens the 3-slot screen; Shift + right-click toggles {@code active}. */
+    /** Right-click opens the 3-slot screen; Shift + right-click toggles {@code enabled}. */
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
                                                Player player, BlockHitResult hit) {
@@ -126,10 +136,10 @@ public class DeckLecternBlock extends BaseEntityBlock {
             return InteractionResult.SUCCESS;
         }
         if (player.isShiftKeyDown()) {
-            boolean active = !state.getValue(ACTIVE);
-            level.setBlock(pos, state.setValue(ACTIVE, active), Block.UPDATE_ALL);
-            level.playSound(null, pos, active ? SoundEvents.AMETHYST_BLOCK_CHIME : SoundEvents.AMETHYST_BLOCK_HIT,
-                    SoundSource.BLOCKS, 1.0f, active ? 1.2f : 0.8f);
+            boolean enabled = !state.getValue(ENABLED);
+            level.setBlock(pos, withDerivedActive(state.setValue(ENABLED, enabled)), Block.UPDATE_ALL);
+            level.playSound(null, pos, enabled ? SoundEvents.AMETHYST_BLOCK_CHIME : SoundEvents.AMETHYST_BLOCK_HIT,
+                    SoundSource.BLOCKS, 1.0f, enabled ? 1.2f : 0.8f);
             return InteractionResult.CONSUME;
         }
         var factory = state.getMenuProvider(level, pos);
@@ -140,22 +150,12 @@ public class DeckLecternBlock extends BaseEntityBlock {
     }
 
     /**
-     * Client-side effects while active: sparkles rising from the amethyst and,
-     * if a deck has cards, the same runes vanilla bookshelves send to a nearby
+     * While active, the same runes vanilla bookshelves send to a nearby
      * enchanting table (same positions, air gap and 1-in-16 chance per tick).
      */
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!state.getValue(ACTIVE)) return;
-
-        if (random.nextInt(6) == 0) {
-            level.addParticle(ParticleTypes.END_ROD,
-                    pos.getX() + 0.5 + (random.nextDouble() - 0.5) * 0.2, pos.getY() + 1.2,
-                    pos.getZ() + 0.5 + (random.nextDouble() - 0.5) * 0.2,
-                    0, 0.02, 0);
-        }
-
-        if (SLOTS.stream().noneMatch(slot -> state.getValue(slot) == LampState.FULL)) return;
         for (BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
             if (random.nextInt(16) != 0) continue;
             BlockPos table = pos.subtract(offset);

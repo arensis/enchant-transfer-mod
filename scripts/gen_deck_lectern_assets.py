@@ -126,8 +126,12 @@ def crystal(palette):
 
 
 def halo(x, y):
-    edge = min(x, y, 15 - x, 15 - y)
-    return (200, 140, 255, 30 if edge == 0 else 60)
+    """Soft radial glow: opaque-ish in the centre, fading to nothing at the edge."""
+    d = ((x - 7.5) ** 2 + (y - 7.5) ** 2) ** 0.5 / 7.5
+    if d >= 1:
+        return None
+    alpha = round(170 * (1 - d) ** 1.6)
+    return (215, 160, 255, alpha) if alpha > 0 else None
 
 
 def lamp(color):
@@ -273,8 +277,13 @@ def finial_model(on):
         plane('crystal_b', [8, 14.7, 5.5], [8, 19.7, 10.5], ('east', 'west')),
     ]
     if on:
-        halo_faces = {k: {'uv': [0, 0, 16, 16], 'texture': '#halo'} for k in ('north', 'south', 'east', 'west', 'up')}
-        elements.append(element('halo', [6.2, 14.8, 6.2], [9.8, 19.4, 9.8], halo_faces, light_emission=15))
+        # Glow sprite on two crossed planes around the crystal, larger than it
+        for name, f, t, sides in (('halo_a', [3.5, 12.7, 8], [12.5, 21.7, 8], ('north', 'south')),
+                                  ('halo_b', [8, 12.7, 3.5], [8, 21.7, 12.5], ('east', 'west'))):
+            elements.append(element(name, f, t,
+                                    {k: {'uv': [0, 0, 16, 16], 'texture': '#halo'} for k in sides},
+                                    rotation={'origin': [8, 17.2, 8], 'axis': 'y', 'angle': 45},
+                                    shade=False, light_emission=15))
     textures = {
         'particle': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',
         'crystal': f'{NS}:block/deck_lectern_amethyst_{"on" if on else "off"}',

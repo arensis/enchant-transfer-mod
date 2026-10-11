@@ -52,6 +52,7 @@
   "enchanttransfer.deck.hint.purple": "Clic derecho con una carta Arcana para guardarla",
   "enchanttransfer.deck.hint.rare": "Guarda cartas de Maldición",
   "block.enchanttransfer.deck_lectern": "Atril de barajas",
-  "enchanttransfer.deck_lectern.active": "Activo: aporta sus barajas a las mesas de encantamientos cercanas (Shift + clic derecho para cambiar)",
-  "enchanttransfer.deck_lectern.inactive": "Inactivo: las mesas de encantamientos cercanas lo ignoran (Shift + clic derecho para cambiar)"
+  "enchanttransfer.deck_lectern.active": "Activo: aporta sus barajas a las mesas de encantamientos cercanas (Shift + clic derecho para apagarlo)",
+  "enchanttransfer.deck_lectern.inactive": "Desconectado: las mesas cercanas lo ignoran (Shift + clic derecho para encenderlo)",
+  "enchanttransfer.deck_lectern.no_cards": "Apagado: ninguna baraja tiene cartas (se enciende en cuanto alguna las tenga)"
 }

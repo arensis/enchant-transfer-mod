@@ -66,6 +66,10 @@ public class DeckLecternScreenHandler extends AbstractContainerMenu {
         return propertyDelegate.get(DeckLecternBlockEntity.PROP_ACTIVE) != 0;
     }
 
+    public boolean isEnabled() {
+        return propertyDelegate.get(DeckLecternBlockEntity.PROP_ENABLED) != 0;
+    }
+
     /** Lamp shown under a deck slot, from the synced slot contents. */
     public LampState lampState(int slot) {
         return LampState.of(slots.get(slot).getItem());
