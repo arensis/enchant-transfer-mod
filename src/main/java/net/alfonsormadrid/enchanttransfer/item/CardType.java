@@ -3,6 +3,7 @@ package net.alfonsormadrid.enchanttransfer.item;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -45,7 +46,9 @@ public enum CardType {
                     Enchantments.AQUA_AFFINITY,
                     Enchantments.DEPTH_STRIDER,
                     Enchantments.SILK_TOUCH,
-                    Enchantments.FORTUNE
+                    Enchantments.FORTUNE,
+                    Enchantments.LUCK_OF_THE_SEA,
+                    Enchantments.LURE
                     // + Harvesting (mod-custom, pendiente de registrar)
             )),
 
@@ -58,7 +61,11 @@ public enum CardType {
                     Enchantments.FIRE_ASPECT,
                     Enchantments.LOOTING,
                     Enchantments.THORNS,
-                    Enchantments.SWEEPING_EDGE
+                    Enchantments.SWEEPING_EDGE,
+                    Enchantments.KNOCKBACK,
+                    Enchantments.DENSITY,
+                    Enchantments.BREACH,
+                    Enchantments.LUNGE
                     // + Momentum (mod-custom, pendiente de registrar)
             )),
 
@@ -66,11 +73,13 @@ public enum CardType {
             List.of(
                     Enchantments.EFFICIENCY,
                     Enchantments.UNBREAKING,
-                    Enchantments.MENDING,
-                    Enchantments.SWIFT_SNEAK,
                     Enchantments.INFINITY,
                     Enchantments.POWER,
-                    Enchantments.PUNCH
+                    Enchantments.PUNCH,
+                    Enchantments.FLAME,
+                    Enchantments.MULTISHOT,
+                    Enchantments.PIERCING,
+                    Enchantments.QUICK_CHARGE
                     // + Magnetism (mod-custom, pendiente de registrar)
             )),
 
@@ -79,7 +88,13 @@ public enum CardType {
                     Enchantments.CHANNELING,
                     Enchantments.RIPTIDE,
                     Enchantments.LOYALTY,
-                    Enchantments.FROST_WALKER
+                    Enchantments.FROST_WALKER,
+                    Enchantments.WIND_BURST,
+                    // Treasure enchantments never come out of the table;
+                    // they're grouped here as "rare magic".
+                    Enchantments.MENDING,
+                    Enchantments.SWIFT_SNEAK,
+                    Enchantments.SOUL_SPEED
                     // + Freezing (mod-custom, pendiente de registrar)
                     // + futuros encantamientos arcanos del mod
             )),
@@ -134,6 +149,10 @@ public enum CardType {
      *         enchantment isn't categorised yet (e.g. modded enchantment
      *         from another mod, or a vanilla one we haven't mapped).
      */
+    public static @Nullable CardType forEnchantment(Holder<Enchantment> enchantment) {
+        return enchantment.unwrapKey().map(CardType::forEnchantment).orElse(null);
+    }
+
     public static @Nullable CardType forEnchantment(ResourceKey<Enchantment> key) {
         for (CardType t : values()) {
             if (t.allowedEnchantments.contains(key)) return t;

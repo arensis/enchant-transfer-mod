@@ -4,7 +4,6 @@ import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.gui.common.SlotPosition;
 import net.alfonsormadrid.enchanttransfer.item.CardType;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -65,15 +64,10 @@ public class TransferItemSlot extends TransferSlot {
             // haven't categorised yet), fall back to the blank/base card so
             // the system degrades gracefully — the player still gets a card
             // with the enchantment, just without its colour identity.
-            ItemStack card = new ItemStack(cardItemFor(cardTypeFor(entry)));
+            ItemStack card = new ItemStack(cardItemFor(CardType.forEnchantment(entry)));
             card.enchant(entry, enchants.getLevel(entry));
             return card;
         }).collect(Collectors.toList());
-    }
-
-    private static @Nullable CardType cardTypeFor(Holder<Enchantment> entry) {
-        ResourceKey<Enchantment> key = entry.unwrapKey().orElse(null);
-        return key != null ? CardType.forEnchantment(key) : null;
     }
 
     /**
