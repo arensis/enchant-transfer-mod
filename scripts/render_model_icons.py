@@ -42,9 +42,16 @@ TARGETS = [
     (f'card_deck_{kind}.png', f'enchanttransfer:item/card_deck_{kind}', PROPOSAL_VIEW, 8, None)
     for kind in ('blue', 'green', 'red', 'yellow', 'purple', 'rare')
 ] + [
+    # Deck Lectern with all three lamp states and the amethyst lit
+    ('render_deck_lectern.png', ['enchanttransfer:block/deck_lectern',
+                                 'enchanttransfer:block/deck_lectern_lamp_0_full',
+                                 'enchanttransfer:block/deck_lectern_lamp_1_empty',
+                                 'enchanttransfer:block/deck_lectern_lamp_2_none',
+                                 'enchanttransfer:block/deck_lectern_finial_on'], PROPOSAL_VIEW, 8, None),
     # Vanilla recipe ingredients, as they look in the inventory (128×128 like the other icons)
     ('blast_furnace.png', 'minecraft:block/blast_furnace', INVENTORY_VIEW, 5, 128),
     ('glass_block.png', 'minecraft:block/glass', INVENTORY_VIEW, 5, 128),
+    ('oak_planks.png', 'minecraft:block/oak_planks', INVENTORY_VIEW, 5, 128),
 ]
 
 # Minecraft-like directional shading
@@ -135,6 +142,29 @@ def default_uv(direction, f, t):
     }[direction]
 
 
+def rotate(p, rotation):
+    """Applies an element's {origin, axis, angle} rotation (right-handed, like Matrix4f.rotation)."""
+    if not rotation:
+        return p
+    o = rotation['origin']
+    a = math.radians(rotation['angle'])
+    x, y, z = p[0] - o[0], p[1] - o[1], p[2] - o[2]
+    c, s = math.cos(a), math.sin(a)
+    if rotation['axis'] == 'x':
+        y, z = y * c - z * s, y * s + z * c
+    elif rotation['axis'] == 'y':
+        x, z = x * c + z * s, -x * s + z * c
+    else:
+        x, y = x * c - y * s, x * s + y * c
+    return x + o[0], y + o[1], z + o[2]
+
+
+def rotate_normal(n, rotation):
+    if not rotation:
+        return n
+    return rotate(n, {**rotation, 'origin': [0, 0, 0]})
+
+
 def camera(azimuth, elevation):
     az, el = math.radians(azimuth), math.radians(elevation)
     to_camera = (math.sin(az) * math.cos(el), math.sin(el), math.cos(az) * math.cos(el))
@@ -151,8 +181,9 @@ def dot(a, b):
 
 # ── Rendering ───────────────────────────────────────────────────────────────
 
-def render(model_ref, view, unit, canvas):
-    elements, textures = load_model(model_ref)
+def render(model_refs, view, unit, canvas):
+    if isinstance(model_refs, str):
+        model_refs = [model_refs]
     to_camera, right, up = camera(view['azimuth'], view['elevation'])
     scale = unit * SUPERSAMPLE
     cache = {}
@@ -162,14 +193,18 @@ def render(model_ref, view, unit, canvas):
         return dot(q, right) * scale, -dot(q, up) * scale, dot(q, to_camera)
 
     faces = []
-    for element in elements:
-        for direction, face in element.get('faces', {}).items():
-            if dot(NORMAL[direction], to_camera) <= 0:
-                continue
-            corners = [project(p) for p in face_corners(direction, element['from'], element['to'])]
-            uv = face.get('uv') or default_uv(direction, element['from'], element['to'])
-            texture = resolve_texture(face['texture'], textures, cache)
-            faces.append((corners, uv, texture, SHADE[direction]))
+    for model_ref in model_refs:
+        elements, textures = load_model(model_ref)
+        for element in elements:
+            rotation = element.get('rotation')
+            for direction, face in element.get('faces', {}).items():
+                if dot(rotate_normal(NORMAL[direction], rotation), to_camera) <= 0:
+                    continue
+                points = face_corners(direction, element['from'], element['to'])
+                corners = [project(rotate(p, rotation)) for p in points]
+                uv = face.get('uv') or default_uv(direction, element['from'], element['to'])
+                texture = resolve_texture(face['texture'], textures, cache)
+                faces.append((corners, uv, texture, SHADE[direction]))
 
     xs = [c[0] for f in faces for c in f[0]] + [f[0][1][0] + f[0][2][0] - f[0][0][0] for f in faces]
     ys = [c[1] for f in faces for c in f[0]] + [f[0][1][1] + f[0][2][1] - f[0][0][1] for f in faces]

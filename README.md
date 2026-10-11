@@ -81,7 +81,7 @@ Magic Cards are now color-coded by enchantment category. When you extract an enc
 
 <img src="docs/images/card_deck_blue.png" height="56" alt="Protection Deck"> <img src="docs/images/card_deck_green.png" height="56" alt="Nature Deck"> <img src="docs/images/card_deck_red.png" height="56" alt="Combat Deck"> <img src="docs/images/card_deck_yellow.png" height="56" alt="Utility Deck"> <img src="docs/images/card_deck_purple.png" height="56" alt="Arcane Deck"> <img src="docs/images/card_deck_rare.png" height="56" alt="Rarity Deck">
 
-A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place decks in a **Chiseled Bookshelf** within an Enchanting Table's normal bookshelf range (same positions and air gap as regular bookshelves) and the table's rolls shift according to what you've stored.
+A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place decks in a **Deck Lectern** within an Enchanting Table's normal bookshelf range (same positions and air gap as regular bookshelves) and the table's rolls shift according to what you've stored.
 
 | Deck | Stores | Effect on nearby Enchanting Tables |
 |------|--------|-----------------------------------|
@@ -102,10 +102,29 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 
 - **Storing**: right-click a card onto the deck (or the deck onto a card), like a bundle. Right-click with an empty cursor to take the last stack back out.
 - **Points**: a level N card is worth 2^(N-1) points (same ratio as combining). Each deck holds up to 64 points.
-- **Enchanting power**: every 3 decks holding cards count as one bookshelf (a full Chiseled Bookshelf = 2 bookshelves). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves.
+- **Enchanting power**: every 3 decks holding cards count as one bookshelf (a full Deck Lectern = 1 bookshelf). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves.
 - **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its enchantments up to ×3 more likely.
 - **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers and Fortune/Silk Touch ×1.5 in forests, jungles and taigas. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
 - **Wear**: each enchantment helped by the library has a 20% chance to consume one card (the cheapest) from a matching deck.
+
+### Deck Lectern
+
+<img src="docs/images/render_deck_lectern.png" height="120" alt="Deck Lectern">
+
+The block that holds your decks: a low brass base with a tilted velvet tray for **3 decks**, under a glass bell.
+
+- **Right-click** opens a small screen with 3 deck slots.
+- **Lamps**: one per slot — dark brown (no deck), light (deck without cards), emerald (deck with cards).
+- **Shift + right-click** toggles the lectern. The amethyst on top of the bell glows while it's active; inactive lecterns are ignored by enchanting tables, so you can choose which ones count.
+- Place lecterns where regular bookshelves would go around an Enchanting Table (same positions and air gap). One ring of 16 at table height already reaches the cap of 15, so they don't need to be stacked.
+
+|   |   |   |
+|---|---|---|
+| Glass | Amethyst Shard | Glass |
+| Brass Ingot | Redstone | Brass Ingot |
+| Planks | Planks | Planks |
+
+→ **Deck Lectern** × 1
 
 ---
 
@@ -223,7 +242,7 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 ## Changelog — 3.1.0
 
 - **Card Decks** — New brass-bound decks that store Magic Cards of one type: Protection, Nature, Combat, Utility, Arcane, and a Rarity wildcard filled with Curse cards. Crafted with 2 Brass Ingots, 2 Leather and 1 card of the deck's type (the card is consumed). Store and take cards with right-click, like a bundle
-- **Libraries that enchant** — Decks in a Chiseled Bookshelf near an Enchanting Table add power: every 3 decks holding cards count as one bookshelf (a full shelf = 2), adding up with regular bookshelves (vanilla cap of 15 still applies)
+- **Deck Lectern** — New block that holds 3 decks on a tilted tray under a glass bell. A lamp per slot shows whether each deck has cards, and Shift + right-click toggles it (the amethyst on top glows while active). Every 3 decks holding cards count as one bookshelf of enchanting power, adding up with regular bookshelves (vanilla cap of 15 still applies)
 - **Steered enchanting** — Decks make the table favor their category, and even more the exact enchantments stored (up to ×3 with a specialized library). The Rarity wildcard favors rare, low-weight enchantments
 - **Location affinity** — Decks resonate with where the table is: Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments in oceans and rivers, Fortune and Silk Touch in forests, jungles and taigas
 - **Datapack-driven affinities** — Affinity rules are JSON files in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add rules for any dimension or biome; they reload with `/reload`

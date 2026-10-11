@@ -16,7 +16,7 @@ Va en `README.md` como nueva sección `## Changelog — 3.1.0`, encima de la de 
 ## Changelog — 3.1.0
 
 - **Card Decks** — New brass-bound decks that store Magic Cards of one type: Protection, Nature, Combat, Utility, Arcane, and a Rarity wildcard filled with Curse cards. Crafted with 2 Brass Ingots, 2 Leather and 1 card of the deck's type (the card is consumed). Store and take cards with right-click, like a bundle
-- **Libraries that enchant** — Place decks in a Chiseled Bookshelf near an Enchanting Table: every 3 decks holding cards count as one bookshelf of enchanting power (a full shelf = 2), adding up with regular bookshelves (vanilla cap of 15 still applies)
+- **Deck Lectern** — Place decks in a Deck Lectern near an Enchanting Table: every 3 decks holding cards count as one bookshelf of enchanting power (a full shelf = 2), adding up with regular bookshelves (vanilla cap of 15 still applies)
 - **Steered enchanting** — Decks make the table favor their category, and even more the exact enchantments stored (up to ×3 with a specialized library). The Rarity wildcard favors rare, low-weight enchantments
 - **Location affinity** — Decks resonate with where the table is: Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments in oceans and rivers, Fortune and Silk Touch in forests, jungles and taigas
 - **Datapack-driven affinities** — Affinity rules are JSON files in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add rules for any dimension or biome; they reload with `/reload`
@@ -29,7 +29,7 @@ Va en `README.md` como nueva sección `## Changelog — 3.1.0`, encima de la de 
 <summary>Mismo changelog en español (por si quieres usarlo en Discord u otros canales)</summary>
 
 - **Barajas de cartas**: estuches de latón que guardan cartas de un tipo (Protección, Naturaleza, Combate, Utilidad, Arcano) y un comodín de Rareza que se llena con cartas de maldición. Receta: 2 lingotes de latón, 2 de cuero y 1 carta del tipo, que se consume. Se guardan y sacan cartas con clic derecho, como en un saco.
-- **Librerías que encantan**: en una librería cincelada cerca de una mesa de encantamientos, cada 3 barajas con cartas cuentan como una librería (una llena = 2). Se suman a las normales, con el tope de 15 de vanilla.
+- **Atril de barajas**: en un atril de barajas cerca de una mesa de encantamientos, cada 3 barajas con cartas cuentan como una librería (una llena = 2). Se suman a las normales, con el tope de 15 de vanilla.
 - **Encantamientos dirigidos**: las barajas favorecen su categoría y, sobre todo, los encantamientos que guardan (hasta ×3). El comodín de Rareza favorece los encantamientos raros.
 - **Afinidad por lugar**: Combate ×2 en el Nether (Fire Aspect ×3), protecciones contra fuego y Flame ×1,5 en el Nether, Arcano ×2 en el End, y Naturaleza según el bioma (agua en océanos y ríos; Fortune y Silk Touch en bosques, junglas y taigas).
 - **Configurable por datapack**: reglas JSON para cualquier dimensión o bioma, también de otros mods; se recargan con `/reload`.
@@ -68,7 +68,7 @@ La web pintaba la mesa, el fundidor y la bobina con 3D en CSS generado por JavaS
 
 Lo único que se pierde es lo que pinta el juego en tiempo real y no está en el modelo: el brillo del núcleo de la mesa, el fluido de la bobina y el fuego del fundidor. El fundidor se renderiza con su modelo encendido, así que la mirilla sí se ve.
 
-Falta una captura del juego: una mesa con librerías cinceladas llenas de barajas. Sería la mejor imagen para la web y para la galería de Modrinth y CurseForge, pero hay que hacerla con `runClient`.
+Falta una captura del juego: una mesa rodeada de atriles de barajas. Sería la mejor imagen para la web y para la galería de Modrinth y CurseForge, pero hay que hacerla con `runClient`.
 
 ---
 
@@ -291,7 +291,7 @@ También hay que actualizar la tabla de categorías de CurseForge (líneas de Gr
 
 ## 6. Checklist antes de publicar
 
-- [ ] Probar en el juego con `runClient`: modelo 3D, guardar y sacar cartas, librería cincelada, mesa y afinidades.
+- [ ] Probar en el juego con `runClient`: modelo 3D, guardar y sacar cartas, atril de barajas (pilotos, activar/desactivar, barajas en la bandeja), mesa y afinidades.
 - [ ] Hacer la captura de la librería con barajas para la web y las galerías.
 - [x] Añadir `docs/images/leather.png`.
 - [ ] Revisar la web en móvil con los renders estáticos.

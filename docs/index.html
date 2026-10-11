@@ -276,7 +276,7 @@
   <!-- CARD DECKS -->
   <h2 id="card-decks"><span class="accent">Card</span> Decks <span class="badge badge-new">New</span></h2>
 
-  <p>Brass-bound decks that store Magic Cards of one type. Place them in a <strong>Chiseled Bookshelf</strong> near an Enchanting Table and the table gains power and starts favoring what you've stored.</p>
+  <p>Brass-bound decks that store Magic Cards of one type. Place them in a <strong>Deck Lectern</strong> near an Enchanting Table and the table gains power and starts favoring what you've stored.</p>
 
   <div class="card-sprites">
     <div class="card-sprite"><img class="deck-sprite" src="images/card_deck_blue.png" alt="Protection Deck"><span>Protection</span></div>
@@ -316,7 +316,37 @@
     <li>Right-click with an empty cursor to take the last stack back out</li>
     <li>Each deck only takes cards of its own type; the Rarity wildcard takes Curse cards</li>
     <li>A level N card is worth 2<sup>N−1</sup> points (the same ratio as combining). Each deck holds up to <strong>64 points</strong></li>
-    <li>Place decks in a <strong>Chiseled Bookshelf</strong> within an Enchanting Table's bookshelf range (same positions and air gap as regular bookshelves)</li>
+  </ul>
+
+  <h3>Deck Lectern</h3>
+  <p>The block that holds your decks: a low brass base with a tilted velvet tray for <strong>3 decks</strong>, under a glass bell. Place lecterns where regular bookshelves would go around an Enchanting Table; one ring of 16 at table height already reaches the cap of 15.</p>
+
+  <div class="recipe">
+    <div class="recipe-title">Crafting Recipe</div>
+    <div class="recipe-layout">
+      <div class="recipe-grid">
+        <div class="recipe-cell"><img class="render-block" src="images/glass_block.png" alt="">Glass</div>
+        <div class="recipe-cell"><img src="images/amethyst_shard.png" alt="">Amethyst</div>
+        <div class="recipe-cell"><img class="render-block" src="images/glass_block.png" alt="">Glass</div>
+        <div class="recipe-cell"><img src="images/brass_ingot.png" alt="">Brass Ingot</div>
+        <div class="recipe-cell"><img src="images/redstone.png" alt="">Redstone</div>
+        <div class="recipe-cell"><img src="images/brass_ingot.png" alt="">Brass Ingot</div>
+        <div class="recipe-cell"><img class="render-block" src="images/oak_planks.png" alt="">Planks</div>
+        <div class="recipe-cell"><img class="render-block" src="images/oak_planks.png" alt="">Planks</div>
+        <div class="recipe-cell"><img class="render-block" src="images/oak_planks.png" alt="">Planks</div>
+      </div>
+      <span class="recipe-arrow-large">→</span>
+      <div class="recipe-output">
+        <img class="render-icon" src="images/render_deck_lectern.png" alt="Deck Lectern" width="182" height="163">
+        <span>Deck Lectern</span>
+      </div>
+    </div>
+  </div>
+
+  <ul>
+    <li><strong>Right-click</strong> opens a small screen with 3 deck slots</li>
+    <li><strong>Lamps</strong>, one per slot: dark brown (no deck), light (deck without cards), emerald (deck with cards)</li>
+    <li><strong>Shift + right-click</strong> toggles the lectern: the amethyst on top glows while it's active, and inactive lecterns are ignored by enchanting tables</li>
   </ul>
 
   <h3>At the Enchanting Table</h3>
@@ -324,7 +354,7 @@
     <table class="card-table">
       <thead><tr><th>Effect</th><th>How it works</th></tr></thead>
       <tbody>
-        <tr><td>Power</td><td>Every 3 decks holding cards count as one bookshelf (a full Chiseled Bookshelf = 2). They add up with regular bookshelves; the vanilla cap of 15 still applies</td></tr>
+        <tr><td>Power</td><td>Every 3 decks holding cards count as one bookshelf (a full Deck Lectern = 1). They add up with regular bookshelves; the vanilla cap of 15 still applies</td></tr>
         <tr><td>Category decks</td><td>Favor their category, and even more the exact enchantments stored — up to ×3 with a specialized library. A library with every category in equal parts barely changes anything</td></tr>
         <tr><td>Rarity wildcard</td><td>Favors rare, low-weight enchantments (Silk Touch, Thorns, Infinity…)</td></tr>
         <tr><td>Wear</td><td>Each enchantment the library helps with has a 20% chance to consume the cheapest matching card</td></tr>
@@ -580,7 +610,7 @@
 
   <ul>
     <li><strong>Card Decks</strong> — New brass-bound decks that store Magic Cards of one type: Protection, Nature, Combat, Utility, Arcane, and a Rarity wildcard filled with Curse cards. Crafted with 2 Brass Ingots, 2 Leather and 1 card of the deck's type (the card is consumed). Store and take cards with right-click, like a bundle</li>
-    <li><strong>Libraries that enchant</strong> — Decks in a Chiseled Bookshelf near an Enchanting Table add power: every 3 decks holding cards count as one bookshelf (a full shelf = 2), adding up with regular bookshelves (vanilla cap of 15 still applies)</li>
+    <li><strong>Deck Lectern</strong> — New block that holds 3 decks on a tilted tray under a glass bell. A lamp per slot shows whether each deck has cards, and Shift + right-click toggles it (the amethyst on top glows while active). Every 3 decks holding cards count as one bookshelf of enchanting power, adding up with regular bookshelves (vanilla cap of 15 still applies)</li>
     <li><strong>Steered enchanting</strong> — Decks make the table favor their category, and even more the exact enchantments stored (up to ×3 with a specialized library). The Rarity wildcard favors rare, low-weight enchantments</li>
     <li><strong>Location affinity</strong> — Decks resonate with where the table is: Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments in oceans and rivers, Fortune and Silk Touch in forests, jungles and taigas</li>
     <li><strong>Datapack-driven affinities</strong> — Affinity rules are JSON files in <code>data/&lt;namespace&gt;/enchanttransfer/library_affinity/</code>, so modpacks can add rules for any dimension or biome; they reload with <code>/reload</code></li>
