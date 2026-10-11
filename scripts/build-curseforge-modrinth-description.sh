@@ -2,6 +2,8 @@
 # Regenerates docs/curseforge-modrinth-description.md (the store description
 # pasted into both CurseForge and Modrinth) from README.md:
 #   - relative image paths (docs/images/...) become absolute raw.githubusercontent.com URLs
+#   - Markdown images (the badges) become <img>/<a> HTML: CurseForge doesn't parse
+#     Markdown inside the README's centred <div>; GitHub and Modrinth do
 #   - the "For Developers" section is removed
 #   - the <!-- AUTO:... --> markers used by sync-release-docs.py are removed
 #
@@ -26,6 +28,9 @@ awk '
   !skipping                         { print }
 ' "$SOURCE" \
   | sed -E "s#([\"'(])(\./)?docs/images/#\1${RAW_BASE}#g" \
+  | sed -E 's#\[!\[([^]]*)\]\(([^)]*)\)\]\(([^)]*)\)#<a href="\3"><img src="\2" alt="\1"></a>#g' \
+  | sed -E 's#!\[([^]]*)\]\(([^)]*)\)#<img src="\2" alt="\1">#g' \
+  | sed -E ':a; s#(https://img\.shields\.io/[^" ]*)≥#\1%E2%89%A5#; ta' \
   > "$TARGET"
 
 echo "Generated ${TARGET#"$ROOT_DIR"/}"
