@@ -1,7 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.services;
 
 import net.alfonsormadrid.enchanttransfer.item.CardDeckItem;
-import net.alfonsormadrid.enchanttransfer.library.ContainerDeckLibrary;
 import net.alfonsormadrid.enchanttransfer.library.DeckLibrary;
 import net.alfonsormadrid.enchanttransfer.library.LibraryAffinities;
 import net.alfonsormadrid.enchanttransfer.library.LibraryProfile;
@@ -10,8 +9,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnchantingTableBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.ChiseledBookShelfBlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -25,9 +22,8 @@ public class LibraryResonanceService {
 
     /**
      * Every this many decks (holding at least one card) count as one regular
-     * bookshelf for the table's power.  A full Chiseled Bookshelf (6 decks)
-     * is worth 2 bookshelves, offsetting that each deck costs a card, brass
-     * and leather.  They add up with regular bookshelves; vanilla still caps
+     * bookshelf for the table's power, so a full Deck Lectern is worth one
+     * bookshelf.  They add up with regular bookshelves; vanilla still caps
      * the total at 15.
      */
     public static final int DECKS_PER_BOOKSHELF = 3;
@@ -41,7 +37,7 @@ public class LibraryResonanceService {
 
             BlockPos libraryPos = tablePos.offset(offset);
             DeckLibrary library = libraryAt(level, libraryPos);
-            if (library == null) continue;
+            if (library == null || !library.isActive()) continue;
 
             for (int slot = 0; slot < library.getSlotCount(); slot++) {
                 ItemStack stack = library.getStack(slot);
@@ -58,14 +54,8 @@ public class LibraryResonanceService {
         return scan(level, tablePos).getDeckCount() / DECKS_PER_BOOKSHELF;
     }
 
-    /**
-     * The deck library at {@code pos}: a block entity implementing
-     * {@link DeckLibrary}, or a Chiseled Bookshelf through its adapter.
-     */
+    /** The deck library at {@code pos} (a block entity implementing {@link DeckLibrary}), if any. */
     public @Nullable DeckLibrary libraryAt(Level level, BlockPos pos) {
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof DeckLibrary library) return library;
-        if (blockEntity instanceof ChiseledBookShelfBlockEntity shelf) return new ContainerDeckLibrary(shelf);
-        return null;
+        return level.getBlockEntity(pos) instanceof DeckLibrary library ? library : null;
     }
 }

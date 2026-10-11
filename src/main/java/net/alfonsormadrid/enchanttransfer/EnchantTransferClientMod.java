@@ -1,8 +1,10 @@
 package net.alfonsormadrid.enchanttransfer;
 
 import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
+import net.alfonsormadrid.enchanttransfer.renderers.DeckLecternRenderer;
 import net.alfonsormadrid.enchanttransfer.renderers.InfusionCoilRenderer;
 import net.alfonsormadrid.enchanttransfer.renderers.TransferTableRenderer;
+import net.alfonsormadrid.enchanttransfer.screens.decklectern.DeckLecternScreen;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreen;
 import net.alfonsormadrid.enchanttransfer.screens.selector.SelectorScreen;
 import net.alfonsormadrid.enchanttransfer.screens.transfertable.TransferTableScreen;
@@ -33,6 +35,10 @@ public class EnchantTransferClientMod implements ClientModInitializer {
                 EnchantTransferMod.ZINC_SMELTER_SCREEN_HANDLER,
                 ZincSmelterScreen::new);
 
+        MenuScreens.register(
+                EnchantTransferMod.DECK_LECTERN_SCREEN_HANDLER,
+                DeckLecternScreen::new);
+
         // ── Block entity renderers ────────────────────────────────────────────
         BlockEntityRenderers.register(
                 EnchantTransferMod.TRANSFER_TABLE_BLOCK_ENTITY,
@@ -45,6 +51,10 @@ public class EnchantTransferClientMod implements ClientModInitializer {
         BlockEntityRenderers.register(
                 EnchantTransferMod.ZINC_SMELTER_BLOCK_ENTITY,
                 ctx -> new ZincSmelterRenderer(ctx));
+
+        BlockEntityRenderers.register(
+                EnchantTransferMod.DECK_LECTERN_BLOCK_ENTITY,
+                ctx -> new DeckLecternRenderer(ctx));
 
         // ── Render layers ─────────────────────────────────────────────────────
         // TRANSLUCENT render type for the infusion coil and zinc smelter is now

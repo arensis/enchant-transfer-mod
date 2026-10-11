@@ -82,7 +82,7 @@
 
 ## Barajas de cartas
 
-Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En una librería cincelada al alcance de una mesa de encantamientos (mismas posiciones y hueco de aire que las librerías normales), modifica lo que ofrece la mesa.
+Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En un atril de barajas al alcance de una mesa de encantamientos (mismas posiciones y hueco de aire que las librerías normales), modifica lo que ofrece la mesa.
 
 | Baraja | Guarda | Efecto |
 |---|---|---|
@@ -95,11 +95,11 @@ Arcano agrupa los encantamientos de tesoro (Mending, Swift Sneak, Soul Speed, Fr
 - **Puntos**: carta de nivel N = 2^(N-1) puntos (misma equivalencia que combinar). Máximo 64 por baraja.
 - **Resonancia** `R = min(1, puntos de categoría / 128)`; comodín `Rr = min(1, puntos / 64)`.
 - **Peso** de cada candidato `e`: `w · (1 + 2·R·(½·cuotaCategoría + ½·cuotaEncantamiento)) · (1 + 2·Rr·(10 − w)/9)`. El sesgo es relativo: una librería equilibrada ≈ vanilla.
-- **Poder de la mesa**: cada 3 barajas con cartas cuentan como 1 librería (una cincelada llena = 2). Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
+- **Poder de la mesa**: cada 3 barajas con cartas cuentan como 1 librería (un atril lleno = 1). Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
 - **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2 (Fire Aspect ×3), Fire/Blast Protection ×1,5, Flame ×1,5, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5.
 - **Desgaste**: por cada encantamiento aplicado y cada tipo de baraja presente que le afecte (su categoría, o el comodín): 20 % de quitar la carta más barata, preferiblemente del mismo encantamiento.
 - Código: paquete `library/` (`DeckEffect` y sus implementaciones, `CardStorage`, `DeckLibrary`, `LibraryProfile`), servicios `LibraryResonanceService`, `DeckEnchantmentSelector`, `DeckWearService` y mixin `EnchantmentMenuMixin`.
-- Siguiente iteración: bloque propio de librería que muestre qué barajas hay.
+- **Atril de barajas** (`DeckLecternBlock`): base baja de latón y madera, bandeja inclinada de terciopelo con 3 barajas (las dibuja un BER con su modelo 3D) y campana de cristal escalonada. Un piloto por hueco (marrón: sin baraja; claro: sin cartas; esmeralda: con cartas) y una amatista en la cúspide que indica si está activo (Shift + clic derecho). Los atriles inactivos no cuentan. Clic derecho abre una ventana con 3 huecos. Receta: cristal, amatista, cristal / latón, redstone, latón / tablones ×3. Recursos generados con `scripts/gen_deck_lectern_assets.py`.
 
 ---
 

@@ -8,9 +8,7 @@ import net.minecraft.world.item.ItemStack;
  * <p>
  * Same role as {@link net.alfonsormadrid.enchanttransfer.modules.TransferTableModule}
  * for the Transfer Table: the enchanting logic only knows libraries through
- * this interface.  Vanilla's Chiseled Bookshelf is wrapped by
- * {@link ContainerDeckLibrary}; the mod's own library block will implement
- * it directly.
+ * this interface.  Implemented by the Deck Lectern's block entity.
  */
 public interface DeckLibrary {
 
@@ -21,4 +19,9 @@ public interface DeckLibrary {
 
     /** Replace a slot's stack (used to write back a worn deck). */
     void setStack(int slot, ItemStack stack);
+
+    /** Inactive libraries are ignored by nearby enchanting tables. */
+    default boolean isActive() {
+        return true;
+    }
 }

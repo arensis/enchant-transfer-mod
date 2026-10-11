@@ -1,0 +1,468 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_0": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_none"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_0": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_empty"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_0": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_full"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_1": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_none"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_1": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_empty"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_1": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_full"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_2": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_none"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_2": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_empty"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "slot_2": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_full"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "active": "true"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_on"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "active": "false"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_off"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_0": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_none",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_0": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_empty",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_0": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_full",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_1": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_none",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_1": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_empty",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_1": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_full",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_2": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_none",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_2": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_empty",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "slot_2": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_full",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "active": "true"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_on",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "active": "false"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_off",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_0": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_none",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_0": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_empty",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_0": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_full",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_1": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_none",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_1": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_empty",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_1": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_full",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_2": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_none",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_2": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_empty",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "slot_2": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_full",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "active": "true"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_on",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "active": "false"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_off",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_0": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_none",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_0": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_empty",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_0": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_0_full",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_1": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_none",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_1": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_empty",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_1": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_1_full",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_2": "none"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_none",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_2": "empty"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_empty",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "slot_2": "full"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_lamp_2_full",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "active": "true"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_on",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "active": "false"
+      },
+      "apply": {
+        "model": "enchanttransfer:block/deck_lectern_finial_off",
+        "y": 270
+      }
+    }
+  ]
+}

@@ -50,5 +50,8 @@
   "enchanttransfer.deck.hint.red": "Right-click a Combat card onto it to store it",
   "enchanttransfer.deck.hint.yellow": "Right-click a Utility card onto it to store it",
   "enchanttransfer.deck.hint.purple": "Right-click an Arcane card onto it to store it",
-  "enchanttransfer.deck.hint.rare": "Stores Curse cards"
+  "enchanttransfer.deck.hint.rare": "Stores Curse cards",
+  "block.enchanttransfer.deck_lectern": "Deck Lectern",
+  "enchanttransfer.deck_lectern.active": "Active: adds its decks to nearby enchanting tables (Shift + right-click to toggle)",
+  "enchanttransfer.deck_lectern.inactive": "Inactive: ignored by nearby enchanting tables (Shift + right-click to toggle)"
 }

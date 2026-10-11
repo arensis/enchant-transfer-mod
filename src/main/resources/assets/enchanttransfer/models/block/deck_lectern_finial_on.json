@@ -1,0 +1,70 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "enchanttransfer:block/deck_lectern_side",
+    "amethyst": "enchanttransfer:block/deck_lectern_amethyst_on"
+  },
+  "elements": [
+    {
+      "name": "finial",
+      "from": [
+        7.2,
+        14.7,
+        7.9
+      ],
+      "to": [
+        8.8,
+        16.3,
+        9.5
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#amethyst"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#amethyst"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#amethyst"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#amethyst"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1.6,
+            1.6
+          ],
+          "texture": "#amethyst"
+        }
+      },
+      "light_emission": 14
+    }
+  ]
+}
