@@ -5,7 +5,7 @@
 <img src="docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;">
 
 <!-- AUTO:badges -->
-![Version](https://img.shields.io/badge/version-3.0.0-d2962a)
+![Version](https://img.shields.io/badge/version-3.1.0-d2962a)
 ![Minecraft](https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&logoColor=white)
 ![Fabric](https://img.shields.io/badge/fabric_loader-≥0.19.3_%7C_≥0.19.2-dbd0b4)
 ![Java](https://img.shields.io/badge/java-25_%7C_21-ED8B00?logo=openjdk&logoColor=white)
@@ -32,7 +32,7 @@ Version 2.0 introduced the **Module System**: specialized blocks that attach to 
 <!-- AUTO:version-table -->
 | Mod version | Minecraft | Status |
 |-------------|-----------|--------|
-| **3.0.x** | 26.2 | Active development |
+| **3.1.x** | 26.2 | Active development |
 | **2.0.x** | 1.21.11 | Maintenance (critical bug fixes only) |
 <!-- /AUTO:version-table -->
 
@@ -315,12 +315,12 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 ## Installation
 
 <!-- AUTO:installation -->
-### Minecraft 26.2 — mod v3.0.x
+### Minecraft 26.2 — mod v3.1.x
 
 1. Make sure Minecraft runs with **Java 25**
 2. Install [Fabric Loader](https://fabricmc.net/use/) **≥ 0.19.3** for Minecraft 26.2
 3. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 26.2 and place it in the `mods/` folder
-4. Download the Enchant Transfer **3.0.x** JAR and place it in `mods/` as well
+4. Download the Enchant Transfer **3.1.x** JAR and place it in `mods/` as well
 5. Launch Minecraft with the Fabric profile
 
 ### Minecraft 1.21.11 — mod v2.0.x (maintenance)
@@ -339,7 +339,7 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 ## Requirements
 
 <!-- AUTO:requirements -->
-| Dependency | Minecraft 26.2 (v3.0.x) | Minecraft 1.21.11 (v2.0.x) |
+| Dependency | Minecraft 26.2 (v3.1.x) | Minecraft 1.21.11 (v2.0.x) |
 |------------|-------------------------|----------------------------|
 | Java | 25 | 21 |
 | Fabric Loader | ≥ 0.19.3 | ≥ 0.19.2 |
