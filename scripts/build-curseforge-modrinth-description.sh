@@ -4,6 +4,9 @@
 #   - relative image paths (docs/images/...) become absolute raw.githubusercontent.com URLs
 #   - Markdown images (the badges) become <img>/<a> HTML: CurseForge doesn't parse
 #     Markdown inside the README's centred <div>; GitHub and Modrinth do
+#   - in shields.io badge paths, "_" becomes "%20" (also a space for shields) and
+#     "≥" is dropped: CurseForge turns the underscores into italics and breaks
+#     the URL, and doesn't take an encoded ≥ either
 #   - the "For Developers" section is removed
 #   - the collapsible "Previous versions" changelog (<details>) is unwrapped, since
 #     CurseForge strips <details>/<summary>: entries from the current minor series
@@ -55,7 +58,8 @@ awk '
   | sed -E "s#([\"'(])(\./)?docs/images/#\1${RAW_BASE}#g" \
   | sed -E 's#\[!\[([^]]*)\]\(([^)]*)\)\]\(([^)]*)\)#<a href="\3"><img src="\2" alt="\1"></a>#g' \
   | sed -E 's#!\[([^]]*)\]\(([^)]*)\)#<img src="\2" alt="\1">#g' \
-  | sed -E -e ':a' -e 's#(https://img\.shields\.io/[^" ]*)≥#\1%E2%89%A5#' -e 'ta' \
+  | sed -E -e ':a' -e 's#(https://img\.shields\.io/badge/[^" ?]*)≥#\1#' -e 'ta' \
+  | sed -E -e ':b' -e 's#(https://img\.shields\.io/badge/[^" ?]*)_#\1%20#' -e 'tb' \
   | sed -E '/^\|( *:?-+:? *\|)+ *$/ { s/:-+:?/---/g; s/-+:/---/g; }' \
   > "$TARGET"
 

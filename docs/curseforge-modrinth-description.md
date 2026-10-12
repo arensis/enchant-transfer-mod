@@ -6,9 +6,9 @@
 
 <p>
 <img src="https://img.shields.io/badge/version-3.1.2-d2962a" alt="Version">
-<img src="https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft">
-<img src="https://img.shields.io/badge/fabric_loader-%E2%89%A50.19.3_%7C_%E2%89%A50.19.2-dbd0b4" alt="Fabric">
-<img src="https://img.shields.io/badge/java-25_%7C_21-ED8B00?logo=openjdk&logoColor=white" alt="Java">
+<img src="https://img.shields.io/badge/minecraft-26.2%20%7C%201.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft">
+<img src="https://img.shields.io/badge/fabric%20loader-0.19.3%20%7C%200.19.2-dbd0b4" alt="Fabric">
+<img src="https://img.shields.io/badge/java-25%20%7C%2021-ED8B00?logo=openjdk&logoColor=white" alt="Java">
 <img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey" alt="License">
 <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"><img src="https://img.shields.io/curseforge/dt/1540807?logo=curseforge&label=curseforge&color=F16436" alt="CurseForge"></a>
 <a href="https://modrinth.com/mod/enchant-transfer"><img src="https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&label=modrinth&color=00AF5C" alt="Modrinth"></a>
