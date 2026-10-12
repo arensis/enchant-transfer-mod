@@ -67,5 +67,6 @@
   "block.enchanttransfer.deck_lectern": "Atril de barajas",
   "enchanttransfer.deck_lectern.active": "Encendido: aporta sus barajas a las mesas de encantamientos cercanas (Shift + clic derecho para apagarlo)",
   "enchanttransfer.deck_lectern.inactive": "Apagado: Shift + clic derecho para encenderlo",
-  "enchanttransfer.deck_lectern.no_cards": "Apagado: necesita una baraja con cartas para poder encenderlo"
+  "enchanttransfer.deck_lectern.no_cards": "Apagado: necesita una baraja con cartas para poder encenderlo",
+  "enchanttransfer.enchanting.deck_influenced": "Influido por las barajas"
 }

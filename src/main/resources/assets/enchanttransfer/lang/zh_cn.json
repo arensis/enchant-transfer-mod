@@ -67,5 +67,6 @@
   "block.enchanttransfer.deck_lectern": "卡组讲台",
   "enchanttransfer.deck_lectern.active": "已开启：为附近的附魔台提供其卡组加成（Shift + 右键关闭）",
   "enchanttransfer.deck_lectern.inactive": "已关闭：Shift + 右键开启",
-  "enchanttransfer.deck_lectern.no_cards": "已关闭：需要放入装有卡牌的卡组才能开启"
+  "enchanttransfer.deck_lectern.no_cards": "已关闭：需要放入装有卡牌的卡组才能开启",
+  "enchanttransfer.enchanting.deck_influenced": "受卡组影响"
 }

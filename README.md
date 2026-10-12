@@ -109,7 +109,10 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 - **Enchanting power**: every 3 decks holding cards count as one bookshelf (a full Deck Lectern = 1 bookshelf). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves.
 - **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its enchantments up to ×3 more likely.
 - **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers and Fortune/Silk Touch ×1.5 in forests, jungles and taigas. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
-- **Wear**: each enchantment helped by the library has a 20% chance to consume one card (the cheapest) from a matching deck.
+- **Wear**: only enchantments the deck bonus actually brought in can wear them — not those the table would have rolled anyway, nor those coming from the decks' power. Each has a 20% chance to consume one card (the cheapest) from a matching deck; the Rarity wildcard is only worn by rare enchantments (Fortune, Looting, Silk Touch, Thorns…).
+- **Influence mark**: options changed by the decks show a small card in their top-right corner and an *Influenced by card decks* line in their tooltip.
+
+> **No marks? That's normal.** Decks tilt the odds, they don't pick for the table: when it would have rolled the same enchantment anyway, the option isn't marked and costs no card. Some rolls show no marks at all — you'll see more with fuller, more specialized decks and higher table levels. The rolls only change after you enchant something, so re-placing the item shows the same options.
 
 ### Deck Lectern
 
@@ -246,7 +249,13 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.1.1
+## Changelog — 3.1.2
+
+- **Fair deck wear** — Cards are only worn by enchantments the decks actually brought in; anything the table would have rolled without decks no longer costs a card
+- **Rarity wildcard wear** — Only rare enchantments (Fortune, Looting, Silk Touch, Thorns…) wear its Curse cards
+- **Influence mark** — Enchanting Table options changed by the decks show a small card and an "Influenced by card decks" tooltip line
+
+### 3.1.1
 
 - **Translatable tooltips** — Module tooltips in the Selector, Transfer Table and Infusion Coil screens (empty sockets, directions, XP level, Idle/Infusing) are no longer hardcoded in English
 - **New languages** — Simplified Chinese (zh_cn), Brazilian Portuguese (pt_br) and Russian (ru_ru)

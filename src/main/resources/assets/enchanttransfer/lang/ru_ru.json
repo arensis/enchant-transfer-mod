@@ -67,5 +67,6 @@
   "block.enchanttransfer.deck_lectern": "Кафедра для колод",
   "enchanttransfer.deck_lectern.active": "Включена: добавляет свои колоды к ближайшим столам зачаровывания (Shift + ПКМ, чтобы выключить)",
   "enchanttransfer.deck_lectern.inactive": "Выключена: Shift + ПКМ, чтобы включить",
-  "enchanttransfer.deck_lectern.no_cards": "Выключена: для включения нужна колода с картами"
+  "enchanttransfer.deck_lectern.no_cards": "Выключена: для включения нужна колода с картами",
+  "enchanttransfer.enchanting.deck_influenced": "Под влиянием колод"
 }

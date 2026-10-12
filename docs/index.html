@@ -358,9 +358,15 @@
         <tr><td>Power</td><td>Every 3 decks holding cards count as one bookshelf (a full Deck Lectern = 1). They add up with regular bookshelves; the vanilla cap of 15 still applies</td></tr>
         <tr><td>Category decks</td><td>Favor their category, and even more the exact enchantments stored — up to ×3 with a specialized library. A library with every category in equal parts barely changes anything</td></tr>
         <tr><td>Rarity wildcard</td><td>Favors rare, low-weight enchantments (Silk Touch, Thorns, Infinity…)</td></tr>
-        <tr><td>Wear</td><td>Each enchantment the library helps with has a 20% chance to consume the cheapest matching card</td></tr>
+        <tr><td>Wear</td><td>Only enchantments the deck bonus actually brought in can wear them (not those the table would have rolled anyway, nor those coming from the decks' power): 20% chance each to consume the cheapest matching card. The Rarity wildcard is only worn by rare enchantments</td></tr>
+        <tr><td>Influence mark</td><td>Options changed by the decks show a small card in their top-right corner and an <em>Influenced by card decks</em> line in their tooltip</td></tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="callout">
+    <p class="label">No marks? That's normal</p>
+    <p>Decks tilt the odds, they don't pick for the table: when it would have rolled the same enchantment anyway, the option isn't marked and costs no card. Some rolls show no marks at all — you'll see more with fuller, more specialized decks and higher table levels. The rolls only change after you enchant something, so re-placing the item shows the same options.</p>
   </div>
 
   <h3>Location affinity</h3>
@@ -615,8 +621,15 @@
   </div>
 
   <!-- CHANGELOG -->
-  <h2 id="changelog"><span class="accent">Changelog</span> — 3.1.1</h2>
+  <h2 id="changelog"><span class="accent">Changelog</span> — 3.1.2</h2>
 
+  <ul>
+    <li><strong>Fair deck wear</strong> — Cards are only worn by enchantments the decks actually brought in; anything the table would have rolled without decks no longer costs a card</li>
+    <li><strong>Rarity wildcard wear</strong> — Only rare enchantments (Fortune, Looting, Silk Touch, Thorns…) wear its Curse cards</li>
+    <li><strong>Influence mark</strong> — Enchanting Table options changed by the decks show a small card and an <em>Influenced by card decks</em> tooltip line</li>
+  </ul>
+
+  <h3>3.1.1</h3>
   <ul>
     <li><strong>Translatable tooltips</strong> — Module tooltips in the Selector, Transfer Table and Infusion Coil screens (empty sockets, directions, XP level, Idle/Infusing) are no longer hardcoded in English</li>
     <li><strong>New languages</strong> — Simplified Chinese (zh_cn), Brazilian Portuguese (pt_br) and Russian (ru_ru)</li>
