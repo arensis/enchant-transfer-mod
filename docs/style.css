@@ -625,3 +625,18 @@ hr.sep {
   .feature-card p { font-size: 0.8rem; }
   .header-logo { width: 72px; height: 72px; }
 }
+
+/* Changelog: versions older than the current minor series */
+.changelog-older {
+  margin-top: 1.5rem;
+}
+
+.changelog-older summary {
+  cursor: pointer;
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.changelog-older summary:hover {
+  color: var(--text-bright);
+}
