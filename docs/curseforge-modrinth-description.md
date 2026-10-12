@@ -4,7 +4,7 @@
 
 <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;">
 
-<img src="https://img.shields.io/badge/version-3.1.0-d2962a" alt="Version">
+<img src="https://img.shields.io/badge/version-3.1.1-d2962a" alt="Version">
 <img src="https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft">
 <img src="https://img.shields.io/badge/fabric_loader-%E2%89%A50.19.3_%7C_%E2%89%A50.19.2-dbd0b4" alt="Fabric">
 <img src="https://img.shields.io/badge/java-25_%7C_21-ED8B00?logo=openjdk&logoColor=white" alt="Java">
