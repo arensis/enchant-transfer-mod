@@ -35,6 +35,9 @@ public class DeckLecternScreen extends AbstractContainerScreen<DeckLecternScreen
 
     private static final int TITLE_COL = 0xFF3A2008;
 
+    // Gem tooltip wraps at this width so long translations don't run off-screen
+    private static final int TOOLTIP_MAX_WIDTH = 200;
+
     public DeckLecternScreen(DeckLecternScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title, BG_W, BG_H);
     }
@@ -80,7 +83,7 @@ public class DeckLecternScreen extends AbstractContainerScreen<DeckLecternScreen
             String key = menu.isActive() ? "enchanttransfer.deck_lectern.active"
                     : menu.hasCards() ? "enchanttransfer.deck_lectern.inactive"
                     : "enchanttransfer.deck_lectern.no_cards";
-            ctx.setTooltipForNextFrame(font, Component.translatable(key), mouseX, mouseY);
+            ctx.setTooltipForNextFrame(font, font.split(Component.translatable(key), TOOLTIP_MAX_WIDTH), mouseX, mouseY);
         }
     }
 
