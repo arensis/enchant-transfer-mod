@@ -6,6 +6,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 
+import java.util.Locale;
+
 /**
  * Pixel-art helpers for drawing circular GUI dots in the Transfer-Table and
  * Infusion-Coil nav rows.
@@ -40,6 +42,14 @@ public final class NavDotRenderer {
             case DOWN  -> "down";
         };
         return Component.translatable("enchanttransfer.direction." + key);
+    }
+
+    /**
+     * Localised full name for a Direction (e.g. "North"), used in tooltips
+     * where the short {@link #dirLabel} glyph would be ambiguous.
+     */
+    public static Component dirName(Direction dir) {
+        return Component.translatable("enchanttransfer.direction_name." + dir.name().toLowerCase(Locale.ROOT));
     }
 
     /** Fills a circular disk centred at ({@code cx}, {@code cy}) with half-extent {@code r}. */

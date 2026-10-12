@@ -30,7 +30,7 @@ awk '
   | sed -E "s#([\"'(])(\./)?docs/images/#\1${RAW_BASE}#g" \
   | sed -E 's#\[!\[([^]]*)\]\(([^)]*)\)\]\(([^)]*)\)#<a href="\3"><img src="\2" alt="\1"></a>#g' \
   | sed -E 's#!\[([^]]*)\]\(([^)]*)\)#<img src="\2" alt="\1">#g' \
-  | sed -E ':a; s#(https://img\.shields\.io/[^" ]*)≥#\1%E2%89%A5#; ta' \
+  | sed -E -e ':a' -e 's#(https://img\.shields\.io/[^" ]*)≥#\1%E2%89%A5#' -e 'ta' \
   > "$TARGET"
 
 echo "Generated ${TARGET#"$ROOT_DIR"/}"

@@ -3,6 +3,7 @@ package net.alfonsormadrid.enchanttransfer.screens.selector;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockEntity;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
+import net.alfonsormadrid.enchanttransfer.screens.ModuleTooltips;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -334,26 +335,14 @@ public class SelectorScreen extends Screen {
             int cx = bgX + s[0], cy = bgY + s[1];
             if (!hovered(mouseX, mouseY, cx, cy, SOCKET_R)) continue;
             Direction dir = e.getKey();
-            String dirName = dir.name();
             BlockPos nbPos = tablePos.relative(dir);
             if (minecraft.level.getBlockState(nbPos).getBlock() != EnchantTransferMod.INFUSION_COIL_BLOCK) {
-                ctx.setTooltipForNextFrame(minecraft.font,
-                        Component.literal("§7Empty (" + dirName + ")"),
-                        mouseX, mouseY);
+                ctx.setTooltipForNextFrame(minecraft.font, ModuleTooltips.empty(dir), mouseX, mouseY);
                 return;
             }
-            String stateS = "§aIdle";
-            String levelS = "?";
-            var be = minecraft.level.getBlockEntity(nbPos);
-            if (be instanceof InfusionCoilBlockEntity coil) {
-                stateS = coil.isProcessing() ? "§eInfusing" : "§aIdle";
-                levelS = coil.getStored() + " / " + coil.getCapacity() + " XP";
-            }
-            ctx.setComponentTooltipForNextFrame(minecraft.font, List.of(
-                    Component.literal("§fInfusion Coil §7(" + dirName + ")"),
-                    Component.literal("§7" + levelS),
-                    Component.literal(stateS)
-            ), mouseX, mouseY);
+            var coil = minecraft.level.getBlockEntity(nbPos) instanceof InfusionCoilBlockEntity c ? c : null;
+            ctx.setComponentTooltipForNextFrame(minecraft.font,
+                    ModuleTooltips.infusionCoil(dir, coil, false), mouseX, mouseY);
             return;
         }
     }

@@ -5,6 +5,7 @@ import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlockE
 import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilSlotPositions;
 import net.alfonsormadrid.enchanttransfer.gui.infusioncoil.InfusionCoilGuiMetrics;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
+import net.alfonsormadrid.enchanttransfer.screens.ModuleTooltips;
 import net.alfonsormadrid.enchanttransfer.screens.NavDotRenderer;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -423,7 +424,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
         if (mouseX >= tankX && mouseX < tankX + InfusionCoilGuiMetrics.TANK_WIDTH
                 && mouseY >= tankY && mouseY < tankY + InfusionCoilGuiMetrics.TANK_HEIGHT) {
             context.setTooltipForNextFrame(font,
-                    Component.literal(menu.getStoredXp() + " / " + menu.getTankCapacity() + " XP"),
+                    ModuleTooltips.xpLevel(menu.getStoredXp(), menu.getTankCapacity()),
                     mouseX, mouseY);
             return;
         }
@@ -441,7 +442,7 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
             context.setTooltipForNextFrame(font,
                     tablePos != null
                             ? Component.translatable("block.enchanttransfer.transfer_table_block")
-                            : Component.literal("§7Disconnected"),
+                            : ModuleTooltips.disconnected(),
                     mouseX, mouseY);
             return;
         }
@@ -451,33 +452,18 @@ public class InfusionCoilScreen extends AbstractContainerScreen<InfusionCoilScre
             int cx = x + NAV_X0 + i * NAV_STEP;
             if (sq(mouseX - cx) + sq(mouseY - hy) > hitR * hitR) continue;
             Direction dir = Direction.values()[i - 1];
-            String dirName = dir.name();
             if (tablePos == null) {
-                context.setTooltipForNextFrame(font,
-                        Component.literal("§7Empty (" + dirName + ")"),
-                        mouseX, mouseY);
+                context.setTooltipForNextFrame(font, ModuleTooltips.empty(dir), mouseX, mouseY);
                 return;
             }
             BlockPos nb = tablePos.relative(dir);
             if (!minecraft.level.getBlockState(nb).is(EnchantTransferMod.INFUSION_COIL_BLOCK)) {
-                context.setTooltipForNextFrame(font,
-                        Component.literal("§7Empty (" + dirName + ")"),
-                        mouseX, mouseY);
+                context.setTooltipForNextFrame(font, ModuleTooltips.empty(dir), mouseX, mouseY);
                 return;
             }
-            String state  = "§aIdle";
-            String levelS = "?";
-            String suffix = nb.equals(thisCoilPos) ? " §6(this)" : "";
-            var be = minecraft.level.getBlockEntity(nb);
-            if (be instanceof InfusionCoilBlockEntity coil) {
-                state  = coil.isProcessing() ? "§eInfusing" : "§aIdle";
-                levelS = coil.getStored() + " / " + coil.getCapacity() + " XP";
-            }
-            context.setComponentTooltipForNextFrame(font, java.util.List.of(
-                    Component.literal("§fInfusion Coil §7(" + dirName + ")" + suffix),
-                    Component.literal("§7" + levelS),
-                    Component.literal(state)
-            ), mouseX, mouseY);
+            var coil = minecraft.level.getBlockEntity(nb) instanceof InfusionCoilBlockEntity c ? c : null;
+            context.setComponentTooltipForNextFrame(font,
+                    ModuleTooltips.infusionCoil(dir, coil, nb.equals(thisCoilPos)), mouseX, mouseY);
             return;
         }
     }
