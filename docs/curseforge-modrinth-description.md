@@ -2,21 +2,13 @@
 
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;">
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;"></p>
 
-<p>
-<img src="https://img.shields.io/badge/version-3.1.2-d2962a" alt="Version">
-<img src="https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft">
-<img src="https://img.shields.io/badge/fabric_loader-%E2%89%A50.19.3_%7C_%E2%89%A50.19.2-dbd0b4" alt="Fabric">
-<img src="https://img.shields.io/badge/java-25_%7C_21-ED8B00?logo=openjdk&logoColor=white" alt="Java">
-<img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey" alt="License">
-<a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"><img src="https://img.shields.io/curseforge/dt/1540807?logo=curseforge&label=curseforge&color=F16436" alt="CurseForge"></a>
-<a href="https://modrinth.com/mod/enchant-transfer"><img src="https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&label=modrinth&color=00AF5C" alt="Modrinth"></a>
-</p>
+<p><img src="https://img.shields.io/badge/version-3.1.2-d2962a" alt="Version"> <img src="https://img.shields.io/badge/minecraft-26.2%20%7C%201.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft"> <img src="https://img.shields.io/badge/fabric%20loader-0.19.3%20%7C%200.19.2-dbd0b4" alt="Fabric"> <img src="https://img.shields.io/badge/java-25%20%7C%2021-ED8B00?logo=openjdk&logoColor=white" alt="Java"> <img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey" alt="License"> <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"><img src="https://img.shields.io/curseforge/dt/1540807?logo=curseforge&label=curseforge&color=F16436" alt="CurseForge"></a> <a href="https://modrinth.com/mod/enchant-transfer"><img src="https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&label=modrinth&color=00AF5C" alt="Modrinth"></a></p>
 
-**Extract, transfer, and combine enchantments through Magic Cards — now with colored cards, attachable modules, and an XP conversion system.**
+<p><strong>Extract, transfer, and combine enchantments through Magic Cards — now with colored cards, attachable modules, and an XP conversion system.</strong></p>
 
-[Website](https://arensis.github.io/enchant-transfer-mod/) · [CurseForge](https://www.curseforge.com/minecraft/mc-mods/enchant-transfer) · [Modrinth](https://modrinth.com/mod/enchant-transfer) · [Issues](https://github.com/arensis/enchant-transfer-mod/issues)
+<p><a href="https://arensis.github.io/enchant-transfer-mod/">Website</a> · <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a> · <a href="https://modrinth.com/mod/enchant-transfer">Modrinth</a> · <a href="https://github.com/arensis/enchant-transfer-mod/issues">Issues</a></p>
 
 </div>
 
@@ -64,7 +56,7 @@ All Transfer Table operations — extraction, application, and combination — a
 
 ## Typed Magic Cards
 
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_blue.png" width="48" style="image-rendering: pixelated;" alt="Blue Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_green.png" width="48" style="image-rendering: pixelated;" alt="Green Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_red.png" width="48" style="image-rendering: pixelated;" alt="Red Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_yellow.png" width="48" style="image-rendering: pixelated;" alt="Yellow Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_purple.png" width="48" style="image-rendering: pixelated;" alt="Purple Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_black.png" width="48" style="image-rendering: pixelated;" alt="Black Card">
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_blue.png" width="48" style="image-rendering: pixelated;" alt="Blue Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_green.png" width="48" style="image-rendering: pixelated;" alt="Green Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_red.png" width="48" style="image-rendering: pixelated;" alt="Red Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_yellow.png" width="48" style="image-rendering: pixelated;" alt="Yellow Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_purple.png" width="48" style="image-rendering: pixelated;" alt="Purple Card"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_black.png" width="48" style="image-rendering: pixelated;" alt="Black Card"></p>
 
 Magic Cards are now color-coded by enchantment category. When you extract an enchantment, the Transfer Table automatically produces a card of the matching color.
 
@@ -81,7 +73,7 @@ Magic Cards are now color-coded by enchantment category. When you extract an enc
 
 ## Card Decks
 
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_blue.png" width="37" alt="Protection Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_green.png" width="37" alt="Nature Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_red.png" width="37" alt="Combat Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_yellow.png" width="37" alt="Utility Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_purple.png" width="37" alt="Arcane Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_rare.png" width="37" alt="Rarity Deck">
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_blue.png" width="37" alt="Protection Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_green.png" width="37" alt="Nature Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_red.png" width="37" alt="Combat Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_yellow.png" width="37" alt="Utility Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_purple.png" width="37" alt="Arcane Deck"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_rare.png" width="37" alt="Rarity Deck"></p>
 
 A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place decks in a **Deck Lectern** within an Enchanting Table's normal bookshelf range (same positions and air gap as regular bookshelves, but **at the table's own height**) and the table's rolls shift according to what you've stored.
 
@@ -98,7 +90,7 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/leather.png" width="32" alt="Leather"><br>Leather | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_red.png" width="32" alt="Card of the deck's type"><br>Card of the deck's type | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/leather.png" width="32" alt="Leather"><br>Leather |
 |   | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot |   |
 
-→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_red.png" width="42" alt="Card Deck"> **Card Deck** × 1 — the card is consumed and sets the deck's type (Rarity: a Curse card)
+<p>→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/card_deck_red.png" width="42" alt="Card Deck"> <strong>Card Deck</strong> × 1 — the card is consumed and sets the deck's type (Rarity: a Curse card)</p>
 
 ### How it works
 
@@ -115,7 +107,7 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 
 ### Deck Lectern
 
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_deck_lectern.png" width="114" alt="Deck Lectern">
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_deck_lectern.png" width="114" alt="Deck Lectern"></p>
 
 The block that holds your decks: a low brass base with a tilted velvet tray for **3 decks**, under a glass bell.
 
@@ -132,7 +124,7 @@ The block that holds your decks: a low brass base with a tilted velvet tray for 
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone"><br>Redstone | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/oak_planks.png" width="32" alt="Planks"><br>Planks | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/oak_planks.png" width="32" alt="Planks"><br>Planks | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/oak_planks.png" width="32" alt="Planks"><br>Planks |
 
-→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_deck_lectern.png" width="61" alt="Deck Lectern"> **Deck Lectern** × 1
+<p>→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_deck_lectern.png" width="61" alt="Deck Lectern"> <strong>Deck Lectern</strong> × 1</p>
 
 ---
 
@@ -147,11 +139,7 @@ The Transfer Table now works as a **hub**. Specialized module blocks can be plac
 
 ### GUI Screens
 
-<p>
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_selector.png" width="200" alt="Selector Screen">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_core.png" width="200" alt="Core Screen">
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_infusor.jpg" width="200" alt="Infusor Screen">
-</p>
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_selector.png" width="200" alt="Selector Screen"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_core.png" width="200" alt="Core Screen"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_infusor.jpg" width="200" alt="Infusor Screen"></p>
 
 *From left to right: Selector (hub with module sockets), Transfer Table Core (enchantment operations), Infusion Coil (XP conversion). Dynamic elements like wires, tank fills, and module icons are drawn by code on top of these backgrounds.*
 
@@ -179,7 +167,7 @@ Unenchanted cards yield a minimum of 5 XP; enchanted cards yield more based on t
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/glass_block.png" width="32" alt="Glass Block"><br>Glass Block | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
 
-→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_infusion_coil.png" width="46" alt="Infusion Coil"> **Infusion Coil** × 1
+<p>→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_infusion_coil.png" width="46" alt="Infusion Coil"> <strong>Infusion Coil</strong> × 1</p>
 
 ---
 
@@ -189,7 +177,7 @@ A standalone steampunk furnace for zinc processing and brass alloy creation. An 
 
 ### New Materials
 
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_oxide.png" width="48" style="image-rendering: pixelated;" alt="Zinc Oxide"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_sheet.png" width="48" style="image-rendering: pixelated;" alt="Zinc Sheet"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="48" style="image-rendering: pixelated;" alt="Brass Ingot">
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_oxide.png" width="48" style="image-rendering: pixelated;" alt="Zinc Oxide"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/zinc_sheet.png" width="48" style="image-rendering: pixelated;" alt="Zinc Sheet"> <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="48" style="image-rendering: pixelated;" alt="Brass Ingot"></p>
 
 ### Processing Chain
 
@@ -209,7 +197,7 @@ Three smelting recipes form a material chain that produces **Brass Ingots** — 
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/glass_pane.png" width="32" alt="Glass Pane"><br>Glass Pane | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/blast_furnace.png" width="32" alt="Blast Furnace"><br>Blast Furnace | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
 
-→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_zinc_smelter.png" width="59" alt="Zinc Smelter"> **Zinc Smelter** × 1
+<p>→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_zinc_smelter.png" width="59" alt="Zinc Smelter"> <strong>Zinc Smelter</strong> × 1</p>
 
 ### Fuel
 
@@ -217,7 +205,7 @@ The Zinc Smelter only accepts **Lava Buckets** and **Blaze Rods** as fuel — no
 
 ### GUI
 
-<img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_zinc_smelter.jpg" width="200" alt="Zinc Smelter GUI">
+<p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gui_zinc_smelter.jpg" width="200" alt="Zinc Smelter GUI"></p>
 
 *Steampunk-themed interface with copper input slots, a lava-bordered fuel slot, and brass output slot.*
 
@@ -233,7 +221,7 @@ The Zinc Smelter only accepts **Lava Buckets** and **Blaze Rods** as fuel — no
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone Dust"><br>Redstone Dust | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone Dust"><br>Redstone Dust | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone Dust"><br>Redstone Dust |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/coal.png" width="32" alt="Coal / Charcoal"><br>Coal / Charcoal | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/diamond.png" width="32" alt="Diamond"><br>Diamond | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/coal.png" width="32" alt="Coal / Charcoal"><br>Coal / Charcoal |
 
-→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_transfer_table.png" width="61" alt="Transfer Table"> **Transfer Table** × 1
+<p>→ <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/render_transfer_table.png" width="61" alt="Transfer Table"> <strong>Transfer Table</strong> × 1</p>
 
 Requires an **iron pickaxe** or better to mine (the same applies to the Infusion Coil and the Zinc Smelter).
 
@@ -249,7 +237,9 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.1.2
+## Changelog — 3.1.x
+
+### 3.1.2
 
 - **Card reserve** — Decks no longer lose whole cards at random: each card holds a reserve (its points) that marked enchantments wear down gradually, in proportion to the level obtained and to how much each deck kind boosted it. Options the decks can't pay for are disabled
 - **Exact bonus from max-level cards** — Every card favors its category; only max-level cards favor their exact enchantment

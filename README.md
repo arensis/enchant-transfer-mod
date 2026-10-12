@@ -251,7 +251,9 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.1.2
+## Changelog — 3.1.x
+
+### 3.1.2
 
 - **Card reserve** — Decks no longer lose whole cards at random: each card holds a reserve (its points) that marked enchantments wear down gradually, in proportion to the level obtained and to how much each deck kind boosted it. Options the decks can't pay for are disabled
 - **Exact bonus from max-level cards** — Every card favors its category; only max-level cards favor their exact enchantment
