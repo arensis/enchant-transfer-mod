@@ -28,6 +28,10 @@ public class CategoryDeckEffect implements DeckEffect {
     private static final double CATEGORY_BIAS = 2.0;
     private static final double EXACT_BIAS = 4.0;
 
+    /** Top of each part (full resonance, a single category / enchantment). */
+    public static final double MAX_CATEGORY_FACTOR = 1.0 + CATEGORY_BIAS;
+    public static final double MAX_EXACT_FACTOR = 1.0 + EXACT_BIAS;
+
     private final CardType category;
 
     public CategoryDeckEffect(CardType category) {
@@ -46,13 +50,26 @@ public class CategoryDeckEffect implements DeckEffect {
 
     @Override
     public double weightMultiplier(EnchantmentInstance candidate, LibraryProfile profile) {
-        int total = profile.getCategoryTotal();
-        if (total <= 0 || CardType.forEnchantment(candidate.enchantment()) != category) return 1.0;
+        if (CardType.forEnchantment(candidate.enchantment()) != category) return 1.0;
+        return categoryFactor(profile) * exactFactor(candidate.enchantment(), profile);
+    }
 
-        double resonance = Math.min(1.0, Math.sqrt(total / (double) FULL_RESONANCE_POINTS));
-        double categoryShare = profile.getCategoryPoints(category) / (double) total;
-        double enchantmentShare = profile.getMaxLevelEnchantmentPoints(candidate.enchantment()) / (double) total;
-        return (1.0 + CATEGORY_BIAS * resonance * categoryShare) * (1.0 + EXACT_BIAS * resonance * enchantmentShare);
+    /** The category part: how much more likely every enchantment of the category is. */
+    public double categoryFactor(LibraryProfile profile) {
+        int total = profile.getCategoryTotal();
+        if (total <= 0) return 1.0;
+        return 1.0 + CATEGORY_BIAS * resonance(total) * profile.getCategoryPoints(category) / (double) total;
+    }
+
+    /** The exact part for {@code enchantment}, on top of {@link #categoryFactor}. */
+    public double exactFactor(Holder<Enchantment> enchantment, LibraryProfile profile) {
+        int total = profile.getCategoryTotal();
+        if (total <= 0) return 1.0;
+        return 1.0 + EXACT_BIAS * resonance(total) * profile.getMaxLevelEnchantmentPoints(enchantment) / (double) total;
+    }
+
+    private static double resonance(int total) {
+        return Math.min(1.0, Math.sqrt(total / (double) FULL_RESONANCE_POINTS));
     }
 
     @Override

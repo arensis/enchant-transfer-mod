@@ -122,7 +122,7 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 The block that holds your decks: a low brass base with a tilted velvet tray for **3 decks**, under a glass bell.
 
 - **Placement**: only counts **at the same height as the enchanting table**. Its glass bell fills the whole column, so **nothing can be placed on top of it** (and it can't go under a block) — that's why it's worth two bookshelves.
-- **Right-click** opens a small screen with 3 deck slots.
+- **Right-click** opens a small screen with 3 deck slots. Hovering the amethyst gem shows what the lectern gives a table on its own, next to each maximum: each category's and max-level enchantment's factor, the power and the wear reserve.
 - **Lamps**: one per slot — dark brown (no deck), light (deck without cards), emerald (deck with cards).
 - **Off by default.** Shift + right-click switches it on (it needs at least one deck with cards) or off, so you choose which lecterns count; the amethyst on top of the bell glows while it's on. It switches itself off when its decks run out of cards, but never on.
 - While active, runes fly from the lectern to the enchanting table, like with bookshelves.
@@ -258,6 +258,7 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 - **Rarity wildcard** — Only favors and is only worn by rare enchantments (Fortune, Looting, Silk Touch, Thorns…)
 - **Stronger deck bonus** — The category part and the exact-enchantment part now multiply (category up to ×3, exact up to ×15 in all), and strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck
 - **Deck screen** — Right-click with a deck in hand to open it and organize its cards at a glance; the deck's tooltip shows its reserve and each worn card's
+- **Lectern contribution** — The amethyst gem's tooltip in the lectern screen shows what its decks give a table, next to each maximum
 - **Deck Lectern = two bookshelves** — A full lectern now counts as the two bookshelves stacked in its column. It only counts at the table's own height, and nothing can be placed on top of it
 - **Influence mark** — Enchanting Table options changed by the decks show a small card and an "Influenced by card decks" tooltip line
 

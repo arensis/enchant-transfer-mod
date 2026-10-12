@@ -76,5 +76,13 @@
   "enchanttransfer.deck.gui.points_value": "Aporte a la mesa: %s/%s puntos",
   "enchanttransfer.deck.gui.points_hint": "Cuantos más puntos, más favorece la mesa la categoría de la baraja (al máximo con 64)",
   "enchanttransfer.deck.gui.reserve_value": "Reserva de desgaste: %s / %s",
-  "enchanttransfer.deck.gui.reserve_hint": "Se gasta al encantar una opción marcada por las barajas"
+  "enchanttransfer.deck.gui.reserve_hint": "Se gasta al encantar una opción marcada por las barajas",
+  "enchanttransfer.lectern.contribution": "Aporta a la mesa (solo este atril):",
+  "enchanttransfer.lectern.contribution_off": "Aportaría a la mesa al encenderlo (solo este atril):",
+  "enchanttransfer.lectern.category": "  %s ×%s (máx. ×%s)",
+  "enchanttransfer.lectern.exact": "    %s ×%s (máx. ×%s)",
+  "enchanttransfer.lectern.rarity": "  Encantamientos raros (peso ≤ 2): hasta ×%s (máx. ×%s)",
+  "enchanttransfer.lectern.power": "  Poder: %s librerías (máx. %s)",
+  "enchanttransfer.lectern.combined": "En la mesa se combina con los demás atriles a su alrededor",
+  "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)"
 }

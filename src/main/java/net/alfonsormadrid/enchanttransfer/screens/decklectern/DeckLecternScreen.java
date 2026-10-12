@@ -1,15 +1,39 @@
 package net.alfonsormadrid.enchanttransfer.screens.decklectern;
 
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
+import net.alfonsormadrid.enchanttransfer.blocks.decklectern.DeckLecternBlockEntity;
 import net.alfonsormadrid.enchanttransfer.blocks.decklectern.LampState;
+import net.alfonsormadrid.enchanttransfer.item.CardDeckItem;
+import net.alfonsormadrid.enchanttransfer.item.CardWear;
+import net.alfonsormadrid.enchanttransfer.item.DeckContents;
+import net.alfonsormadrid.enchanttransfer.item.DeckKind;
+import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
+import net.alfonsormadrid.enchanttransfer.library.CategoryDeckEffect;
+import net.alfonsormadrid.enchanttransfer.library.DeckCardStorage;
+import net.alfonsormadrid.enchanttransfer.library.LibraryProfile;
+import net.alfonsormadrid.enchanttransfer.library.RarityDeckEffect;
+import net.alfonsormadrid.enchanttransfer.services.LibraryResonanceService;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 /**
  * GUI screen for the Deck Lectern: 3 deck slots, a lamp under each slot
@@ -83,8 +107,78 @@ public class DeckLecternScreen extends AbstractContainerScreen<DeckLecternScreen
             String key = menu.isActive() ? "enchanttransfer.deck_lectern.active"
                     : menu.hasCards() ? "enchanttransfer.deck_lectern.inactive"
                     : "enchanttransfer.deck_lectern.no_cards";
-            ctx.setTooltipForNextFrame(font, font.split(Component.translatable(key), TOOLTIP_MAX_WIDTH), mouseX, mouseY);
+            List<FormattedCharSequence> lines = new ArrayList<>(font.split(Component.translatable(key), TOOLTIP_MAX_WIDTH));
+            for (Component line : contribution()) lines.addAll(font.split(line, TOOLTIP_MAX_WIDTH));
+            ctx.setTooltipForNextFrame(font, lines, mouseX, mouseY);
         }
+    }
+
+    /**
+     * What this lectern's decks would give a table on their own, each next
+     * to its maximum: each category's factor, each max-level enchantment's
+     * (category · exact), the Rarity wildcard's top factor, the power and
+     * the wear reserve.  At a table they combine with every other lectern
+     * around it.
+     */
+    private List<Component> contribution() {
+        LibraryProfile profile = new LibraryProfile();
+        Map<DeckKind, Map<ResourceKey<Enchantment>, Holder<Enchantment>>> maxLevel = new EnumMap<>(DeckKind.class);
+        int decksWithCards = 0;
+        int reserve = 0;
+        for (int i = 0; i < DeckLecternBlockEntity.SLOT_COUNT; i++) {
+            ItemStack stack = menu.getSlot(i).getItem();
+            if (!(stack.getItem() instanceof CardDeckItem deck)) continue;
+            DeckContents contents = deck.getStorage(stack).getContents();
+            if (contents.isEmpty()) continue;
+            decksWithCards++;
+            reserve += contents.reserve();
+            profile.add(deck.getKind(), contents, BlockPos.ZERO, i);
+            for (ItemStack card : contents.stacks()) {
+                if (!CardWear.isMaxLevel(card)) continue;
+                MagicCardItem.enchantmentOf(card).ifPresent(e -> e.unwrapKey().ifPresent(k ->
+                        maxLevel.computeIfAbsent(deck.getKind(), x -> new LinkedHashMap<>()).putIfAbsent(k, e)));
+            }
+        }
+        if (decksWithCards == 0) return List.of();
+
+        List<Component> lines = new ArrayList<>();
+        lines.add(Component.translatable(menu.isActive() ? "enchanttransfer.lectern.contribution"
+                : "enchanttransfer.lectern.contribution_off").withStyle(ChatFormatting.GOLD));
+        for (DeckKind kind : profile.getPresentKinds()) {
+            if (kind.effect() instanceof CategoryDeckEffect category) {
+                double factor = category.categoryFactor(profile);
+                lines.add(Component.translatable("enchanttransfer.lectern.category",
+                        Component.translatable("enchanttransfer.card_category." + category.getCategory().categoryKey()),
+                        factor(factor), factor(CategoryDeckEffect.MAX_CATEGORY_FACTOR)).withStyle(ChatFormatting.GRAY));
+                for (Holder<Enchantment> e : maxLevel.getOrDefault(kind, Map.of()).values()) {
+                    lines.add(Component.translatable("enchanttransfer.lectern.exact",
+                            Enchantment.getFullname(e, e.value().getMaxLevel()),
+                            factor(factor * category.exactFactor(e, profile)),
+                            factor(CategoryDeckEffect.MAX_CATEGORY_FACTOR * CategoryDeckEffect.MAX_EXACT_FACTOR))
+                            .withStyle(ChatFormatting.GRAY));
+                }
+            } else if (kind.effect() instanceof RarityDeckEffect rarity) {
+                lines.add(Component.translatable("enchanttransfer.lectern.rarity",
+                        factor(rarity.factorFor(1, profile)), factor(RarityDeckEffect.MAX_FACTOR)).withStyle(ChatFormatting.GRAY));
+            }
+        }
+        double power = decksWithCards * LibraryResonanceService.POWER_PER_STEP
+                / (double) LibraryResonanceService.DECKS_PER_POWER_STEP;
+        double maxPower = DeckLecternBlockEntity.SLOT_COUNT * LibraryResonanceService.POWER_PER_STEP
+                / (double) LibraryResonanceService.DECKS_PER_POWER_STEP;
+        lines.add(Component.translatable("enchanttransfer.lectern.power", factor(power), factor(maxPower))
+                .withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("enchanttransfer.lectern.reserve", CardWear.format(reserve),
+                CardWear.format(DeckLecternBlockEntity.SLOT_COUNT * DeckCardStorage.CAPACITY_POINTS * CardWear.UNITS_PER_POINT))
+                .withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("enchanttransfer.lectern.combined").withStyle(ChatFormatting.DARK_GRAY));
+        return lines;
+    }
+
+    /** "3", "1.5", "2.4": one decimal, dropped when it's .0. */
+    private static String factor(double value) {
+        String s = String.format(Locale.ROOT, "%.1f", value);
+        return s.endsWith(".0") ? s.substring(0, s.length() - 2) : s;
     }
 
     private static int lampColor(LampState state) {

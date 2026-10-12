@@ -20,6 +20,9 @@ public class RarityDeckEffect extends WildcardDeckEffect {
 
     private static final double MAX_BIAS = 2.0;
 
+    /** Top factor: full strength, weight 1. */
+    public static final double MAX_FACTOR = 1.0 + MAX_BIAS;
+
     /** Highest weight that counts as rare: Fortune, Looting (2), Silk Touch, Thorns (1)… */
     private static final int RARE_WEIGHT = 2;
 
@@ -35,10 +38,15 @@ public class RarityDeckEffect extends WildcardDeckEffect {
 
     @Override
     public double weightMultiplier(EnchantmentInstance candidate, LibraryProfile profile) {
+        if (candidate.weight() > RARE_WEIGHT) return 1.0;
+        return factorFor(candidate.weight(), profile);
+    }
+
+    /** Factor for an enchantment of {@code weight}; the rarest (weight 1) get the most. */
+    public double factorFor(int weight, LibraryProfile profile) {
         double strength = strength(profile);
-        if (strength <= 0 || candidate.weight() > RARE_WEIGHT) return 1.0;
-        int weight = Math.clamp(candidate.weight(), 1, 10);
-        return 1.0 + MAX_BIAS * strength * (10 - weight) / 9.0;
+        if (strength <= 0) return 1.0;
+        return 1.0 + MAX_BIAS * strength * (10 - Math.clamp(weight, 1, 10)) / 9.0;
     }
 
     @Override
