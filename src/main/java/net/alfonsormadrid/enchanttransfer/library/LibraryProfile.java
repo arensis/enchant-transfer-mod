@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import net.alfonsormadrid.enchanttransfer.item.CardType;
+import net.alfonsormadrid.enchanttransfer.item.CardWear;
 import net.alfonsormadrid.enchanttransfer.item.DeckContents;
 import net.alfonsormadrid.enchanttransfer.item.DeckKind;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
@@ -37,7 +38,9 @@ public final class LibraryProfile {
 
     private final Map<DeckKind, Integer> pointsByKind = new EnumMap<>(DeckKind.class);
     private final Map<CardType, Integer> pointsByCategory = new EnumMap<>(CardType.class);
-    private final Map<ResourceKey<Enchantment>, Integer> pointsByEnchantment = new HashMap<>();
+    /** Points of max-level cards only: they're the ones that favor their exact enchantment. */
+    private final Map<ResourceKey<Enchantment>, Integer> maxLevelPointsByEnchantment = new HashMap<>();
+    private final Map<DeckKind, Integer> reserveByKind = new EnumMap<>(DeckKind.class);
     private final List<DeckLocation> locations = new ArrayList<>();
     private int categoryTotal;
     private List<AffinityRule> affinityRules = List.of();
@@ -50,13 +53,15 @@ public final class LibraryProfile {
         int points = contents.points();
         locations.add(new DeckLocation(libraryPos, slot, kind));
         pointsByKind.merge(kind, points, Integer::sum);
+        reserveByKind.merge(kind, contents.reserve(), Integer::sum);
 
         if (kind.effect() instanceof CategoryDeckEffect category) {
             categoryTotal += points;
             pointsByCategory.merge(category.getCategory(), points, Integer::sum);
             for (ItemStack card : contents.stacks()) {
+                if (!CardWear.isMaxLevel(card)) continue;
                 MagicCardItem.enchantmentOf(card).flatMap(Holder::unwrapKey).ifPresent(key ->
-                        pointsByEnchantment.merge(key, MagicCardItem.pointsOf(card) * card.getCount(), Integer::sum));
+                        maxLevelPointsByEnchantment.merge(key, MagicCardItem.pointsOf(card) * card.getCount(), Integer::sum));
             }
         }
     }
@@ -93,8 +98,24 @@ public final class LibraryProfile {
         return pointsByCategory.getOrDefault(category, 0);
     }
 
-    public int getEnchantmentPoints(Holder<Enchantment> enchantment) {
-        return enchantment.unwrapKey().map(key -> pointsByEnchantment.getOrDefault(key, 0)).orElse(0);
+    /** Points of max-level {@code enchantment} cards across category decks. */
+    public int getMaxLevelEnchantmentPoints(Holder<Enchantment> enchantment) {
+        return enchantment.unwrapKey().map(key -> maxLevelPointsByEnchantment.getOrDefault(key, 0)).orElse(0);
+    }
+
+    /** Wear reserve left across the decks of {@code kind}, in {@code CardWear} units. */
+    public int getReserve(DeckKind kind) {
+        return reserveByKind.getOrDefault(kind, 0);
+    }
+
+    /**
+     * Extra ({@code factor − 1}, with affinity) {@code kind} decks give
+     * {@code candidate}: its part of {@link #weightMultiplier}.
+     */
+    public double extra(DeckKind kind, EnchantmentInstance candidate) {
+        if (!pointsByKind.containsKey(kind)) return 0.0;
+        double factor = kind.effect().weightMultiplier(candidate, this);
+        return (factor - 1.0) * affinity(kind, candidate.enchantment());
     }
 
     // ── Aggregated effect views ─────────────────────────────────────────────
@@ -107,8 +128,7 @@ public final class LibraryProfile {
     public double weightMultiplier(EnchantmentInstance candidate) {
         double multiplier = 1.0;
         for (DeckKind kind : getPresentKinds()) {
-            double factor = kind.effect().weightMultiplier(candidate, this);
-            multiplier *= 1.0 + (factor - 1.0) * affinity(kind, candidate.enchantment());
+            multiplier *= 1.0 + extra(kind, candidate);
         }
         return multiplier;
     }

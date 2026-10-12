@@ -4,8 +4,9 @@ import net.alfonsormadrid.enchanttransfer.item.DeckKind;
 
 /**
  * Base for wildcard decks: they don't favor a category, they change how the
- * table rolls.  Their strength is the wildcard's fill around the table:
- * {@code min(1, points of this wildcard / 64)}.
+ * table rolls.  Their strength is the wildcard's fill around the table,
+ * on the same curve as a category deck's resonance:
+ * {@code min(1, √(points of this wildcard / 64))}.
  */
 public abstract class WildcardDeckEffect implements DeckEffect {
 
@@ -15,6 +16,6 @@ public abstract class WildcardDeckEffect implements DeckEffect {
     protected abstract DeckKind kind();
 
     protected double strength(LibraryProfile profile) {
-        return Math.min(1.0, profile.getPoints(kind()) / (double) FULL_WILDCARD_POINTS);
+        return Math.min(1.0, Math.sqrt(profile.getPoints(kind()) / (double) FULL_WILDCARD_POINTS));
     }
 }

@@ -67,5 +67,22 @@
   "block.enchanttransfer.deck_lectern": "Atril de barajas",
   "enchanttransfer.deck_lectern.active": "Encendido: aporta sus barajas a las mesas de encantamientos cercanas (Shift + clic derecho para apagarlo)",
   "enchanttransfer.deck_lectern.inactive": "Apagado: Shift + clic derecho para encenderlo",
-  "enchanttransfer.deck_lectern.no_cards": "Apagado: necesita una baraja con cartas para poder encenderlo"
+  "enchanttransfer.deck_lectern.no_cards": "Apagado: necesita una baraja con cartas para poder encenderlo",
+  "enchanttransfer.enchanting.deck_influenced": "Influido por las barajas",
+  "enchanttransfer.enchanting.no_reserve": "Las barajas no tienen reserva suficiente",
+  "enchanttransfer.card.reserve": "Reserva: %s / %s",
+  "enchanttransfer.deck.gui.points": "Aporte",
+  "enchanttransfer.deck.gui.reserve": "Reserva",
+  "enchanttransfer.deck.gui.points_value": "Aporte a la mesa: %s/%s puntos",
+  "enchanttransfer.deck.gui.points_hint": "Cuantos más puntos, más favorece la mesa la categoría de la baraja (al máximo con 64)",
+  "enchanttransfer.deck.gui.reserve_value": "Reserva de desgaste: %s / %s",
+  "enchanttransfer.deck.gui.reserve_hint": "Se gasta al encantar una opción marcada por las barajas",
+  "enchanttransfer.lectern.contribution": "Aporta a la mesa (solo este atril):",
+  "enchanttransfer.lectern.contribution_off": "Aportaría a la mesa al encenderlo (solo este atril):",
+  "enchanttransfer.lectern.category": "  %s ×%s (máx. ×%s)",
+  "enchanttransfer.lectern.exact": "    %s ×%s (máx. ×%s)",
+  "enchanttransfer.lectern.rarity": "  Encantamientos raros (peso ≤ 2): hasta ×%s (máx. ×%s)",
+  "enchanttransfer.lectern.power": "  Poder: %s librerías (máx. %s)",
+  "enchanttransfer.lectern.combined": "En la mesa se combina con los demás atriles a su alrededor",
+  "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)"
 }

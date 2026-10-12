@@ -1,14 +1,20 @@
 package net.alfonsormadrid.enchanttransfer.item;
 
 import java.util.Optional;
+import java.util.function.Consumer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Holder;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.Mth;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
@@ -36,6 +42,8 @@ import org.jetbrains.annotations.Nullable;
  * cada color registrado en {@code EnchantTransferMod}, no se almacena en NBT.
  */
 public class MagicCardItem extends Item {
+
+    private static final int BAR_WIDTH = 13;
 
     private final @Nullable CardType cardType;
 
@@ -83,6 +91,36 @@ public class MagicCardItem extends Item {
     public static int pointsOf(ItemStack stack) {
         int level = levelOf(stack);
         return level <= 0 ? 0 : 1 << Math.clamp(level - 1, 0, 10);
+    }
+
+    // ── Wear bar & tooltip (see CardWear) ───────────────────────────────
+
+    @Override
+    public boolean isBarVisible(ItemStack card) {
+        return CardWear.wornOf(card) > 0;
+    }
+
+    @Override
+    public int getBarWidth(ItemStack card) {
+        int reserve = CardWear.reserveOf(card);
+        return reserve <= 0 ? 0 : Math.round(BAR_WIDTH * (float) CardWear.remainingOf(card) / reserve);
+    }
+
+    @Override
+    public int getBarColor(ItemStack card) {
+        int reserve = CardWear.reserveOf(card);
+        float left = reserve <= 0 ? 0 : (float) CardWear.remainingOf(card) / reserve;
+        return Mth.hsvToRgb(left / 3.0F, 1.0F, 1.0F);
+    }
+
+    @Override
+    @SuppressWarnings("deprecation")
+    public void appendHoverText(ItemStack card, TooltipContext context, TooltipDisplay display,
+                                Consumer<Component> tooltip, TooltipFlag flag) {
+        if (CardWear.wornOf(card) <= 0) return;
+        tooltip.accept(Component.translatable("enchanttransfer.card.reserve",
+                CardWear.format(CardWear.remainingOf(card)), CardWear.format(CardWear.reserveOf(card)))
+                .withStyle(ChatFormatting.GRAY));
     }
 
     @Override

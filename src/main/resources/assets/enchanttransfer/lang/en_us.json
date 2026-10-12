@@ -67,5 +67,22 @@
   "block.enchanttransfer.deck_lectern": "Deck Lectern",
   "enchanttransfer.deck_lectern.active": "On: adds its decks to nearby enchanting tables (Shift + right-click to switch off)",
   "enchanttransfer.deck_lectern.inactive": "Off: Shift + right-click to switch it on",
-  "enchanttransfer.deck_lectern.no_cards": "Off: needs a deck with cards before it can be switched on"
+  "enchanttransfer.deck_lectern.no_cards": "Off: needs a deck with cards before it can be switched on",
+  "enchanttransfer.enchanting.deck_influenced": "Influenced by card decks",
+  "enchanttransfer.enchanting.no_reserve": "Not enough reserve in the card decks",
+  "enchanttransfer.card.reserve": "Reserve: %s / %s",
+  "enchanttransfer.deck.gui.points": "Contribution",
+  "enchanttransfer.deck.gui.reserve": "Reserve",
+  "enchanttransfer.deck.gui.points_value": "Contribution to the table: %s/%s points",
+  "enchanttransfer.deck.gui.points_hint": "The more points, the more the table favors this deck's category (in full at 64)",
+  "enchanttransfer.deck.gui.reserve_value": "Wear reserve: %s / %s",
+  "enchanttransfer.deck.gui.reserve_hint": "Worn down when you enchant an option marked by the decks",
+  "enchanttransfer.lectern.contribution": "Gives the table (this lectern alone):",
+  "enchanttransfer.lectern.contribution_off": "Would give the table once on (this lectern alone):",
+  "enchanttransfer.lectern.category": "  %s ×%s (max ×%s)",
+  "enchanttransfer.lectern.exact": "    %s ×%s (max ×%s)",
+  "enchanttransfer.lectern.rarity": "  Rare enchantments (weight ≤ 2): up to ×%s (max ×%s)",
+  "enchanttransfer.lectern.power": "  Power: %s bookshelves (max %s)",
+  "enchanttransfer.lectern.combined": "At a table it combines with the other lecterns around it",
+  "enchanttransfer.lectern.reserve": "  Wear reserve: %s (max %s)"
 }

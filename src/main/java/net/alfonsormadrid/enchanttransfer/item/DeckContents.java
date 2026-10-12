@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -79,24 +78,58 @@ public record DeckContents(List<ItemStackTemplate> cards) {
         return cards.isEmpty() ? this : new DeckContents(cards.subList(0, cards.size() - 1));
     }
 
-    /** Removes a single card: the cheapest one matching {@code filter}. */
-    public Optional<DeckContents> withoutOneCard(Predicate<ItemStack> filter) {
+    /** Result of {@link #wear}: the new contents and the wear left to apply elsewhere. */
+    public record Worn(DeckContents contents, int leftover) {
+    }
+
+    /** Reserve left across the stored cards, in {@link CardWear} units. */
+    public int reserve() {
+        return stacks().stream().mapToInt(s -> CardWear.remainingOf(s) * s.getCount()).sum();
+    }
+
+    /**
+     * Wears {@code units} off the stored cards, one card at a time: first a
+     * card already worn, else the lowest-level one.  A card whose reserve
+     * runs out is removed and the rest moves on to the next card.
+     */
+    public Worn wear(int units) {
+        List<ItemStackTemplate> out = new ArrayList<>(cards);
+        while (units > 0) {
+            int i = nextToWear(out);
+            if (i < 0) break;
+            ItemStackTemplate t = out.get(i);
+            ItemStack card = t.create().copyWithCount(1);
+            int left = CardWear.remainingOf(card);
+            if (t.count() > 1) out.set(i, t.withCount(t.count() - 1));
+            else out.remove(i);
+            if (units >= left) {
+                units -= left;
+                continue;
+            }
+            CardWear.setWorn(card, CardWear.wornOf(card) + units);
+            units = 0;
+            // Back in the same place, so the deck keeps its insertion order.
+            out.add(i, ItemStackTemplate.fromNonEmptyStack(card));
+        }
+        return new Worn(new DeckContents(out), units);
+    }
+
+    private static int nextToWear(List<ItemStackTemplate> cards) {
         int best = -1;
+        boolean bestWorn = false;
         int bestPoints = Integer.MAX_VALUE;
         for (int i = 0; i < cards.size(); i++) {
             ItemStack card = cards.get(i).create();
+            if (CardWear.remainingOf(card) <= 0) continue;
+            boolean worn = CardWear.wornOf(card) > 0;
             int points = MagicCardItem.pointsOf(card);
-            if (filter.test(card) && points < bestPoints) {
+            if (best < 0 || (worn && !bestWorn) || (worn == bestWorn && points < bestPoints)) {
                 best = i;
+                bestWorn = worn;
                 bestPoints = points;
             }
         }
-        if (best < 0) return Optional.empty();
-        List<ItemStackTemplate> out = new ArrayList<>(cards);
-        ItemStackTemplate t = out.get(best);
-        if (t.count() > 1) out.set(best, t.withCount(t.count() - 1));
-        else out.remove(best);
-        return Optional.of(new DeckContents(out));
+        return best;
     }
 
     /** Stacks ordered from most to least valuable, for the tooltip. */

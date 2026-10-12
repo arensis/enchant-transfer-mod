@@ -85,12 +85,12 @@ Magic Cards are now color-coded by enchantment category. When you extract an enc
 
 <img src="docs/images/card_deck_blue.png" width="37" alt="Protection Deck"> <img src="docs/images/card_deck_green.png" width="37" alt="Nature Deck"> <img src="docs/images/card_deck_red.png" width="37" alt="Combat Deck"> <img src="docs/images/card_deck_yellow.png" width="37" alt="Utility Deck"> <img src="docs/images/card_deck_purple.png" width="37" alt="Arcane Deck"> <img src="docs/images/card_deck_rare.png" width="37" alt="Rarity Deck">
 
-A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place decks in a **Deck Lectern** within an Enchanting Table's normal bookshelf range (same positions and air gap as regular bookshelves) and the table's rolls shift according to what you've stored.
+A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place decks in a **Deck Lectern** within an Enchanting Table's normal bookshelf range (same positions and air gap as regular bookshelves, but **at the table's own height**) and the table's rolls shift according to what you've stored.
 
 | Deck | Stores | Effect on nearby Enchanting Tables |
 |------|--------|-----------------------------------|
 | Protection / Nature / Combat / Utility / Arcane | Cards of that color | Favors that category, and even more the exact enchantments stored |
-| Rarity (wildcard) | Curse cards | Favors rare (low-weight) enchantments |
+| Rarity (wildcard) | Curse cards | Favors rare enchantments (weight ≤ 2) |
 
 ### Crafting Recipe
 
@@ -105,11 +105,15 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 ### How it works
 
 - **Storing**: right-click a card onto the deck (or the deck onto a card), like a bundle. Right-click with an empty cursor to take the last stack back out.
+- **Deck screen**: right-click with a deck in hand to open it — its cards in a grid, with a points bar and a reserve bar — and move cards in and out at a glance (Shift + click works). The 64-point limit still applies. The deck's tooltip also shows its reserve and each worn card's.
 - **Points**: a level N card is worth 2^(N-1) points (same ratio as combining). Each deck holds up to 64 points.
-- **Enchanting power**: every 3 decks holding cards count as one bookshelf (a full Deck Lectern = 1 bookshelf). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves.
-- **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its enchantments up to ×3 more likely.
+- **Enchanting power**: a full Deck Lectern counts as **two bookshelves** — the two that would stack in its column (every 3 decks holding cards = 2 bookshelves). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves; 8 full lecterns alone reach level 30.
+- **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its category up to ×3 more likely. Every card favors its category; only max-level cards (Efficiency V, Fortune III, Silk Touch I…) also favor their exact enchantment, up to ×15 in all. Strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck (64 points); more decks don't raise it further, but add reserve and power.
 - **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers and Fortune/Silk Touch ×1.5 in forests, jungles and taigas. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
-- **Wear**: each enchantment helped by the library has a 20% chance to consume one card (the cheapest) from a matching deck.
+- **Wear**: decks pay, in card reserve, only for what their bonus brings in — not for what the table would have rolled anyway, nor for what comes from the decks' power. Each card holds as much reserve as the points it takes (a level V card holds 16, so a full deck always holds 64); worn cards show it as a bar. Each marked enchantment costs 20% of a max-level card of it, scaled by the level obtained (Efficiency V: 3.2, Efficiency III: 1.92, Silk Touch I: 0.2): in full when max-level cards of it are in the decks, half for a category or Rarity bonus. It's split among the deck kinds that boosted it, in proportion to their boost, and taken first from a card already started, then from the lowest-level ones. An option the decks can't pay for is disabled. Worn cards work normally at the Transfer Table, and combining two adds up what they had left.
+- **Influence mark**: options changed by the decks show a small card in their top-right corner and an *Influenced by card decks* line in their tooltip.
+
+> **No marks? That's normal.** Decks tilt the odds, they don't pick for the table: when it would have rolled the same enchantment anyway, the option isn't marked and costs no card. Some rolls show no marks at all — you'll see more with fuller, more specialized decks and higher table levels. The rolls only change after you enchant something, so re-placing the item shows the same options.
 
 ### Deck Lectern
 
@@ -117,7 +121,8 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 
 The block that holds your decks: a low brass base with a tilted velvet tray for **3 decks**, under a glass bell.
 
-- **Right-click** opens a small screen with 3 deck slots.
+- **Placement**: only counts **at the same height as the enchanting table**. Its glass bell fills the whole column, so **nothing can be placed on top of it** (and it can't go under a block) — that's why it's worth two bookshelves.
+- **Right-click** opens a small screen with 3 deck slots. Hovering the amethyst gem shows what the lectern gives a table on its own, next to each maximum: each category's and max-level enchantment's factor, the power and the wear reserve.
 - **Lamps**: one per slot — dark brown (no deck), light (deck without cards), emerald (deck with cards).
 - **Off by default.** Shift + right-click switches it on (it needs at least one deck with cards) or off, so you choose which lecterns count; the amethyst on top of the bell glows while it's on. It switches itself off when its decks run out of cards, but never on.
 - While active, runes fly from the lectern to the enchanting table, like with bookshelves.
@@ -246,7 +251,18 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.1.1
+## Changelog — 3.1.2
+
+- **Card reserve** — Decks no longer lose whole cards at random: each card holds a reserve (its points) that marked enchantments wear down gradually, in proportion to the level obtained and to how much each deck kind boosted it. Options the decks can't pay for are disabled
+- **Exact bonus from max-level cards** — Every card favors its category; only max-level cards favor their exact enchantment
+- **Rarity wildcard** — Only favors and is only worn by rare enchantments (Fortune, Looting, Silk Touch, Thorns…)
+- **Stronger deck bonus** — The category part and the exact-enchantment part now multiply (category up to ×3, exact up to ×15 in all), and strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck
+- **Deck screen** — Right-click with a deck in hand to open it and organize its cards at a glance; the deck's tooltip shows its reserve and each worn card's
+- **Lectern contribution** — The amethyst gem's tooltip in the lectern screen shows what its decks give a table, next to each maximum
+- **Deck Lectern = two bookshelves** — A full lectern now counts as the two bookshelves stacked in its column. It only counts at the table's own height, and nothing can be placed on top of it
+- **Influence mark** — Enchanting Table options changed by the decks show a small card and an "Influenced by card decks" tooltip line
+
+### 3.1.1
 
 - **Translatable tooltips** — Module tooltips in the Selector, Transfer Table and Infusion Coil screens (empty sockets, directions, XP level, Idle/Infusing) are no longer hardcoded in English
 - **New languages** — Simplified Chinese (zh_cn), Brazilian Portuguese (pt_br) and Russian (ru_ru)

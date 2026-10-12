@@ -67,5 +67,22 @@
   "block.enchanttransfer.deck_lectern": "卡组讲台",
   "enchanttransfer.deck_lectern.active": "已开启：为附近的附魔台提供其卡组加成（Shift + 右键关闭）",
   "enchanttransfer.deck_lectern.inactive": "已关闭：Shift + 右键开启",
-  "enchanttransfer.deck_lectern.no_cards": "已关闭：需要放入装有卡牌的卡组才能开启"
+  "enchanttransfer.deck_lectern.no_cards": "已关闭：需要放入装有卡牌的卡组才能开启",
+  "enchanttransfer.enchanting.deck_influenced": "受卡组影响",
+  "enchanttransfer.enchanting.no_reserve": "卡组储备不足",
+  "enchanttransfer.card.reserve": "储备：%s / %s",
+  "enchanttransfer.deck.gui.points": "贡献",
+  "enchanttransfer.deck.gui.reserve": "储备",
+  "enchanttransfer.deck.gui.points_value": "对附魔台的贡献：%s/%s 点",
+  "enchanttransfer.deck.gui.points_hint": "点数越多，附魔台越偏向该卡组的类别（64 点时达到最大）",
+  "enchanttransfer.deck.gui.reserve_value": "磨损储备：%s / %s",
+  "enchanttransfer.deck.gui.reserve_hint": "附魔带有卡组标记的选项时消耗",
+  "enchanttransfer.lectern.contribution": "为附魔台提供（仅此讲台）：",
+  "enchanttransfer.lectern.contribution_off": "开启后将为附魔台提供（仅此讲台）：",
+  "enchanttransfer.lectern.category": "  %s ×%s（最高 ×%s）",
+  "enchanttransfer.lectern.exact": "    %s ×%s（最高 ×%s）",
+  "enchanttransfer.lectern.rarity": "  稀有附魔（权重 ≤ 2）：最高 ×%s（上限 ×%s）",
+  "enchanttransfer.lectern.power": "  能量：相当于 %s 个书架（最多 %s）",
+  "enchanttransfer.lectern.combined": "在附魔台旁会与周围其他讲台叠加",
+  "enchanttransfer.lectern.reserve": "  磨损储备：%s（最多 %s）"
 }
