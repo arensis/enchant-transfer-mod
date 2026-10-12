@@ -9,7 +9,8 @@
 #     CurseForge strips <details>/<summary>: entries from the current minor series
 #     (e.g. 3.1.0 under "Changelog — 3.1.1") stay, older ones become a link to the
 #     website's changelog
-#   - the <!-- AUTO:... --> markers used by sync-release-docs.py are removed
+#   - the <!-- AUTO:... --> markers used by sync-release-docs.py are removed; the
+#     badges' ones become a <p>, so CurseForge sets them apart from the logo
 #   - table alignment rows (|:-:|) become plain ones (|---|): CurseForge doesn't
 #     render tables with alignment colons
 #
@@ -26,6 +27,8 @@ RAW_BASE="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/
 # separator (plus the blank line after it), so the preceding separator leads
 # straight into the next section.
 awk '
+  /^[[:space:]]*<!-- AUTO:badges -->[[:space:]]*$/  { print "<p>"; next }
+  /^[[:space:]]*<!-- \/AUTO:badges -->[[:space:]]*$/ { print "</p>"; next }
   /^[[:space:]]*<!-- \/?AUTO:[a-z-]+ -->[[:space:]]*$/ { next }
   /^## For Developers[[:space:]]*$/ { skipping = 1; next }
   /^## Changelog — [0-9]+\.[0-9]+\./ {
