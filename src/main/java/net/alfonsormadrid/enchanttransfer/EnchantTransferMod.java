@@ -10,6 +10,7 @@ import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.zincsmelter.ZincSmelterBlockEntity;
 import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
 import net.alfonsormadrid.enchanttransfer.network.RequestOpenGuiPayload;
+import net.alfonsormadrid.enchanttransfer.screens.carddeck.CardDeckMenu;
 import net.alfonsormadrid.enchanttransfer.screens.decklectern.DeckLecternScreenHandler;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreenHandler;
 import net.alfonsormadrid.enchanttransfer.screens.zincsmelter.ZincSmelterScreenHandler;
@@ -36,10 +37,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -139,6 +142,12 @@ public class EnchantTransferMod implements ModInitializer {
 			Registry.register(BuiltInRegistries.MENU, DECK_LECTERN_IDENTIFIER,
 					new net.minecraft.world.inventory.MenuType<>(DeckLecternScreenHandler::new,
 							net.minecraft.world.flag.FeatureFlags.VANILLA_SET));
+
+	// Opened by right-clicking a Card Deck in hand; the hand tells both sides where the deck is.
+	public static final ExtendedMenuType<CardDeckMenu, InteractionHand> CARD_DECK_SCREEN_HANDLER =
+			Registry.register(BuiltInRegistries.MENU, Identifier.fromNamespaceAndPath(MOD_ID, "card_deck"),
+					new ExtendedMenuType<>(CardDeckMenu::new,
+							ByteBufCodecs.VAR_INT.map(i -> InteractionHand.values()[i], InteractionHand::ordinal)));
 
 	// ── Zinc Smelter ───────────────────────────────────────────────────────
 	public static final Identifier ZINC_SMELTER_BLOCK_IDENTIFIER = Identifier.fromNamespaceAndPath(MOD_ID, "zinc_smelter");

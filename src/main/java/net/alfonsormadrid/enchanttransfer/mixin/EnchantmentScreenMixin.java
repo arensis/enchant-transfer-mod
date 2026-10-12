@@ -22,7 +22,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /**
  * Marks the Enchanting Table options the Card Decks changed (see
  * {@link DeckInfluenceView}): a small deck card in the option's top-right
- * corner and an extra tooltip line.
+ * corner and an extra tooltip line.  Options the decks lack the reserve to
+ * pay for are dimmed and say why in the tooltip (the menu refuses them).
  * <p>
  * Option rows match vanilla: 108×19 at (60, 14 + 19·i).  The corner is free:
  * the glyph text wraps before it and the level cost sits at the bottom.
@@ -32,6 +33,8 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
 
     @Unique private static final int OPTION_X = 60, OPTION_Y = 14, OPTION_STEP = 19;
     @Unique private static final int OPTION_W = 108;
+
+    @Unique private static final int DIM = 0xA0101010;
 
     // Mark: 5×7 card, 2 px from the option's top-right corner
     @Unique private static final int MARK_W = 5, MARK_H = 7, MARK_INSET = 2;
@@ -46,6 +49,10 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
                                                     CallbackInfo ci) {
         for (int option = 0; option < 3; option++) {
             if (!enchanttransfer$isMarked(option)) continue;
+            if (enchanttransfer$lacksReserve(option)) {
+                int ox = leftPos + OPTION_X, oy = topPos + OPTION_Y + OPTION_STEP * option;
+                ctx.fill(ox + 1, oy + 1, ox + OPTION_W - 1, oy + OPTION_STEP - 1, DIM);
+            }
             int x = leftPos + OPTION_X + OPTION_W - MARK_INSET - MARK_W;
             int y = topPos + OPTION_Y + OPTION_STEP * option + MARK_INSET;
             ctx.fill(x, y, x + MARK_W, y + MARK_H, MARK_BORDER);
@@ -64,6 +71,10 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
             lines = new ArrayList<>(lines);
             lines.add(Component.translatable("enchanttransfer.enchanting.deck_influenced")
                     .withStyle(ChatFormatting.LIGHT_PURPLE));
+            if (enchanttransfer$lacksReserve(option)) {
+                lines.add(Component.translatable("enchanttransfer.enchanting.no_reserve")
+                        .withStyle(ChatFormatting.RED));
+            }
         }
         original.call(ctx, font, lines, mouseX, mouseY);
     }
@@ -71,6 +82,11 @@ public abstract class EnchantmentScreenMixin extends AbstractContainerScreen<Enc
     @Unique
     private boolean enchanttransfer$isMarked(int option) {
         return menu.costs[option] > 0 && ((DeckInfluenceView) menu).enchanttransfer$isDeckInfluenced(option);
+    }
+
+    @Unique
+    private boolean enchanttransfer$lacksReserve(int option) {
+        return ((DeckInfluenceView) menu).enchanttransfer$lacksReserve(option);
     }
 
     @Unique

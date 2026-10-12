@@ -82,7 +82,7 @@
 
 ## Barajas de cartas
 
-Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En un atril de barajas al alcance de una mesa de encantamientos (mismas posiciones y hueco de aire que las librerías normales), modifica lo que ofrece la mesa.
+Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En un atril de barajas al alcance de una mesa de encantamientos (mismas posiciones y hueco de aire que las librerías normales, pero solo a la altura de la mesa: nada puede ir encima del atril ni el atril debajo de un bloque, así que ocupa toda su columna), modifica lo que ofrece la mesa.
 
 | Baraja | Guarda | Efecto |
 |---|---|---|
@@ -93,9 +93,9 @@ Arcano agrupa los encantamientos de tesoro (Mending, Swift Sneak, Soul Speed, Fr
 
 - **Receta**: 2 latón + 2 cuero + 1 carta del tipo (se consume). Rareza: carta negra.
 - **Puntos**: carta de nivel N = 2^(N-1) puntos (misma equivalencia que combinar). Máximo 64 por baraja.
-- **Resonancia** `R = min(1, puntos de categoría / 128)`; comodín `Rr = min(1, puntos / 64)`.
-- **Peso** de cada candidato `e`: `w · (1 + 2·R·(½·cuotaCategoría + ½·cuotaEncantamiento)) · (1 + 2·Rr·(10 − w)/9)`. El sesgo es relativo: una librería equilibrada ≈ vanilla.
-- **Poder de la mesa**: cada 3 barajas con cartas cuentan como 1 librería (un atril lleno = 1). Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
+- **Resonancia** `R = min(1, √(puntos de categoría / 64))`; comodín `Rr = min(1, √(puntos / 64))`. Crece rápido al principio (unas pocas cartas de nivel I ya se notan) y llega al máximo con una baraja llena; más barajas no lo suben, pero añaden reserva y poder.
+- **Peso** de cada candidato `e`: `w · (1 + 2·R·cuotaCategoría) · (1 + 4·R·cuotaEncantamiento) · (1 + 2·Rr·(10 − w)/9)`. La parte de categoría favorece la categoría frente a las otras (hasta ×3); la exacta, el encantamiento frente al resto de su categoría (hasta ×5, ×15 en total). La cuota de categoría cuenta todas las cartas; la del encantamiento, solo las de nivel máximo. El factor de Rareza solo se aplica con peso ≤ 2. El sesgo es relativo: una librería equilibrada ≈ vanilla.
+- **Poder de la mesa**: cada 3 barajas con cartas cuentan como 2 librerías (un atril lleno = las 2 librerías apiladas que cabrían en su columna): `⌊2·barajas/3⌋`. Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
 - **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2 (Fire Aspect ×3), Fire/Blast Protection ×1,5, Flame ×1,5, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5.
 - **Influencia**: cada elección se acopla a la vanilla (acoplamiento máximo): se hace la tirada vanilla con el random de la mesa y se conserva con probabilidad `min(1, p_baraja / p_vanilla)`; si no, se elige entre los encantamientos favorecidos en proporción a `p_baraja − p_vanilla`. La distribución final es la de las barajas, pero solo cambian una elección que han causado. Esas elecciones son las *influidas*; no cuentan las que salen igual que en vanilla, las que cambian en cadena porque una anterior cambió (se eligen con pesos vanilla) ni las debidas al poder. El azar del acoplamiento sale de un random aparte sembrado por opción, para que la pista coincida con el resultado. La mesa marca las opciones con alguno (carta pequeña arriba a la derecha y línea en el tooltip), sincronizado con un `DataSlot`.
 - **Desgaste**: ver *Desgaste de cartas* más abajo.
@@ -103,7 +103,7 @@ Arcano agrupa los encantamientos de tesoro (Mending, Swift Sneak, Soul Speed, Fr
 - **Atril de barajas** (`DeckLecternBlock`): base baja de latón y madera, bandeja inclinada de terciopelo con 3 barajas (las dibuja un BER con su modelo 3D) y campana de cristal escalonada. Un piloto por hueco (marrón: sin baraja; claro: sin cartas; esmeralda: con cartas) y una amatista en la cúspide que se enciende (con halo y runas hacia la mesa) cuando el atril está encendido. Apagado por defecto: Shift + clic derecho lo enciende (solo con alguna baraja con cartas) o lo apaga; se apaga solo cuando las barajas se quedan sin cartas, pero nunca se enciende solo. Los atriles apagados no cuentan. Clic derecho abre una ventana con 3 huecos. Receta: cristal, amatista, cristal / latón, redstone, latón / tablones ×3. Recursos generados con `scripts/gen_deck_lectern_assets.py`.
 
 
-### Desgaste de cartas *(en diseño — sustituye al 20 % de quitar una carta)*
+### Desgaste de cartas
 
 Las cartas de una baraja se gastan poco a poco, en proporción a lo que la baraja aporta. Solo hay desgaste en las elecciones **influidas** (opciones con marca): nunca por lo que la mesa habría dado igualmente, por los cambios en cadena ni por el poder.
 
@@ -137,14 +137,14 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 **Sin reserva.** El desgaste es determinista, así que se calcula al mostrar las opciones (sobre la lista final; en libros, tras quitar vanilla una entrada). Si las barajas de algún tipo no tienen reserva suficiente para su parte, la opción aparece **desactivada** y el tooltip explica que falta reserva en las barajas, como cuando faltan niveles.
 
-**Rareza.** Solo se desgasta con encantamientos raros (peso ≤ 2), al 50 %, gastando cartas de maldición.
+**Rareza.** Solo favorece y solo se desgasta con encantamientos raros (peso ≤ 2), al 50 %, gastando cartas de maldición. Así nunca da un bonus que no paga.
 
-### Bonificación *(pendiente de revisar)*
+### Bonificación
 
-Idea de partida para la siguiente revisión:
 1. Cualquier carta da bonus de **categoría** (frente a otras categorías), además de lo que da vanilla con librerías.
 2. Las cartas de nivel I–IV (relativo al máximo) solo dan el de categoría.
 3. Las cartas de nivel máximo dan además bonus a su **encantamiento exacto** (y por eso su desgaste es del 100 %).
+4. Fuerza acumulativa por puntos con curva de raíz (ver *Resonancia* y *Peso* arriba). Ejemplo, Irrompibilidad en una espada a nivel 30 con cartas de Eficiencia (solo categoría): vanilla 14 %; 4 cartas I → 20 %; 4 cartas III → 24 %; baraja llena → 33 %. Eficiencia en un pico a nivel 30: vanilla 56 %; 1 carta V → 82 %; 4 cartas V → 89 %.
 
 ---
 

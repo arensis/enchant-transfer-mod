@@ -67,11 +67,16 @@ public class DeckCardStorage implements CardStorage {
     }
 
     @Override
-    public boolean consumeOne(Predicate<ItemStack> filter) {
-        return getContents().withoutOneCard(filter).map(worn -> {
-            setContents(worn);
-            return true;
-        }).orElse(false);
+    public int wear(int units) {
+        if (units <= 0) return 0;
+        DeckContents.Worn worn = getContents().wear(units);
+        setContents(worn.contents());
+        return worn.leftover();
+    }
+
+    @Override
+    public int getReserve() {
+        return getContents().reserve();
     }
 
     @Override

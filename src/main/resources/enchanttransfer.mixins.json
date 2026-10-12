@@ -4,6 +4,7 @@
   "package": "net.alfonsormadrid.enchanttransfer.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "DeckLecternStackingMixin",
     "EnchantmentMenuMixin"
   ],
   "client": [

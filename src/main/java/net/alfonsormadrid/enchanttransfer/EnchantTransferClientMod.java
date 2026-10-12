@@ -4,6 +4,7 @@ import net.alfonsormadrid.enchanttransfer.network.OpenSelectorPayload;
 import net.alfonsormadrid.enchanttransfer.renderers.DeckLecternRenderer;
 import net.alfonsormadrid.enchanttransfer.renderers.InfusionCoilRenderer;
 import net.alfonsormadrid.enchanttransfer.renderers.TransferTableRenderer;
+import net.alfonsormadrid.enchanttransfer.screens.carddeck.CardDeckScreen;
 import net.alfonsormadrid.enchanttransfer.screens.decklectern.DeckLecternScreen;
 import net.alfonsormadrid.enchanttransfer.screens.infusioncoil.InfusionCoilScreen;
 import net.alfonsormadrid.enchanttransfer.screens.selector.SelectorScreen;
@@ -38,6 +39,10 @@ public class EnchantTransferClientMod implements ClientModInitializer {
         MenuScreens.register(
                 EnchantTransferMod.DECK_LECTERN_SCREEN_HANDLER,
                 DeckLecternScreen::new);
+
+        MenuScreens.register(
+                EnchantTransferMod.CARD_DECK_SCREEN_HANDLER,
+                CardDeckScreen::new);
 
         // ── Block entity renderers ────────────────────────────────────────────
         BlockEntityRenderers.register(

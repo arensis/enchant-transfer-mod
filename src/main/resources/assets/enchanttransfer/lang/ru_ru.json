@@ -68,5 +68,13 @@
   "enchanttransfer.deck_lectern.active": "Включена: добавляет свои колоды к ближайшим столам зачаровывания (Shift + ПКМ, чтобы выключить)",
   "enchanttransfer.deck_lectern.inactive": "Выключена: Shift + ПКМ, чтобы включить",
   "enchanttransfer.deck_lectern.no_cards": "Выключена: для включения нужна колода с картами",
-  "enchanttransfer.enchanting.deck_influenced": "Под влиянием колод"
+  "enchanttransfer.enchanting.deck_influenced": "Под влиянием колод",
+  "enchanttransfer.enchanting.no_reserve": "В колодах недостаточно запаса",
+  "enchanttransfer.card.reserve": "Запас: %s / %s",
+  "enchanttransfer.deck.gui.points": "Вклад",
+  "enchanttransfer.deck.gui.reserve": "Запас",
+  "enchanttransfer.deck.gui.points_value": "Вклад в стол: %s/%s очков",
+  "enchanttransfer.deck.gui.points_hint": "Чем больше очков, тем сильнее стол склоняется к категории колоды (максимум при 64)",
+  "enchanttransfer.deck.gui.reserve_value": "Запас износа: %s / %s",
+  "enchanttransfer.deck.gui.reserve_hint": "Расходуется при зачаровывании варианта, отмеченного колодами"
 }

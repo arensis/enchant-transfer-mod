@@ -27,8 +27,17 @@ public interface DeckEffect {
         return 1.0;
     }
 
-    /** Whether applying {@code applied} can wear (consume a card from) decks with this effect. */
+    /** Whether applying {@code applied} can wear decks with this effect. */
     default boolean wearsOn(EnchantmentInstance applied) {
         return true;
+    }
+
+    /**
+     * Share of the full wear (see {@code CardWear#wearFor}) these decks pay
+     * for their part of an influenced {@code applied}: 1 for an exact
+     * enchantment bonus, ½ for a category-like one.
+     */
+    default double wearRate(EnchantmentInstance applied, LibraryProfile profile) {
+        return 0.5;
     }
 }

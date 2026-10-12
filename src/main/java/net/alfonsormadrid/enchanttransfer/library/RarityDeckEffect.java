@@ -8,13 +8,13 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 
 /**
  * Rarity wildcard: stores Curse cards (curses never come out of the table,
- * so they have no category to favor) and favors the table's low-weight
- * enchantments.
+ * so they have no category to favor) and favors the table's rare
+ * enchantments (vanilla rarity "rare" or "very rare", weight ≤
+ * {@value #RARE_WEIGHT}), the lower the weight the more:
  * <pre>
- *   factor = 1 + 2·strength·(10 − weight) / 9
+ *   factor = 1 + 2·strength·(10 − weight) / 9    (weight ≤ 2; else 1)
  * </pre>
- * Only rare enchantments (vanilla rarity "rare" or "very rare", weight ≤
- * {@value #RARE_WEIGHT}) wear its cards.
+ * Only those enchantments wear its cards, so it never favors what it doesn't pay for.
  */
 public class RarityDeckEffect extends WildcardDeckEffect {
 
@@ -36,7 +36,7 @@ public class RarityDeckEffect extends WildcardDeckEffect {
     @Override
     public double weightMultiplier(EnchantmentInstance candidate, LibraryProfile profile) {
         double strength = strength(profile);
-        if (strength <= 0) return 1.0;
+        if (strength <= 0 || candidate.weight() > RARE_WEIGHT) return 1.0;
         int weight = Math.clamp(candidate.weight(), 1, 10);
         return 1.0 + MAX_BIAS * strength * (10 - weight) / 9.0;
     }

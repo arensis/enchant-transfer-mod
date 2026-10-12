@@ -12,6 +12,7 @@ import net.alfonsormadrid.enchanttransfer.services.DeckEnchantmentSelector;
 import net.alfonsormadrid.enchanttransfer.services.DeckWearService;
 import net.alfonsormadrid.enchanttransfer.services.LibraryResonanceService;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -45,8 +46,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  *   <li><strong>Influence</strong> — the selector reports the picks the deck
  *       bonus changed; a data slot syncs, per option, whether there are any,
  *       for the screen's mark.</li>
- *   <li><strong>Wear</strong> — after a successful enchant, on the applied
- *       enchantments the deck bonus changed.</li>
+ *   <li><strong>Wear</strong> — a {@link DeckWearService.Plan} per option, on
+ *       its final list (books included); options the decks can't pay for
+ *       are refused and flagged for the screen; the plan is applied after a
+ *       successful enchant.</li>
  * </ul>
  * The logic lives in the services; this mixin only wires them in.
  */
@@ -74,18 +77,24 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu impleme
     @Unique
     private static final long enchanttransfer$COUPLING_SALT = 0x9E3779B97F4A7C15L;
 
-    /** Bit {@code i} set when the decks changed option {@code i}; synced to the client. */
+    /**
+     * Synced to the client: bit {@code i} when the decks changed option {@code i},
+     * bit {@code 3 + i} when they lack the reserve to pay for it.
+     */
     @Unique
     private final DataSlot enchanttransfer$influence = DataSlot.standalone();
+
+    @Unique
+    private static final int enchanttransfer$NO_RESERVE_SHIFT = 3;
 
     @Unique
     private LibraryProfile enchanttransfer$profile = LibraryProfile.EMPTY;
 
     @Unique
-    private List<EnchantmentInstance> enchanttransfer$lastResult = List.of();
+    private Set<Holder<Enchantment>> enchanttransfer$lastInfluenced = Set.of();
 
     @Unique
-    private Set<Holder<Enchantment>> enchanttransfer$lastInfluenced = Set.of();
+    private DeckWearService.Plan enchanttransfer$lastPlan = DeckWearService.Plan.NONE;
 
     private EnchantmentMenuMixin(MenuType<?> type, int containerId) {
         super(type, containerId);
@@ -136,39 +145,64 @@ public abstract class EnchantmentMenuMixin extends AbstractContainerMenu impleme
             influenced = selection.influenced();
         }
         this.enchanttransfer$profile = profile;
-        // Same reference the menu keeps using: for books it removes all but
-        // one entry from it, so wear only sees what was actually applied.
-        this.enchanttransfer$lastResult = result;
         this.enchanttransfer$lastInfluenced = influenced;
-        enchanttransfer$setInfluenced(option, !influenced.isEmpty());
+        enchanttransfer$setFlag(option, !influenced.isEmpty());
         return result;
     }
 
-    @Inject(method = "clickMenuButton", at = @At("HEAD"))
-    private void enchanttransfer$resetLastResult(Player player, int id, CallbackInfoReturnable<Boolean> cir) {
-        this.enchanttransfer$lastResult = List.of();
+    @Inject(method = "getEnchantmentList", at = @At("HEAD"))
+    private void enchanttransfer$resetSelection(RegistryAccess registryAccess, ItemStack stack, int option, int cost,
+                                                CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
+        this.enchanttransfer$profile = LibraryProfile.EMPTY;
         this.enchanttransfer$lastInfluenced = Set.of();
+    }
+
+    // On the final list: for books vanilla has removed an entry by now.
+    @Inject(method = "getEnchantmentList", at = @At("RETURN"))
+    private void enchanttransfer$planWear(RegistryAccess registryAccess, ItemStack stack, int option, int cost,
+                                          CallbackInfoReturnable<List<EnchantmentInstance>> cir) {
+        LibraryProfile profile = this.enchanttransfer$profile;
+        DeckWearService.Plan plan = enchanttransfer$wear.plan(profile, cir.getReturnValue(), this.enchanttransfer$lastInfluenced);
+        this.enchanttransfer$lastPlan = plan;
+        enchanttransfer$setFlag(enchanttransfer$NO_RESERVE_SHIFT + option, !plan.affordable(profile));
+    }
+
+    // Runs on both sides: the client doesn't even send the click.
+    @Inject(method = "clickMenuButton", at = @At("HEAD"), cancellable = true)
+    private void enchanttransfer$refuseWithoutReserve(Player player, int id, CallbackInfoReturnable<Boolean> cir) {
+        this.enchanttransfer$lastPlan = DeckWearService.Plan.NONE;
+        if (enchanttransfer$lacksReserve(id)) cir.setReturnValue(false);
     }
 
     @Inject(method = "clickMenuButton", at = @At("RETURN"))
     private void enchanttransfer$wearDecks(Player player, int id, CallbackInfoReturnable<Boolean> cir) {
         if (!cir.getReturnValueZ()) return;
         LibraryProfile profile = this.enchanttransfer$profile;
-        List<EnchantmentInstance> applied = this.enchanttransfer$lastResult;
-        Set<Holder<Enchantment>> influenced = this.enchanttransfer$lastInfluenced;
-        this.access.execute((level, pos) -> enchanttransfer$wear.apply(level, profile, applied, influenced));
+        DeckWearService.Plan plan = this.enchanttransfer$lastPlan;
+        if (plan.isEmpty()) return;
+        this.access.execute((level, pos) -> enchanttransfer$wear.apply(level, profile, plan));
     }
 
     @Unique
-    private void enchanttransfer$setInfluenced(int option, boolean influenced) {
-        if (option < 0 || option >= 3) return;
-        int bit = 1 << option;
+    private void enchanttransfer$setFlag(int index, boolean set) {
+        if (index < 0 || index >= 6) return;
+        int bit = 1 << index;
         int flags = enchanttransfer$influence.get();
-        enchanttransfer$influence.set(influenced ? flags | bit : flags & ~bit);
+        enchanttransfer$influence.set(set ? flags | bit : flags & ~bit);
+    }
+
+    @Unique
+    private boolean enchanttransfer$flag(int index) {
+        return (enchanttransfer$influence.get() & (1 << index)) != 0;
     }
 
     @Override
     public boolean enchanttransfer$isDeckInfluenced(int option) {
-        return option >= 0 && option < 3 && (enchanttransfer$influence.get() & (1 << option)) != 0;
+        return option >= 0 && option < 3 && enchanttransfer$flag(option);
+    }
+
+    @Override
+    public boolean enchanttransfer$lacksReserve(int option) {
+        return option >= 0 && option < 3 && enchanttransfer$flag(enchanttransfer$NO_RESERVE_SHIFT + option);
     }
 }

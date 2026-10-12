@@ -127,6 +127,9 @@ public class DeckLecternBlock extends BaseEntityBlock {
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        // Nothing can sit on a lectern (see DeckLecternStackingMixin), so it
+        // can't go under a block either: it fills its whole column.
+        if (!ctx.getLevel().getBlockState(ctx.getClickedPos().above()).canBeReplaced()) return null;
         return defaultBlockState().setValue(FACING, ctx.getHorizontalDirection());
     }
 

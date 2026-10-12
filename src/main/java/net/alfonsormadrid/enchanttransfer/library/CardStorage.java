@@ -35,12 +35,16 @@ public interface CardStorage {
     ItemStack extractLast(boolean simulate);
 
     /**
-     * Remove a single card — the cheapest one matching {@code filter}.
+     * Wear the stored cards by {@code units} (see {@code CardWear}): a worn
+     * card first, else the lowest-level one; cards that run out are removed.
      * Used by library wear.
      *
-     * @return {@code true} if a card was removed
+     * @return the wear that didn't fit (0 if all of it was applied)
      */
-    boolean consumeOne(Predicate<ItemStack> filter);
+    int wear(int units);
+
+    /** Reserve left across the stored cards, in {@code CardWear} units. */
+    int getReserve();
 
     int getStoredPoints();
 

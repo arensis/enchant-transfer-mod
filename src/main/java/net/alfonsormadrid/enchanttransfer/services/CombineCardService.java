@@ -1,6 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.services;
 
 import java.util.Optional;
+import net.alfonsormadrid.enchanttransfer.item.CardWear;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -27,6 +28,9 @@ public class CombineCardService {
             // CardType — reusing card1.getItem() avoids a separate lookup.
             ItemStack outputCard = new ItemStack(card1.getItem(), resultCount);
             outputCard.enchant(enchantmentEntry.get(), currentLevel + 1);
+            // The new card's reserve is the sum of what both had left; as its
+            // reserve is exactly theirs together, that means adding their wear.
+            CardWear.setWorn(outputCard, CardWear.wornOf(card1) + CardWear.wornOf(card2));
             return outputCard;
         } else {
             return ItemStack.EMPTY;
