@@ -91,7 +91,7 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 ### Crafting Recipe
 
 |   |   |   |
-|:-:|:-:|:-:|
+|---|---|---|
 |   | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot |   |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/leather.png" width="32" alt="Leather"><br>Leather | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/magic_card_red.png" width="32" alt="Card of the deck's type"><br>Card of the deck's type | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/leather.png" width="32" alt="Leather"><br>Leather |
 |   | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot |   |
@@ -125,7 +125,7 @@ The block that holds your decks: a low brass base with a tilted velvet tray for 
 - Place lecterns where regular bookshelves would go around an Enchanting Table (same positions and air gap). One ring of 16 at table height already reaches the cap of 15, so they don't need to be stacked.
 
 |   |   |   |
-|:-:|:-:|:-:|
+|---|---|---|
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/glass_block.png" width="32" alt="Glass"><br>Glass | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/amethyst_shard.png" width="32" alt="Amethyst Shard"><br>Amethyst Shard | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/glass_block.png" width="32" alt="Glass"><br>Glass |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone"><br>Redstone | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/oak_planks.png" width="32" alt="Planks"><br>Planks | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/oak_planks.png" width="32" alt="Planks"><br>Planks | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/oak_planks.png" width="32" alt="Planks"><br>Planks |
@@ -172,7 +172,7 @@ Unenchanted cards yield a minimum of 5 XP; enchanted cards yield more based on t
 ### Crafting Recipe
 
 |   |   |   |
-|:-:|:-:|:-:|
+|---|---|---|
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/amethyst_shard.png" width="32" alt="Amethyst Shard"><br>Amethyst Shard | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/brass_ingot.png" width="32" alt="Brass Ingot"><br>Brass Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/glass_block.png" width="32" alt="Glass Block"><br>Glass Block | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
@@ -202,7 +202,7 @@ Three smelting recipes form a material chain that produces **Brass Ingots** — 
 ### Crafting Recipe
 
 |   |   |   |
-|:-:|:-:|:-:|
+|---|---|---|
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/iron_ingot.png" width="32" alt="Iron Ingot"><br>Iron Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/iron_ingot.png" width="32" alt="Iron Ingot"><br>Iron Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/iron_ingot.png" width="32" alt="Iron Ingot"><br>Iron Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/glass_pane.png" width="32" alt="Glass Pane"><br>Glass Pane | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/blast_furnace.png" width="32" alt="Blast Furnace"><br>Blast Furnace | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/copper_ingot.png" width="32" alt="Copper Ingot"><br>Copper Ingot |
@@ -226,7 +226,7 @@ The Zinc Smelter only accepts **Lava Buckets** and **Blaze Rods** as fuel — no
 ### Crafting Recipe
 
 |   |   |   |
-|:-:|:-:|:-:|
+|---|---|---|
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gold_ingot.png" width="32" alt="Gold Ingot"><br>Gold Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gold_ingot.png" width="32" alt="Gold Ingot"><br>Gold Ingot | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/gold_ingot.png" width="32" alt="Gold Ingot"><br>Gold Ingot |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone Dust"><br>Redstone Dust | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone Dust"><br>Redstone Dust | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/redstone.png" width="32" alt="Redstone Dust"><br>Redstone Dust |
 | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/coal.png" width="32" alt="Coal / Charcoal"><br>Coal / Charcoal | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/diamond.png" width="32" alt="Diamond"><br>Diamond | <img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/coal.png" width="32" alt="Coal / Charcoal"><br>Coal / Charcoal |

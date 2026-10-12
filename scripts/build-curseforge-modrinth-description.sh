@@ -10,6 +10,8 @@
 #     (e.g. 3.1.0 under "Changelog — 3.1.1") stay, older ones become a link to the
 #     website's changelog
 #   - the <!-- AUTO:... --> markers used by sync-release-docs.py are removed
+#   - table alignment rows (|:-:|) become plain ones (|---|): CurseForge doesn't
+#     render tables with alignment colons
 #
 # Usage: ./scripts/build-curseforge-modrinth-description.sh [output-file]
 
@@ -51,6 +53,7 @@ awk '
   | sed -E 's#\[!\[([^]]*)\]\(([^)]*)\)\]\(([^)]*)\)#<a href="\3"><img src="\2" alt="\1"></a>#g' \
   | sed -E 's#!\[([^]]*)\]\(([^)]*)\)#<img src="\2" alt="\1">#g' \
   | sed -E -e ':a' -e 's#(https://img\.shields\.io/[^" ]*)≥#\1%E2%89%A5#' -e 'ta' \
+  | sed -E '/^\|( *:?-+:? *\|)+ *$/ { s/:-+:?/---/g; s/-+:/---/g; }' \
   > "$TARGET"
 
 echo "Generated ${TARGET#"$ROOT_DIR"/}"
