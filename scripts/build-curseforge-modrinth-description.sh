@@ -11,8 +11,8 @@
 #   - the collapsible "Previous versions" changelog (<details>) is unwrapped, since
 #     CurseForge strips <details>/<summary>: entries from the current minor series
 #     (e.g. 3.1.0 under "Changelog — 3.1.1") stay, older ones become a link to the
-#     website's changelog; the section is headed "Changelog — 3.1.x", with the
-#     current version under its own "### 3.1.1" like the others
+#     website's changelog (the README heads the section "Changelog — 3.1.x",
+#     each version under its own "### 3.1.1")
 #   - the <!-- AUTO:... --> markers used by sync-release-docs.py are removed; the
 #     badges' ones become a <p>, so CurseForge sets them apart from the logo
 #   - table alignment rows (|:-:|) become plain ones (|---|): CurseForge doesn't
@@ -44,8 +44,10 @@ awk '
   /^## For Developers[[:space:]]*$/ { skipping = 1; next }
   /^## Changelog — [0-9]+\.[0-9]+\./ {
     version = $0; sub(/^## Changelog — /, "", version); sub(/[[:space:]]*$/, "", version)
-    series = version; sub(/\.[0-9]+[^0-9.]*$/, "", series)
-    # Headed by the series it shows, each version under its own heading.
+    series = version; sub(/\.([0-9]+|x)$/, "", series)
+    # Headed by the series it shows, each version under its own heading;
+    # the README already writes it that way ("3.1.x"), older ones get it here.
+    if (version ~ /\.x$/) { print; last = $0; next }
     print "## Changelog — " series ".x"; print ""; print "### " version
     last = "### " version
     next

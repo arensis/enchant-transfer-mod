@@ -320,8 +320,12 @@ def main() -> None:
 
     summary = ", ".join(f"{l.series} → MC {l.minecraft}" for l in lines)
     print(f"Synced docs for {summary}")
-    if f"## Changelog — {lines[0].mod}" not in outputs[README]:
-        print(f"::warning::README.md has no '## Changelog — {lines[0].mod}' section; write it by hand.")
+    # The changelog is headed by series ("## Changelog — 3.1.x"), each version
+    # under its own "### 3.1.2".
+    mod = lines[0].mod
+    series = ".".join(mod.split(".")[:2])
+    if f"## Changelog — {series}.x" not in outputs[README] or f"\n### {mod}\n" not in outputs[README]:
+        print(f"::warning::README.md has no '### {mod}' under '## Changelog — {series}.x'; write it by hand.")
 
 
 if __name__ == "__main__":

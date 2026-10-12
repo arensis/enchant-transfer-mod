@@ -148,3 +148,11 @@ Empty → dim dot. Active screen → filled dot + cyan ring (border at radius 5)
 - `cachedCoreFace` in `InfusionCoilBlockEntity` is server-only; never synced to client.  
   The client BER scans adjacent block states directly in `extractRenderState()`.
 - The `InfusionCoilBlock` must have `.nonOpaque()` in settings to prevent Minecraft culling the top face of the block it sits on (inset model has corner gaps).
+
+## Changelog & releases
+
+- The changelog is written by hand **in the release PR** (README + `docs/index.html`); CI only bumps versions (`sync-release-docs.py`) and regenerates the store description. Write the version the PR's `tag/*` label will produce.
+- Layout, per series: `## Changelog — 3.1.x` (web: `<h2>… — 3.1.x</h2>`), then each version of the current minor series under its own `### 3.1.2` / `<h3>`, newest first, always visible; older series inside the "Previous versions" `<details>` (README and web).
+  - **Patch**: add `### 3.1.3` at the top of the current series.
+  - **Minor**: heading becomes `3.2.x` with `### 3.2.0`; move the whole 3.1.x series into "Previous versions".
+- Store description (`docs/curseforge-modrinth-description.md`, pasted by hand into CurseForge/Modrinth) is generated from the README by `scripts/build-curseforge-modrinth-description.sh`; never edit it directly. It keeps the current series and links older ones, and works around CurseForge (no `align`/`style`, no Markdown inside HTML blocks, `<img>` widths only inside a one-line `<p>`, no `_`/`≥` in shields URLs, no table alignment colons).
