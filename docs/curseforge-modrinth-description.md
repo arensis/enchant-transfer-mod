@@ -34,6 +34,10 @@ Version 2.0 introduced the **Module System**: specialized blocks that attach to 
 
 **Requires:** Fabric Loader and Fabric API
 
+**Languages:** English · Español · Português (Brasil)\* · Русский\* · 简体中文\*
+
+> \* Pending review by a native speaker. Do you speak one of them? Help us review the translations or add your own language: open an [issue](https://github.com/arensis/enchant-transfer-mod/issues) or a pull request editing the [language files](https://github.com/arensis/enchant-transfer-mod/tree/master/src/main/resources/assets/enchanttransfer/lang).
+
 ---
 
 ## Core Features
