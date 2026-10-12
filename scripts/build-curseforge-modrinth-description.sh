@@ -5,6 +5,8 @@
 #   - Markdown images (the badges) become <img>/<a> HTML: CurseForge doesn't parse
 #     Markdown inside the README's centred <div>; GitHub and Modrinth do
 #   - the "For Developers" section is removed
+#   - the collapsible "Previous versions" changelog (<details>) becomes a link to
+#     the website's changelog: CurseForge strips <details>/<summary>
 #   - the <!-- AUTO:... --> markers used by sync-release-docs.py are removed
 #
 # Usage: ./scripts/build-curseforge-modrinth-description.sh [output-file]
@@ -22,6 +24,13 @@ RAW_BASE="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/
 awk '
   /^[[:space:]]*<!-- \/?AUTO:[a-z-]+ -->[[:space:]]*$/ { next }
   /^## For Developers[[:space:]]*$/ { skipping = 1; next }
+  /^<details>[[:space:]]*$/          { in_details = 1; next }
+  in_details && /^<\/details>[[:space:]]*$/ {
+    in_details = 0
+    print "**Previous versions:** see the [full changelog](https://arensis.github.io/enchant-transfer-mod/#changelog)."
+    next
+  }
+  in_details                        { next }
   skipping && /^---[[:space:]]*$/   { skipping = 0; eat_blank = 1; next }
   eat_blank && /^[[:space:]]*$/     { eat_blank = 0; next }
                                     { eat_blank = 0 }
