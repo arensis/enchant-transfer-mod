@@ -84,5 +84,11 @@
   "enchanttransfer.lectern.rarity": "  Rare enchantments (weight ≤ 2): up to ×%s (max ×%s)",
   "enchanttransfer.lectern.power": "  Power: %s bookshelves (max %s)",
   "enchanttransfer.lectern.combined": "At a table it combines with the other lecterns around it",
-  "enchanttransfer.lectern.reserve": "  Wear reserve: %s (max %s)"
+  "enchanttransfer.lectern.reserve": "  Wear reserve: %s (max %s)",
+  "enchantment.enchanttransfer.magnetism": "Magnetism",
+  "enchantment.enchanttransfer.harvesting": "Harvesting",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "Harvesting: XP per field",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "Experience levels a whole-field harvest with Harvesting III+ costs per started 9×9 (doubled with bone meal at IV). 0 makes it free",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "Harvesting: XP per tree",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "Experience levels felling a whole tree with Harvesting III+ costs. 0 makes it free"
 }

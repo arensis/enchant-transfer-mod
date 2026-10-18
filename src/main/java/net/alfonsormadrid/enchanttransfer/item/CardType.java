@@ -3,6 +3,7 @@ package net.alfonsormadrid.enchanttransfer.item;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.alfonsormadrid.enchanttransfer.enchantment.ModEnchantments;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -25,9 +26,9 @@ import net.minecraft.world.item.enchantment.Enchantments;
  *
  * <p>Mapeo derivado de {@code DESIGN.md} sección "Categorías de
  * encantamientos (por color de cristal/gema)".  Los encantamientos
- * <em>nuevos</em> del mod (Harvesting, Momentum, Magnetism, Freezing)
- * todavía no existen como {@code RegistryKey}, así que aparecen comentados
- * en cada tipo hasta que se registren.
+ * <em>nuevos</em> del mod que ya existen ({@link ModEnchantments}) están en
+ * su tipo; los pendientes (Momentum, Freezing) aparecen comentados hasta que
+ * se registren.
  */
 public enum CardType {
 
@@ -48,8 +49,8 @@ public enum CardType {
                     Enchantments.SILK_TOUCH,
                     Enchantments.FORTUNE,
                     Enchantments.LUCK_OF_THE_SEA,
-                    Enchantments.LURE
-                    // + Harvesting (mod-custom, pendiente de registrar)
+                    Enchantments.LURE,
+                    ModEnchantments.HARVESTING
             )),
 
     RED("red", "combat",
@@ -58,42 +59,43 @@ public enum CardType {
                     Enchantments.SMITE,
                     Enchantments.BANE_OF_ARTHROPODS,
                     Enchantments.IMPALING,
-                    Enchantments.FIRE_ASPECT,
                     Enchantments.LOOTING,
                     Enchantments.THORNS,
                     Enchantments.SWEEPING_EDGE,
                     Enchantments.KNOCKBACK,
                     Enchantments.DENSITY,
                     Enchantments.BREACH,
-                    Enchantments.LUNGE
+                    Enchantments.LUNGE,
+                    // Bow and crossbow attacks
+                    Enchantments.POWER,
+                    Enchantments.PUNCH,
+                    Enchantments.MULTISHOT,
+                    Enchantments.PIERCING
                     // + Momentum (mod-custom, pendiente de registrar)
             )),
 
     YELLOW("yellow", "utility",
             List.of(
+                    // Speed and durability of the tool, weapon or wearer
                     Enchantments.EFFICIENCY,
                     Enchantments.UNBREAKING,
-                    Enchantments.INFINITY,
-                    Enchantments.POWER,
-                    Enchantments.PUNCH,
-                    Enchantments.FLAME,
-                    Enchantments.MULTISHOT,
-                    Enchantments.PIERCING,
-                    Enchantments.QUICK_CHARGE
-                    // + Magnetism (mod-custom, pendiente de registrar)
+                    Enchantments.QUICK_CHARGE,
+                    Enchantments.SWIFT_SNEAK,
+                    ModEnchantments.MAGNETISM
             )),
 
     PURPLE("purple", "arcane",
             List.of(
+                    // Magic: lightning, water, wind, ice, fire, souls and experience
                     Enchantments.CHANNELING,
                     Enchantments.RIPTIDE,
                     Enchantments.LOYALTY,
                     Enchantments.FROST_WALKER,
                     Enchantments.WIND_BURST,
-                    // Treasure enchantments never come out of the table;
-                    // they're grouped here as "rare magic".
+                    Enchantments.FIRE_ASPECT,
+                    Enchantments.FLAME,
+                    Enchantments.INFINITY,
                     Enchantments.MENDING,
-                    Enchantments.SWIFT_SNEAK,
                     Enchantments.SOUL_SPEED
                     // + Freezing (mod-custom, pendiente de registrar)
                     // + futuros encantamientos arcanos del mod

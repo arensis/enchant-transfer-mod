@@ -84,5 +84,11 @@
   "enchanttransfer.lectern.rarity": "  Encantamentos raros (peso ≤ 2): até ×%s (máx. ×%s)",
   "enchanttransfer.lectern.power": "  Poder: %s estantes (máx. %s)",
   "enchanttransfer.lectern.combined": "Na mesa, combina-se com os outros atris ao redor",
-  "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)"
+  "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)",
+  "enchantment.enchanttransfer.magnetism": "Magnetismo",
+  "enchantment.enchanttransfer.harvesting": "Colheita",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "Colheita: XP por campo",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "Níveis de experiência que colher um campo inteiro com Colheita III+ custa por cada 9×9 iniciado (o dobro com farinha de osso no IV). 0 torna grátis",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "Colheita: XP por árvore",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "Níveis de experiência que derrubar uma árvore inteira com Colheita III+ custa. 0 torna grátis"
 }

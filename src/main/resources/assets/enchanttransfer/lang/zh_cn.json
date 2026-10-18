@@ -84,5 +84,11 @@
   "enchanttransfer.lectern.rarity": "  稀有附魔（权重 ≤ 2）：最高 ×%s（上限 ×%s）",
   "enchanttransfer.lectern.power": "  能量：相当于 %s 个书架（最多 %s）",
   "enchanttransfer.lectern.combined": "在附魔台旁会与周围其他讲台叠加",
-  "enchanttransfer.lectern.reserve": "  磨损储备：%s（最多 %s）"
+  "enchanttransfer.lectern.reserve": "  磨损储备：%s（最多 %s）",
+  "enchantment.enchanttransfer.magnetism": "磁力",
+  "enchantment.enchanttransfer.harvesting": "收割",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "收割：每片农田的经验",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "使用收割 III+ 收割整片农田时，每开始一个 9×9 区域消耗的经验等级（IV 级使用骨粉时翻倍）。0 表示免费",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "收割：每棵树的经验",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "使用收割 III+ 砍倒整棵树消耗的经验等级。0 表示免费"
 }

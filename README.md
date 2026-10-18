@@ -38,9 +38,9 @@ Version 2.0 introduced the **Module System**: specialized blocks that attach to 
 
 **Requires:** Fabric Loader and Fabric API
 
-**Languages:** English · Español · Português (Brasil)\* · Русский\* · 简体中文\*
+**Languages:** English · Español · Português (Brasil)\* · Русский\* · 简体中文\* · Français\* · Deutsch\* · 日本語\* — **New:** Français, Deutsch and 日本語
 
-> \* Pending review by a native speaker. Do you speak one of them? Help us review the translations or add your own language: open an [issue](https://github.com/arensis/enchant-transfer-mod/issues) or a pull request editing the [language files](https://github.com/arensis/enchant-transfer-mod/tree/master/src/main/resources/assets/enchanttransfer/lang).
+> \* Pending review by a native speaker (Portuguese, Russian, Chinese, French, German and Japanese). Do you speak one of them? Help us review the translations or add your own language: open an [issue](https://github.com/arensis/enchant-transfer-mod/issues) or a pull request editing the [language files](https://github.com/arensis/enchant-transfer-mod/tree/master/src/main/resources/assets/enchanttransfer/lang).
 
 ---
 
@@ -53,6 +53,8 @@ Place any enchanted item or book in the Transfer Table to strip its enchantments
 ### Apply
 
 Place a Magic Card and a target item in the Transfer Table. The enchantment transfers instantly, respecting vanilla incompatibility rules.
+
+**Shift + click** a card in your inventory and it goes straight onto the item on the table, if the item accepts it and it doesn't clash with its enchantments. Otherwise it goes to the combine slots, the stack split evenly between both (the odd card stays in your inventory) — with an item on the table, only when the cards make a pair that can level up.
 
 ### Combine
 
@@ -73,11 +75,40 @@ Magic Cards are now color-coded by enchantment category. When you extract an enc
 | Card | Category | Enchantments |
 |------|----------|-------------|
 | 🔵 Blue | Protection | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
-| 🟢 Green | Nature | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure |
-| 🔴 Red | Combat | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge |
-| 🟡 Yellow | Utility | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge |
-| 🟣 Purple | Arcane | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed |
+| 🟢 Green | Nature | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, Harvesting\* |
+| 🔴 Red | Combat | Sharpness, Smite, Bane of Arthropods, Impaling, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Power, Punch, Multishot, Piercing |
+| 🟡 Yellow | Utility | Efficiency, Unbreaking, Quick Charge, Swift Sneak, Magnetism\* |
+| 🟣 Purple | Arcane | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Fire Aspect, Flame, Infinity, Mending, Soul Speed |
 | ⚫ Black | Curse | Curse of Vanishing, Curse of Binding |
+
+\* Added by this mod, see [Enchantments](#enchantments-).
+
+---
+
+## Enchantments 🆕
+
+Two new enchantments, from the Enchanting Table, villagers and loot — and, like any other, extractable into Magic Cards.
+
+### Magnetism
+
+**Utility · I–V · metal armor** (chainmail, iron, copper, gold, netherite). Worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 / 10 / 12 blocks (the highest level you wear counts). Sneak to switch it off; items you throw yourself are left alone.
+
+### Harvesting
+
+**Nature · I–IV · hoes and axes.** It only works when you carry what it replants — the crop's seed or the tree's sapling — and spends one per plant.
+
+| Level | Hoe — right-click a ripe crop | Axe — break a log of a natural tree |
+|-------|-------------------------------|-------------------------------------|
+| I | Harvests it and replants it | Replants the sapling where the base log was |
+| II | Also the next two crops ahead (a row of 3) | Also fells the logs straight above |
+| III | The whole connected field, for **0.5 XP levels per started 9×9** | The whole tree, branches included, for **0.5 XP levels** |
+| IV | Grows every replanted crop with bone meal from your inventory (doubles the field's XP cost) | Grows the replanted sapling into a tree with bone meal from your inventory |
+
+- **Wear**: 1 durability per crop or log, like tilling or chopping. **Sneak** to harvest a single crop or chop a single log.
+- **XP cost**: 0.5 levels by default, set per world with the game rules `enchanttransfer:harvesting_field_xp_cost` and `enchanttransfer:harvesting_tree_xp_cost` (0 makes it free).
+- **Not enough XP**: the field is cut to the 9×9s you can pay for (or a row if not even one), and a tree falls like level II.
+- **Safe for builds**: it only fells trees whose logs touch leaves that grew there, not leaves placed by a player (up to 256 logs).
+- **Crops and trees from other mods**: any crop built on vanilla's crop block works out of the box; others can be added to the `#enchanttransfer:harvesting_replantable` block tag (or left out with `harvesting_excluded`). Trees whose logs and leaves are in `#minecraft:logs` and `#minecraft:leaves` are felled, and the sapling comes from datapack rules in `data/<namespace>/enchanttransfer/harvesting_sapling/` — `{"logs": "mymod:maple_log", "sapling": "mymod:maple_sapling"}` — or, without one, from the name (`maple_log` → `maple_sapling`). They reload with `/reload`.
 
 ---
 
@@ -109,7 +140,7 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 - **Points**: a level N card is worth 2^(N-1) points (same ratio as combining). Each deck holds up to 64 points.
 - **Enchanting power**: a full Deck Lectern counts as **two bookshelves** — the two that would stack in its column (every 3 decks holding cards = 2 bookshelves). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves; 8 full lecterns alone reach level 30.
 - **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its category up to ×3 more likely. Every card favors its category; only max-level cards (Efficiency V, Fortune III, Silk Touch I…) also favor their exact enchantment, up to ×15 in all. Strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck (64 points); more decks don't raise it further, but add reserve and power.
-- **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers and Fortune/Silk Touch ×1.5 in forests, jungles and taigas. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
+- **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether, Fire/Blast Protection ×1.5 and Arcane fire (Fire Aspect, Flame) ×2 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers Fortune/Silk Touch ×1.5 in forests, jungles and taigas, and Harvesting ×1.5 in plains. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
 - **Wear**: decks pay, in card reserve, only for what their bonus brings in — not for what the table would have rolled anyway, nor for what comes from the decks' power. Each card holds as much reserve as the points it takes (a level V card holds 16, so a full deck always holds 64); worn cards show it as a bar. Each marked enchantment costs 20% of a max-level card of it, scaled by the level obtained (Efficiency V: 3.2, Efficiency III: 1.92, Silk Touch I: 0.2): in full when max-level cards of it are in the decks, half for a category or Rarity bonus. It's split among the deck kinds that boosted it, in proportion to their boost, and taken first from a card already started, then from the lowest-level ones. An option the decks can't pay for is disabled. Worn cards work normally at the Transfer Table, and combining two adds up what they had left.
 - **Influence mark**: options changed by the decks show a small card in their top-right corner and an *Influenced by card decks* line in their tooltip.
 
@@ -251,7 +282,22 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.1.x
+## Changelog — 3.2.x
+
+### 3.2.0
+
+- **Magnetism** — New Utility enchantment (I–V) for metal armor: pulls nearby items and XP orbs toward you (4 to 12 blocks). Sneak to switch it off
+- **Harvesting** — New Nature enchantment (I–IV) for hoes and axes. Hoe: right-click a ripe crop to harvest and replant it, then a row of 3, the whole field (0.5 XP levels per 9×9) and bone meal growth. Axe: replant the sapling, then fell the trunk, the whole tree (0.5 XP levels) and grow the sapling back with bone meal. It spends a seed or sapling from your inventory per plant, and only fells natural trees
+- **Crops and trees from other mods** — Harvesting works with other mods' crops out of the box, and their trees through datapack rules in `data/<namespace>/enchanttransfer/harvesting_sapling/` or the `_log` → `_sapling` naming convention
+- **Shift + click at the Transfer Table** — A card goes straight onto the item when it fits; otherwise the stack is split evenly into both combine slots. Colored cards can now be shift-clicked too
+- **Zinc Smelter drops itself** — It dropped nothing when mined; it now drops with an iron pickaxe or better
+- **Card categories reviewed** — Each color now has a clear theme: bow and crossbow attacks (Power, Punch, Multishot, Piercing) move to **Combat**; Fire Aspect, Flame and Infinity move to **Arcane**, which now means magic (fire, ice, lightning, wind, souls, experience) rather than "treasure"; Swift Sneak moves to **Utility** (speed and durability). Cards already extracted keep their color; take them out of their old deck and they go into the new one
+- **Configurable XP cost** — Game rules `enchanttransfer:harvesting_field_xp_cost` and `enchanttransfer:harvesting_tree_xp_cost` (0.5 levels by default; 0 makes them free, any higher value works)
+- **Plains affinity** — Nature decks favor Harvesting ×1.5 at tables in plains (`#c:is_plains`, so modded plains count too)
+- **New languages** — French (fr_fr), German (de_de) and Japanese (ja_jp)
+
+<details>
+<summary>Previous versions</summary>
 
 ### 3.1.2
 
@@ -280,9 +326,6 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 - **26.2 enchantments categorized** — Knockback, Density, Breach, Lunge, Flame, Multishot, Piercing, Quick Charge, Luck of the Sea, Lure and Wind Burst now have card colors
 - **Arcane = rare magic** — All treasure enchantments (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) are now Arcane cards. Cards already extracted keep their color and still go into the matching deck
 - **Lighter website** — 3D block previews are now static images, much faster on phones
-
-<details>
-<summary>Previous versions</summary>
 
 ### 3.0.0
 

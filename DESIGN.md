@@ -1,17 +1,25 @@
 # Enchant Transfer Mod — Diseño y decisiones
 
 > Documento de referencia. Registra decisiones de diseño tomadas, no implementación técnica.
-> Última actualización: 2026-05-29
+> Tres partes: **✅ Implementado** (está en el mod), **📝 Diseñado, sin implementar** (decidido pero sin código) y **❌ Descartado**.
+> Última actualización: 2026-10-18
 
 ---
 
-## Estado actual del mod (implementado)
+# ✅ Implementado
+
+## Bloques y sistemas
 
 ### Transfer Table (core)
 - Extrae encantamientos de cualquier ítem encantable → carta mágica (**coste 0**)
 - Aplica cartas a ítems (**coste 0**, respeta reglas vanilla de compatibilidad)
 - Combina dos cartas del mismo encantamiento y mismo nivel → carta de nivel superior (**coste 0**)
 - GUI: grid visual de cartas, 100% configurable dentro de los límites vanilla
+- **Shift + clic** en una carta del inventario: va al objeto de la mesa si la admite y no choca con sus encantamientos (una carta); si no, al par de combinación, repartiendo el stack a partes iguales entre las dos ranuras (lo impar se queda en el inventario). Con objeto en la mesa que la rechaza, solo pasa a combinación si forma pareja que pueda subir de nivel
+
+### Zinc Smelter
+- Horno independiente para la cadena del latón (calcita → óxido de zinc → lámina de zinc → lingote de latón); combustible solo lava o varas de blaze
+- Se rompe con pico de hierro o superior y suelta el bloque (loot table)
 
 ### Infusion Coil (módulo 1)
 - Carta mágica → XP almacenado en tank interno
@@ -33,50 +41,8 @@
 - Estética general: fondo estrellado oscuro, acentos dorados y cian, borde morado
 - Referencia visual interactiva en `reference/`
 
----
-
-## Material base del mod
-
-### Cristal Horneado ♦
-**Crafteo:** Cuarzo de Nether → (horno) → Cristal Horneado
-
-- Forma de rombo, igual que un fragmento de amatista pero transparente/blanquecino
-- **Material base de todo lo mágico del mod** — aparece en la cadena de crafteo de cristales de color, gemas arcanas, essence shield y futuros módulos
-- Requiere haber ido al Nether → progresión natural antes de acceder a mecánicas avanzadas
-- Equivalente al *vis cristal* de Thaumcraft: señaliza al jugador que está en territorio avanzado del mod
-
-### Cristales de Color
-**Crafteo:** Cristal Horneado + mineral de color → Cristal de [color]
-
-6 tipos, forma de rombo, cada uno con su color distintivo:
-
-| Color | Mineral | Usos en el mod |
-|---|---|---|
-| Azul | Lapislázuli | Gemas de Protección |
-| Verde | Esmeralda | Gemas de Naturaleza |
-| Rojo | Redstone | Gemas de Combate |
-| Amarillo | Oro (lingote) | Gemas de Utilidad |
-| Morado | Fragmento de amatista | Gemas Arcanas |
-| Negro | Obsidiana | Gemas de Maldición |
-
-- El **color identifica la categoría** del encantamiento
-- La **runa grabada** sobre el cristal identifica el encantamiento específico dentro de esa categoría
-- Son el ingrediente intermedio para craftear gemas arcanas del colgante
-- Se reutilizarán en futuras mecánicas del mod como material común
-
----
-
-## Esencia Mágica
-- Nuevo material producido a partir de cartas + XP (módulo destilador, **pendiente de definir**)
-- Ingrediente en crafteos avanzados: cristales de color, essence shield, gemas arcanas, Cristal Foco
-- No es un recurso de energía en tiempo real, es un material crafteable/consumible
-
-### Cristal Foco
-- Curio equipable que el jugador lleva encima para almacenar esencia mágica
-- Crafteado con Cristal Horneado
-- Los encantamientos mágicos del mod (como Freezing) consumen esencia de este depósito al activarse
-- Si se agota, los efectos que requieren esencia no se activan
-- Niveles con distintas capacidades de almacenamiento (**pendiente de definir**)
+### Idiomas
+- Inglés y español (revisados); portugués de Brasil, ruso, chino simplificado, francés, alemán y japonés pendientes de revisión nativa
 
 ---
 
@@ -89,14 +55,14 @@ Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En un atril de ba
 | Protección / Naturaleza / Combate / Utilidad / Arcano | Cartas de su color | Sesgo hacia su categoría y, más aún, hacia los encantamientos guardados |
 | Comodín de Rareza | Cartas de maldición | Favorece encantamientos de peso bajo |
 
-Arcano agrupa los encantamientos de tesoro (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) como "magia rara": la mesa nunca los da, pero sus cartas suman fuerza a la baraja Arcana.
+Cada color tiene un tema: **Combate**, todo lo que hace daño o empuja (también arco y ballesta); **Arcano**, lo mágico —fuego, hielo, rayo, viento, almas y experiencia—, salga o no de la mesa (Mending, Soul Speed, Frost Walker y Wind Burst son de tesoro: la mesa nunca los da, pero sus cartas suman fuerza a la baraja Arcana); **Utilidad**, velocidad y durabilidad (Efficiency, Unbreaking, Quick Charge, Swift Sneak, Magnetism).
 
 - **Receta**: 2 latón + 2 cuero + 1 carta del tipo (se consume). Rareza: carta negra.
 - **Puntos**: carta de nivel N = 2^(N-1) puntos (misma equivalencia que combinar). Máximo 64 por baraja.
 - **Resonancia** `R = min(1, √(puntos de categoría / 64))`; comodín `Rr = min(1, √(puntos / 64))`. Crece rápido al principio (unas pocas cartas de nivel I ya se notan) y llega al máximo con una baraja llena; más barajas no lo suben, pero añaden reserva y poder.
 - **Peso** de cada candidato `e`: `w · (1 + 2·R·cuotaCategoría) · (1 + 4·R·cuotaEncantamiento) · (1 + 2·Rr·(10 − w)/9)`. La parte de categoría favorece la categoría frente a las otras (hasta ×3); la exacta, el encantamiento frente al resto de su categoría (hasta ×5, ×15 en total). La cuota de categoría cuenta todas las cartas; la del encantamiento, solo las de nivel máximo. El factor de Rareza solo se aplica con peso ≤ 2. El sesgo es relativo: una librería equilibrada ≈ vanilla.
 - **Poder de la mesa**: cada 3 barajas con cartas cuentan como 2 librerías (un atril lleno = las 2 librerías apiladas que cabrían en su columna): `⌊2·barajas/3⌋`. Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
-- **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2 (Fire Aspect ×3), Fire/Blast Protection ×1,5, Flame ×1,5, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5.
+- **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2, Fire/Blast Protection ×1,5, fuego Arcano (Fire Aspect, Flame) ×2, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5; llanuras (`#c:is_plains`) → Harvesting ×1,5.
 - **Influencia**: cada elección se acopla a la vanilla (acoplamiento máximo): se hace la tirada vanilla con el random de la mesa y se conserva con probabilidad `min(1, p_baraja / p_vanilla)`; si no, se elige entre los encantamientos favorecidos en proporción a `p_baraja − p_vanilla`. La distribución final es la de las barajas, pero solo cambian una elección que han causado. Esas elecciones son las *influidas*; no cuentan las que salen igual que en vanilla, las que cambian en cadena porque una anterior cambió (se eligen con pesos vanilla) ni las debidas al poder. El azar del acoplamiento sale de un random aparte sembrado por opción, para que la pista coincida con el resultado. La mesa marca las opciones con alguno (carta pequeña arriba a la derecha y línea en el tooltip), sincronizado con un `DataSlot`.
 - **Desgaste**: ver *Desgaste de cartas* más abajo.
 - Código: paquete `library/` (`DeckEffect` y sus implementaciones, `CardStorage`, `DeckLibrary`, `LibraryProfile`), servicios `LibraryResonanceService`, `DeckEnchantmentSelector`, `DeckWearService` y mixin `EnchantmentMenuMixin`.
@@ -148,7 +114,11 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 ---
 
-## Nuevos encantamientos
+## Encantamientos
+
+### Peso y rareza
+
+El **peso** de un encantamiento (vanilla) es su probabilidad relativa en la mesa: cuanto mayor, más común. La mesa elige con probabilidad `peso / suma de pesos` de los candidatos. Vanilla usa 10 (común: Protection, Sharpness, Efficiency, Power), 5 (poco común: Smite, Unbreaking, Feather Falling), 2 (raro: Fortune, Looting, Fire Aspect) y 1 (muy raro: Silk Touch, Thorns, Infinity). Las barajas multiplican esos pesos; la de Rareza solo actúa con peso ≤ 2, así ayuda a lo raro sin volverlo común. Los del mod: Magnetism 2 (raro, entra en Rareza), Harvesting 3.
 
 ### Categorías de encantamientos (por color de cristal/gema)
 
@@ -156,24 +126,95 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 |---|---|---|
 | Azul | Protección | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
 | Verde | Naturaleza | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, Harvesting* |
-| Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Momentum* |
-| Amarillo | Utilidad | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge |
-| Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed, Freezing* + encantamientos propios del mod |
+| Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Power, Punch, Multishot, Piercing, Momentum* |
+| Amarillo | Utilidad | Efficiency, Unbreaking, Quick Charge, Swift Sneak, Magnetism* |
+| Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Fire Aspect, Flame, Infinity, Mending, Soul Speed, Freezing* + encantamientos propios del mod |
 | Negro | Maldición | Curse of Vanishing, Curse of Binding + maldiciones propias del mod |
 
-> *Encantamientos nuevos del mod
-
----
+> \* Encantamientos nuevos del mod. Magnetism y Harvesting están implementados; Momentum y Freezing, solo diseñados (ver más abajo).
 
 ### Magnetism *(nuevo — Utilidad/Amarillo)*
 - Ítems y orbes de XP cercanos se atraen automáticamente al jugador
-- Disponible en herramientas y armadura
+- Solo armaduras metálicas (malla, hierro, cobre, oro y netherita; tag `enchanttransfer:enchantable/magnetism`); cuenta puesta, y vale el nivel más alto que lleve
+- **Niveles y alcance:** I = 4 bloques · II = 6 · III = 8 · IV = 10 · V = 12
+- Agacharse lo desactiva; los ítems que tira el propio jugador (o con retraso de recogida) no se atraen
+- Mesa de encantamientos, aldeanos y botín (`non_treasure`); peso 2 (raro)
 - No existe en vanilla
 
 ### Harvesting *(nuevo — Naturaleza/Verde)*
-- Los cultivos se auto-replanten al ser cosechados
-- Disponible en azada
-- No existe en vanilla
+Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_treasure`); peso 3. No existe en vanilla.
+
+**Azada** — clic derecho en un cultivo maduro:
+- Lo cosecha (botín normal, Fortuna incluida) y lo vuelve a plantar
+- **Solo si el jugador lleva en el inventario la semilla de ese cultivo** (gasta una; en creativo no). Sin semilla, o con el cultivo sin madurar, no hace nada
+- Coste de experiencia configurable por mundo con reglas de juego: `enchanttransfer:harvesting_field_xp_cost` (por 9×9) y `enchanttransfer:harvesting_tree_xp_cost` (por árbol), 0,5 niveles por defecto; 0 lo hace gratis
+- Desgasta la azada 1 punto por cultivo, igual que arar la tierra; cada cultivo gasta su semilla, así que se cosecha como mucho tantos como semillas lleves
+- **II:** además los dos cultivos siguientes en la dirección a la que miras (fila de 3)
+- **III:** el campo entero: todos los cultivos iguales conectados en esa capa (los que no están maduros se cruzan pero no se cosechan). Sin tope de tamaño: cuesta **0,5 niveles de experiencia por cada 9×9 empezado** (81 cultivos), cobrados tras cosechar por lo realmente cosechado. Si no llega la experiencia se cosechan solo los 9×9 que se puedan pagar; si no llega ni para uno, hace la fila de II
+- **IV:** además hace crecer con polvo de hueso cada cultivo replantado; en campo entero, si llevas polvo de hueso, el coste se duplica (1 nivel por 9×9)
+- Agacharse limita la cosecha al cultivo pinchado
+- Cultivos: cualquier `CropBlock` (trigo, zanahorias, patatas, remolachas y los de otros mods que usen esa clase, sin configurar nada) + el tag de bloque `enchanttransfer:harvesting_replantable` para los que crecen con una propiedad `age` sin ser `CropBlock` (verruga del Nether, cacao) − el tag `enchanttransfer:harvesting_excluded`. La semilla que gasta es el ítem de "pick block" del cultivo
+
+**Hacha** — al romper un tronco de un **árbol natural** (algún tronco conectado toca hojas que no colocó un jugador, o follaje de `harvesting_foliage`); con construcciones no hace nada:
+- **I:** si el tronco roto estaba sobre tierra (la base), planta el plantón del árbol, si el jugador lo lleva (gasta uno)
+- **II:** además tala los troncos que hay justo encima, en línea recta (el tronco principal, sin ramas)
+- **III:** tala el árbol entero, ramas incluidas (tope de 256 troncos), por **0,5 niveles de experiencia**; sin ellos tala como II
+- **IV:** además hace crecer el plantón replantado con polvo de hueso del inventario, uno a uno con la probabilidad de vanilla, hasta que sale el árbol; si no hay sitio, se detiene sin gastar más
+- La tala va de arriba abajo y cuesta 1 punto de durabilidad por tronco (para si el hacha se rompe). Agacharse desactiva la tala en cadena
+- Árboles de 2×2 (roble oscuro, roble pálido, abeto y jungla gigantes): con III se replanta un plantón en cada una de las 4 bases
+- Plantón de cada árbol: reglas de datapack en `data/<ns>/enchanttransfer/harvesting_sapling/*.json` (`logs`: id, lista o `#tag`; `sapling`), con las de vanilla incluidas (el mangle da propágulo; carmesí y distorsionado, hongos sobre nilio). Sin regla, se deduce por nombre en el mismo namespace: `x_log`/`x_stem` → `x_sapling`, `x_propagule` o `x_fungus`; si no existe, se tala pero no se replanta
+- Árboles de otros mods: funcionan si sus troncos están en `#minecraft:logs` y sus hojas en `#minecraft:leaves` (lo normal); otro follaje natural se añade al tag `enchanttransfer:harvesting_foliage` (por defecto, los bloques de verruga del Nether)
+
+---
+
+# 📝 Diseñado, sin implementar
+
+## Material base del mod
+
+### Cristal Horneado ♦
+**Crafteo:** Cuarzo de Nether → (horno) → Cristal Horneado
+
+- Forma de rombo, igual que un fragmento de amatista pero transparente/blanquecino
+- **Material base de todo lo mágico del mod** — aparece en la cadena de crafteo de cristales de color, gemas arcanas, essence shield y futuros módulos
+- Requiere haber ido al Nether → progresión natural antes de acceder a mecánicas avanzadas
+- Equivalente al *vis cristal* de Thaumcraft: señaliza al jugador que está en territorio avanzado del mod
+
+### Cristales de Color
+**Crafteo:** Cristal Horneado + mineral de color → Cristal de [color]
+
+6 tipos, forma de rombo, cada uno con su color distintivo:
+
+| Color | Mineral | Usos en el mod |
+|---|---|---|
+| Azul | Lapislázuli | Gemas de Protección |
+| Verde | Esmeralda | Gemas de Naturaleza |
+| Rojo | Redstone | Gemas de Combate |
+| Amarillo | Oro (lingote) | Gemas de Utilidad |
+| Morado | Fragmento de amatista | Gemas Arcanas |
+| Negro | Obsidiana | Gemas de Maldición |
+
+- El **color identifica la categoría** del encantamiento
+- La **runa grabada** sobre el cristal identifica el encantamiento específico dentro de esa categoría
+- Son el ingrediente intermedio para craftear gemas arcanas del colgante
+- Se reutilizarán en futuras mecánicas del mod como material común
+
+---
+
+## Esencia Mágica
+- Nuevo material producido a partir de cartas + XP (módulo destilador, **pendiente de definir**)
+- Ingrediente en crafteos avanzados: cristales de color, essence shield, gemas arcanas, Cristal Foco
+- No es un recurso de energía en tiempo real, es un material crafteable/consumible
+
+### Cristal Foco
+- Curio equipable que el jugador lleva encima para almacenar esencia mágica
+- Crafteado con Cristal Horneado
+- Los encantamientos mágicos del mod (como Freezing) consumen esencia de este depósito al activarse
+- Si se agota, los efectos que requieren esencia no se activan
+- Niveles con distintas capacidades de almacenamiento (**pendiente de definir**)
+
+---
+
+## Encantamientos pendientes
 
 ### Momentum *(nuevo — Combate/Rojo)*
 - Cada golpe consecutivo al mismo mob aumenta ligeramente el daño
@@ -199,6 +240,8 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 ## Nuevos bloques
 
+> En revisión: ideas parecidas existen en otros mods (Cyclic, etc.).
+
 ### Speed Pad
 - Aumenta la velocidad de movimiento al pisarlo
 - Crafteado con esencia mágica
@@ -207,6 +250,7 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 - Atrae ítems y orbes de XP cercanos hacia él
 - Útil junto a granjas automáticas
 - Crafteado con esencia mágica
+- Independiente de Magnetism: este atrae hacia un **bloque** (p. ej. para que una tolva los recoja); Magnetism, hacia el jugador
 
 ---
 
@@ -251,25 +295,6 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 ---
 
-## Sistema de Portales
-> ⚠️ **DESCARTADO** — demasiado similar a Waystones (mod muy popular que hace exactamente esto). Los cristales de color siguen existiendo como material del mod con otros usos.
-
----
-
-## Ideas descartadas
-
-| Idea | Motivo |
-|---|---|
-| Sistema de portales | Demasiado similar a Waystones (mod muy popular) |
-| Romper reglas vanilla (encantamientos incompatibles, superar nivel máximo, ítems no compatibles) | Más un cheat que una mecánica satisfactoria |
-| Scrying Basin (ver otra ubicación en tiempo real) | Demasiado costoso en servidor |
-| Echo Module (duplicar cartas con mucho XP) | Controvertido, rompe balance |
-| Curse Siphon, Tome Binder, Auto-Combiner | No suficientemente diferenciadores |
-| Efectos de área sin catalizador | Demasiado pasivo, no convence |
-| Speed Pad, Attractor | Replicados en docenas de mods (Cyclic, etc.) — reconsiderar |
-
----
-
 ## Pendiente de definir
 
 ### Mecánicas
@@ -286,3 +311,17 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 - [ ] Receta del Essence Shield (lleva Cristal Horneado, resto pendiente)
 - [ ] Receta del Cristal Foco (lleva Cristal Horneado, resto pendiente)
 - [ ] Niveles del Cristal Foco y sus capacidades
+
+---
+
+# ❌ Descartado
+
+| Idea | Motivo |
+|---|---|
+| Sistema de portales | Demasiado similar a Waystones (mod muy popular). Los cristales de color siguen como material del mod con otros usos |
+| Romper reglas vanilla (encantamientos incompatibles, superar nivel máximo, ítems no compatibles) | Más un cheat que una mecánica satisfactoria |
+| Scrying Basin (ver otra ubicación en tiempo real) | Demasiado costoso en servidor |
+| Echo Module (duplicar cartas con mucho XP) | Controvertido, rompe balance |
+| Curse Siphon, Tome Binder, Auto-Combiner | No suficientemente diferenciadores |
+| Efectos de área sin catalizador | Demasiado pasivo, no convence |
+
