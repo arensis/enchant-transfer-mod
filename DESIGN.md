@@ -179,14 +179,17 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 **Azada** — clic derecho en un cultivo maduro:
 - Lo cosecha (botín normal, Fortuna incluida) y lo vuelve a plantar
 - **Solo si el jugador lleva en el inventario la semilla de ese cultivo** (gasta una; en creativo no). Sin semilla, o con el cultivo sin madurar, no hace nada
-- Desgasta la azada 1 punto por cultivo, igual que arar la tierra
-- **IV:** además gasta polvo de hueso del inventario para que el cultivo replantado crezca al momento
+- Desgasta la azada 1 punto por cultivo, igual que arar la tierra; cada cultivo gasta su semilla, así que se cosecha como mucho tantos como semillas lleves
+- **II:** además los dos cultivos siguientes en la dirección a la que miras (fila de 3)
+- **III:** el campo entero: todos los cultivos iguales conectados en esa capa (los que no están maduros se cruzan pero no se cosechan). Sin tope de tamaño: cuesta **0,5 niveles de experiencia por cada 9×9 empezado** (81 cultivos), cobrados tras cosechar por lo realmente cosechado. Si no llega la experiencia se cosechan solo los 9×9 que se puedan pagar; si no llega ni para uno, hace la fila de II
+- **IV:** además hace crecer con polvo de hueso cada cultivo replantado; en campo entero, si llevas polvo de hueso, el coste se duplica (1 nivel por 9×9)
+- Agacharse limita la cosecha al cultivo pinchado
 - Cultivos: tag de bloque `enchanttransfer:harvesting_replantable` (trigo, zanahorias, patatas, remolachas, verruga del Nether, cacao); maduro = propiedad `age` al máximo
 
 **Hacha** — al romper un tronco de un **árbol natural** (algún tronco conectado toca hojas que no colocó un jugador, o bloques de verruga del Nether); con construcciones no hace nada:
 - **I:** si el tronco roto estaba sobre tierra (la base), planta el plantón del árbol, si el jugador lo lleva (gasta uno)
 - **II:** además tala los troncos que hay justo encima, en línea recta (el tronco principal, sin ramas)
-- **III:** tala el árbol entero, ramas incluidas (tope de 256 troncos)
+- **III:** tala el árbol entero, ramas incluidas (tope de 256 troncos), por **0,5 niveles de experiencia**; sin ellos tala como II
 - **IV:** además hace crecer el plantón replantado con polvo de hueso del inventario, uno a uno con la probabilidad de vanilla, hasta que sale el árbol; si no hay sitio, se detiene sin gastar más
 - La tala va de arriba abajo y cuesta 1 punto de durabilidad por tronco (para si el hacha se rompe). Agacharse desactiva la tala en cadena
 - Árboles de 2×2 (roble oscuro, roble pálido, abeto y jungla gigantes): con III se replanta un plantón en cada una de las 4 bases
