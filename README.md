@@ -38,9 +38,9 @@ Version 2.0 introduced the **Module System**: specialized blocks that attach to 
 
 **Requires:** Fabric Loader and Fabric API
 
-**Languages:** English · Español · Português (Brasil)\* · Русский\* · 简体中文\* · Français\* · Deutsch\* · 日本語\*
+**Languages:** English · Español · Português (Brasil)\* · Русский\* · 简体中文\* · Français\* · Deutsch\* · 日本語\* — **New:** Français, Deutsch and 日本語
 
-> \* Pending review by a native speaker. Do you speak one of them? Help us review the translations or add your own language: open an [issue](https://github.com/arensis/enchant-transfer-mod/issues) or a pull request editing the [language files](https://github.com/arensis/enchant-transfer-mod/tree/master/src/main/resources/assets/enchanttransfer/lang).
+> \* Pending review by a native speaker (Portuguese, Russian, Chinese, French, German and Japanese). Do you speak one of them? Help us review the translations or add your own language: open an [issue](https://github.com/arensis/enchant-transfer-mod/issues) or a pull request editing the [language files](https://github.com/arensis/enchant-transfer-mod/tree/master/src/main/resources/assets/enchanttransfer/lang).
 
 ---
 
@@ -53,6 +53,8 @@ Place any enchanted item or book in the Transfer Table to strip its enchantments
 ### Apply
 
 Place a Magic Card and a target item in the Transfer Table. The enchantment transfers instantly, respecting vanilla incompatibility rules.
+
+**Shift + click** a card in your inventory and it goes straight onto the item on the table, if the item accepts it and it doesn't clash with its enchantments. Otherwise it goes to the combine slots, the stack split evenly between both (the odd card stays in your inventory) — with an item on the table, only when the cards make a pair that can level up.
 
 ### Combine
 
@@ -73,11 +75,39 @@ Magic Cards are now color-coded by enchantment category. When you extract an enc
 | Card | Category | Enchantments |
 |------|----------|-------------|
 | 🔵 Blue | Protection | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
-| 🟢 Green | Nature | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure |
+| 🟢 Green | Nature | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, Harvesting\* |
 | 🔴 Red | Combat | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge |
-| 🟡 Yellow | Utility | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge |
+| 🟡 Yellow | Utility | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge, Magnetism\* |
 | 🟣 Purple | Arcane | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed |
 | ⚫ Black | Curse | Curse of Vanishing, Curse of Binding |
+
+\* Added by this mod, see [Enchantments](#enchantments-).
+
+---
+
+## Enchantments 🆕
+
+Two new enchantments, from the Enchanting Table, villagers and loot — and, like any other, extractable into Magic Cards.
+
+### Magnetism
+
+**Utility · I–III · tools and armor.** Held or worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 blocks. Sneak to switch it off; items you throw yourself are left alone.
+
+### Harvesting
+
+**Nature · I–IV · hoes and axes.** It only works when you carry what it replants — the crop's seed or the tree's sapling — and spends one per plant.
+
+| Level | Hoe — right-click a ripe crop | Axe — break a log of a natural tree |
+|-------|-------------------------------|-------------------------------------|
+| I | Harvests it and replants it | Replants the sapling where the base log was |
+| II | Also the next two crops ahead (a row of 3) | Also fells the logs straight above |
+| III | The whole connected field, for **0.5 XP levels per started 9×9** | The whole tree, branches included, for **0.5 XP levels** |
+| IV | Grows every replanted crop with bone meal from your inventory (doubles the field's XP cost) | Grows the replanted sapling into a tree with bone meal from your inventory |
+
+- **Wear**: 1 durability per crop or log, like tilling or chopping. **Sneak** to harvest a single crop or chop a single log.
+- **Not enough XP**: the field is cut to the 9×9s you can pay for (or a row if not even one), and a tree falls like level II.
+- **Safe for builds**: it only fells trees whose logs touch leaves that grew there, not leaves placed by a player (up to 256 logs).
+- **Crops and trees from other mods**: any crop built on vanilla's crop block works out of the box; others can be added to the `#enchanttransfer:harvesting_replantable` block tag (or left out with `harvesting_excluded`). Trees whose logs and leaves are in `#minecraft:logs` and `#minecraft:leaves` are felled, and the sapling comes from datapack rules in `data/<namespace>/enchanttransfer/harvesting_sapling/` — `{"logs": "mymod:maple_log", "sapling": "mymod:maple_sapling"}` — or, without one, from the name (`maple_log` → `maple_sapling`). They reload with `/reload`.
 
 ---
 
@@ -251,7 +281,19 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ---
 
-## Changelog — 3.1.x
+## Changelog — 3.2.x
+
+### 3.2.0
+
+- **Magnetism** — New Utility enchantment (I–III) for tools and armor: pulls nearby items and XP orbs toward you (4 / 6 / 8 blocks). Sneak to switch it off
+- **Harvesting** — New Nature enchantment (I–IV) for hoes and axes. Hoe: right-click a ripe crop to harvest and replant it, then a row of 3, the whole field (0.5 XP levels per 9×9) and bone meal growth. Axe: replant the sapling, then fell the trunk, the whole tree (0.5 XP levels) and grow the sapling back with bone meal. It spends a seed or sapling from your inventory per plant, and only fells natural trees
+- **Crops and trees from other mods** — Harvesting works with other mods' crops out of the box, and their trees through datapack rules in `data/<namespace>/enchanttransfer/harvesting_sapling/` or the `_log` → `_sapling` naming convention
+- **Shift + click at the Transfer Table** — A card goes straight onto the item when it fits; otherwise the stack is split evenly into both combine slots. Colored cards can now be shift-clicked too
+- **Zinc Smelter drops itself** — It dropped nothing when mined; it now drops with an iron pickaxe or better
+- **New languages** — French (fr_fr), German (de_de) and Japanese (ja_jp)
+
+<details>
+<summary>Previous versions</summary>
 
 ### 3.1.2
 
@@ -280,9 +322,6 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 - **26.2 enchantments categorized** — Knockback, Density, Breach, Lunge, Flame, Multishot, Piercing, Quick Charge, Luck of the Sea, Lure and Wind Burst now have card colors
 - **Arcane = rare magic** — All treasure enchantments (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) are now Arcane cards. Cards already extracted keep their color and still go into the matching deck
 - **Lighter website** — 3D block previews are now static images, much faster on phones
-
-<details>
-<summary>Previous versions</summary>
 
 ### 3.0.0
 

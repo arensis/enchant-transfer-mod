@@ -68,11 +68,13 @@
 <nav class="nav-menu">
   <a href="#overview">Overview</a>
   <a href="#transfer-table">Transfer Table</a>
-  <a href="#card-decks">Card Decks <span class="nav-badge">New</span></a>
   <a href="#typed-cards">Typed Cards</a>
+  <a href="#enchantments">Enchantments <span class="nav-badge">New</span></a>
+  <a href="#card-decks">Card Decks</a>
   <a href="#zinc-smelter">Zinc Smelter</a>
   <a href="#infusion-coil">Infusion Coil</a>
   <a href="#installation">Installation</a>
+  <a href="#translations">Translations <span class="nav-badge">New</span></a>
   <a href="#compatibility">Compatibility</a>
   <a href="#changelog">Changelog</a>
 </nav>
@@ -87,7 +89,7 @@
     <!-- AUTO:requires -->
     <p class="requires"><strong>Requires:</strong> Fabric Loader and Fabric API · Minecraft 26.2 | 1.21.11</p>
     <!-- /AUTO:requires -->
-    <p class="requires"><strong>Languages:</strong> English · Español · Português (Brasil)* · Русский* · 简体中文* · Français* · Deutsch* · 日本語* <a href="#translations">(*pending review)</a></p>
+    <p class="requires"><strong>Languages:</strong> English · Español · Português (Brasil)* · Русский* · 简体中文* · Français* · Deutsch* · 日本語* <span class="badge badge-new">New</span> <a href="#translations">(*pending review)</a></p>
     <p class="links">
       <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer">CurseForge</a>
       <span class="sep">·</span>
@@ -159,7 +161,7 @@
     </div>
     <div class="feature-card">
       <h3>Apply</h3>
-      <p>Place a Magic Card and a target item in the Transfer Table. The enchantment transfers instantly, respecting vanilla incompatibility rules.</p>
+      <p>Place a Magic Card and a target item in the Transfer Table. The enchantment transfers instantly, respecting vanilla incompatibility rules. <strong>Shift + click</strong> a card in your inventory to send it straight onto the item, or split the stack into both combine slots.</p>
     </div>
     <div class="feature-card">
       <h3>Combine</h3>
@@ -246,7 +248,7 @@
         <tr>
           <td><img class="card-icon" src="images/magic_card_green.png" alt="">Green</td>
           <td>Nature</td>
-          <td>Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure</td>
+          <td>Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, <a href="#enchantments">Harvesting</a>*</td>
         </tr>
         <tr>
           <td><img class="card-icon" src="images/magic_card_red.png" alt="">Red</td>
@@ -256,7 +258,7 @@
         <tr>
           <td><img class="card-icon" src="images/magic_card_yellow.png" alt="">Yellow</td>
           <td>Utility</td>
-          <td>Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge</td>
+          <td>Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge, <a href="#enchantments">Magnetism</a>*</td>
         </tr>
         <tr>
           <td><img class="card-icon" src="images/magic_card_purple.png" alt="">Purple</td>
@@ -271,11 +273,51 @@
       </tbody>
     </table>
   </div>
+  <p>* Added by this mod.</p>
+
+  <h3>Shift + click</h3>
+  <p>Shift + click a card in your inventory and it goes straight onto the item on the table, if the item accepts it and it doesn't clash with its enchantments. Otherwise it goes to the combine slots, the stack split evenly between both (the odd card stays in your inventory) — with an item on the table, only when the cards make a pair that can level up.</p>
+
+  <hr class="sep">
+
+  <!-- ENCHANTMENTS -->
+  <h2 id="enchantments"><span class="accent">Enchant</span>ments <span class="badge badge-new">New</span></h2>
+
+  <p>Two new enchantments, from the Enchanting Table, villagers and loot — and, like any other, extractable into Magic Cards.</p>
+
+  <h3>Magnetism</h3>
+  <p><strong>Utility · I–III · tools and armor.</strong> Held or worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 blocks. Sneak to switch it off; items you throw yourself are left alone.</p>
+
+  <h3>Harvesting</h3>
+  <p><strong>Nature · I–IV · hoes and axes.</strong> It only works when you carry what it replants — the crop's seed or the tree's sapling — and spends one per plant.</p>
+  <div class="card-table-wrap">
+    <table class="card-table">
+      <thead><tr><th>Level</th><th>Hoe — right-click a ripe crop</th><th>Axe — break a log of a natural tree</th></tr></thead>
+      <tbody>
+        <tr><td>I</td><td>Harvests it and replants it</td><td>Replants the sapling where the base log was</td></tr>
+        <tr><td>II</td><td>Also the next two crops ahead (a row of 3)</td><td>Also fells the logs straight above</td></tr>
+        <tr><td>III</td><td>The whole connected field, for <strong>0.5 XP levels per started 9×9</strong></td><td>The whole tree, branches included, for <strong>0.5 XP levels</strong></td></tr>
+        <tr><td>IV</td><td>Grows every replanted crop with bone meal from your inventory (doubles the field's XP cost)</td><td>Grows the replanted sapling into a tree with bone meal from your inventory</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <ul>
+    <li><strong>Wear:</strong> 1 durability per crop or log, like tilling or chopping. <strong>Sneak</strong> to harvest a single crop or chop a single log</li>
+    <li><strong>Not enough XP:</strong> the field is cut to the 9×9s you can pay for (or a row if not even one), and a tree falls like level II</li>
+    <li><strong>Safe for builds:</strong> it only fells trees whose logs touch leaves that grew there, not leaves placed by a player (up to 256 logs)</li>
+  </ul>
+
+  <h3>Crops and trees from other mods</h3>
+  <p>Any crop built on vanilla's crop block works out of the box; others can be added to the <code>#enchanttransfer:harvesting_replantable</code> block tag (or left out with <code>harvesting_excluded</code>). Trees whose logs and leaves are in <code>#minecraft:logs</code> and <code>#minecraft:leaves</code> are felled, and the sapling comes from datapack rules in <code>data/&lt;namespace&gt;/enchanttransfer/harvesting_sapling/</code>, or, without one, from the name (<code>maple_log</code> → <code>maple_sapling</code>). They reload with <code>/reload</code>:</p>
+  <pre><code>{
+  "logs": "mymod:maple_log",
+  "sapling": "mymod:maple_sapling"
+}</code></pre>
 
   <hr class="sep">
 
   <!-- CARD DECKS -->
-  <h2 id="card-decks"><span class="accent">Card</span> Decks <span class="badge badge-new">New</span></h2>
+  <h2 id="card-decks"><span class="accent">Card</span> Decks</h2>
 
   <p>Brass-bound decks that store Magic Cards of one type. Place them in a <strong>Deck Lectern</strong> near an Enchanting Table and the table gains power and starts favoring what you've stored.</p>
 
@@ -609,8 +651,8 @@
 
   <!-- COMPATIBILITY -->
   <div class="compat" id="compatibility">
-    <h3 id="translations">Translations</h3>
-    <p>The mod is available in <strong>English</strong>, <strong>Español</strong>, <strong>Português (Brasil)</strong>, <strong>Русский</strong>, <strong>简体中文</strong>, <strong>Français</strong>, <strong>Deutsch</strong> and <strong>日本語</strong>. All translations except English and Spanish are <strong>pending review by a native speaker</strong>.</p>
+    <h3 id="translations">Translations <span class="badge badge-new">New</span></h3>
+    <p>The mod is available in <strong>English</strong>, <strong>Español</strong>, <strong>Português (Brasil)</strong>, <strong>Русский</strong>, <strong>简体中文</strong>, <strong>Français</strong>, <strong>Deutsch</strong> and <strong>日本語</strong>. The Portuguese, Russian, Chinese, French, German and Japanese translations are <strong>pending review by a native speaker</strong> — French, German and Japanese are new in 3.2.0.</p>
     <p>Do you speak one of them? Help us review the translations or add your own language: open an <a href="https://github.com/arensis/enchant-transfer-mod/issues">issue</a> or a pull request editing the <a href="https://github.com/arensis/enchant-transfer-mod/tree/master/src/main/resources/assets/enchanttransfer/lang">language files</a>.</p>
 
     <h3>Compatibility with 3.0.x worlds</h3>
@@ -623,41 +665,51 @@
   </div>
 
   <!-- CHANGELOG -->
-  <h2 id="changelog"><span class="accent">Changelog</span> — 3.1.x</h2>
+  <h2 id="changelog"><span class="accent">Changelog</span> — 3.2.x</h2>
 
-  <h3>3.1.2</h3>
+  <h3>3.2.0</h3>
   <ul>
-    <li><strong>Card reserve</strong> — Decks no longer lose whole cards at random: each card holds a reserve (its points) that marked enchantments wear down gradually, in proportion to the level obtained and to how much each deck kind boosted it. Options the decks can't pay for are disabled</li>
-    <li><strong>Exact bonus from max-level cards</strong> — Every card favors its category; only max-level cards favor their exact enchantment</li>
-    <li><strong>Rarity wildcard</strong> — Only favors and is only worn by rare enchantments (Fortune, Looting, Silk Touch, Thorns…)</li>
-    <li><strong>Stronger deck bonus</strong> — The category part and the exact-enchantment part now multiply (category up to ×3, exact up to ×15 in all), and strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck</li>
-    <li><strong>Deck screen</strong> — Right-click with a deck in hand to open it and organize its cards at a glance; the deck's tooltip shows its reserve and each worn card's</li>
-    <li><strong>Lectern contribution</strong> — The amethyst gem's tooltip in the lectern screen shows what its decks give a table, next to each maximum</li>
-    <li><strong>Deck Lectern = two bookshelves</strong> — A full lectern now counts as the two bookshelves stacked in its column. It only counts at the table's own height, and nothing can be placed on top of it</li>
-    <li><strong>Influence mark</strong> — Enchanting Table options changed by the decks show a small card and an <em>Influenced by card decks</em> tooltip line</li>
-  </ul>
-
-  <h3>3.1.1</h3>
-  <ul>
-    <li><strong>Translatable tooltips</strong> — Module tooltips in the Selector, Transfer Table and Infusion Coil screens (empty sockets, directions, XP level, Idle/Infusing) are no longer hardcoded in English</li>
-    <li><strong>New languages</strong> — Simplified Chinese (zh_cn), Brazilian Portuguese (pt_br) and Russian (ru_ru)</li>
-  </ul>
-
-  <h3>3.1.0</h3>
-  <ul>
-    <li><strong>Card Decks</strong> — New brass-bound decks that store Magic Cards of one type: Protection, Nature, Combat, Utility, Arcane, and a Rarity wildcard filled with Curse cards. Crafted with 2 Brass Ingots, 2 Leather and 1 card of the deck's type (the card is consumed). Store and take cards with right-click, like a bundle</li>
-    <li><strong>Deck Lectern</strong> — New block that holds 3 decks on a tilted tray under a glass bell. A lamp per slot shows whether each deck has cards, and Shift + right-click toggles it (the amethyst on top glows while active). Every 3 decks holding cards count as one bookshelf of enchanting power, adding up with regular bookshelves (vanilla cap of 15 still applies)</li>
-    <li><strong>Steered enchanting</strong> — Decks make the table favor their category, and even more the exact enchantments stored (up to ×3 with a specialized library). The Rarity wildcard favors rare, low-weight enchantments</li>
-    <li><strong>Location affinity</strong> — Decks resonate with where the table is: Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments in oceans and rivers, Fortune and Silk Touch in forests, jungles and taigas</li>
-    <li><strong>Datapack-driven affinities</strong> — Affinity rules are JSON files in <code>data/&lt;namespace&gt;/enchanttransfer/library_affinity/</code>, so modpacks can add rules for any dimension or biome; they reload with <code>/reload</code></li>
-    <li><strong>Deck wear</strong> — Each enchantment the library helps with has a 20% chance to consume the cheapest matching card</li>
-    <li><strong>26.2 enchantments categorized</strong> — Knockback, Density, Breach, Lunge, Flame, Multishot, Piercing, Quick Charge, Luck of the Sea, Lure and Wind Burst now have card colors</li>
-    <li><strong>Arcane = rare magic</strong> — All treasure enchantments (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) are now Arcane cards. Cards already extracted keep their color and still go into the matching deck</li>
-    <li><strong>Lighter website</strong> — 3D block previews are now static images, much faster on phones</li>
+    <li><strong>Magnetism</strong> — New Utility enchantment (I–III) for tools and armor: pulls nearby items and XP orbs toward you (4 / 6 / 8 blocks). Sneak to switch it off</li>
+    <li><strong>Harvesting</strong> — New Nature enchantment (I–IV) for hoes and axes. Hoe: right-click a ripe crop to harvest and replant it, then a row of 3, the whole field (0.5 XP levels per 9×9) and bone meal growth. Axe: replant the sapling, then fell the trunk, the whole tree (0.5 XP levels) and grow the sapling back with bone meal. It spends a seed or sapling from your inventory per plant, and only fells natural trees</li>
+    <li><strong>Crops and trees from other mods</strong> — Harvesting works with other mods' crops out of the box, and their trees through datapack rules in <code>data/&lt;namespace&gt;/enchanttransfer/harvesting_sapling/</code> or the <code>_log</code> → <code>_sapling</code> naming convention</li>
+    <li><strong>Shift + click at the Transfer Table</strong> — A card goes straight onto the item when it fits; otherwise the stack is split evenly into both combine slots. Colored cards can now be shift-clicked too</li>
+    <li><strong>Zinc Smelter drops itself</strong> — It dropped nothing when mined; it now drops with an iron pickaxe or better</li>
+    <li><strong>New languages</strong> — French (fr_fr), German (de_de) and Japanese (ja_jp)</li>
   </ul>
 
   <details class="changelog-older">
     <summary>Previous versions</summary>
+
+    <h3>3.1.2</h3>
+    <ul>
+      <li><strong>Card reserve</strong> — Decks no longer lose whole cards at random: each card holds a reserve (its points) that marked enchantments wear down gradually, in proportion to the level obtained and to how much each deck kind boosted it. Options the decks can't pay for are disabled</li>
+      <li><strong>Exact bonus from max-level cards</strong> — Every card favors its category; only max-level cards favor their exact enchantment</li>
+      <li><strong>Rarity wildcard</strong> — Only favors and is only worn by rare enchantments (Fortune, Looting, Silk Touch, Thorns…)</li>
+      <li><strong>Stronger deck bonus</strong> — The category part and the exact-enchantment part now multiply (category up to ×3, exact up to ×15 in all), and strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck</li>
+      <li><strong>Deck screen</strong> — Right-click with a deck in hand to open it and organize its cards at a glance; the deck's tooltip shows its reserve and each worn card's</li>
+      <li><strong>Lectern contribution</strong> — The amethyst gem's tooltip in the lectern screen shows what its decks give a table, next to each maximum</li>
+      <li><strong>Deck Lectern = two bookshelves</strong> — A full lectern now counts as the two bookshelves stacked in its column. It only counts at the table's own height, and nothing can be placed on top of it</li>
+      <li><strong>Influence mark</strong> — Enchanting Table options changed by the decks show a small card and an <em>Influenced by card decks</em> tooltip line</li>
+    </ul>
+
+    <h3>3.1.1</h3>
+    <ul>
+      <li><strong>Translatable tooltips</strong> — Module tooltips in the Selector, Transfer Table and Infusion Coil screens (empty sockets, directions, XP level, Idle/Infusing) are no longer hardcoded in English</li>
+      <li><strong>New languages</strong> — Simplified Chinese (zh_cn), Brazilian Portuguese (pt_br) and Russian (ru_ru)</li>
+    </ul>
+
+    <h3>3.1.0</h3>
+    <ul>
+      <li><strong>Card Decks</strong> — New brass-bound decks that store Magic Cards of one type: Protection, Nature, Combat, Utility, Arcane, and a Rarity wildcard filled with Curse cards. Crafted with 2 Brass Ingots, 2 Leather and 1 card of the deck's type (the card is consumed). Store and take cards with right-click, like a bundle</li>
+      <li><strong>Deck Lectern</strong> — New block that holds 3 decks on a tilted tray under a glass bell. A lamp per slot shows whether each deck has cards, and Shift + right-click toggles it (the amethyst on top glows while active). Every 3 decks holding cards count as one bookshelf of enchanting power, adding up with regular bookshelves (vanilla cap of 15 still applies)</li>
+      <li><strong>Steered enchanting</strong> — Decks make the table favor their category, and even more the exact enchantments stored (up to ×3 with a specialized library). The Rarity wildcard favors rare, low-weight enchantments</li>
+      <li><strong>Location affinity</strong> — Decks resonate with where the table is: Combat ×2 in the Nether (Fire Aspect ×3), fire protections and Flame ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments in oceans and rivers, Fortune and Silk Touch in forests, jungles and taigas</li>
+      <li><strong>Datapack-driven affinities</strong> — Affinity rules are JSON files in <code>data/&lt;namespace&gt;/enchanttransfer/library_affinity/</code>, so modpacks can add rules for any dimension or biome; they reload with <code>/reload</code></li>
+      <li><strong>Deck wear</strong> — Each enchantment the library helps with has a 20% chance to consume the cheapest matching card</li>
+      <li><strong>26.2 enchantments categorized</strong> — Knockback, Density, Breach, Lunge, Flame, Multishot, Piercing, Quick Charge, Luck of the Sea, Lure and Wind Burst now have card colors</li>
+      <li><strong>Arcane = rare magic</strong> — All treasure enchantments (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) are now Arcane cards. Cards already extracted keep their color and still go into the matching deck</li>
+      <li><strong>Lighter website</strong> — 3D block previews are now static images, much faster on phones</li>
+    </ul>
 
     <h3>3.0.0</h3>
     <ul>
