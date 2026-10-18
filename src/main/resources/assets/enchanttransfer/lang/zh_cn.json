@@ -84,5 +84,7 @@
   "enchanttransfer.lectern.rarity": "  稀有附魔（权重 ≤ 2）：最高 ×%s（上限 ×%s）",
   "enchanttransfer.lectern.power": "  能量：相当于 %s 个书架（最多 %s）",
   "enchanttransfer.lectern.combined": "在附魔台旁会与周围其他讲台叠加",
-  "enchanttransfer.lectern.reserve": "  磨损储备：%s（最多 %s）"
+  "enchanttransfer.lectern.reserve": "  磨损储备：%s（最多 %s）",
+  "enchantment.enchanttransfer.magnetism": "磁力",
+  "enchantment.enchanttransfer.harvesting": "收割"
 }

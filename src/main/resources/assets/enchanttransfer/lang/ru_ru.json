@@ -84,5 +84,7 @@
   "enchanttransfer.lectern.rarity": "  Редкие чары (вес ≤ 2): до ×%s (макс. ×%s)",
   "enchanttransfer.lectern.power": "  Сила: книжных полок — %s (макс. %s)",
   "enchanttransfer.lectern.combined": "У стола суммируется с другими кафедрами вокруг",
-  "enchanttransfer.lectern.reserve": "  Запас износа: %s (макс. %s)"
+  "enchanttransfer.lectern.reserve": "  Запас износа: %s (макс. %s)",
+  "enchantment.enchanttransfer.magnetism": "Магнетизм",
+  "enchantment.enchanttransfer.harvesting": "Жатва"
 }

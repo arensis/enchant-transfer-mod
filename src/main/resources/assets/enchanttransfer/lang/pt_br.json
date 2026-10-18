@@ -84,5 +84,7 @@
   "enchanttransfer.lectern.rarity": "  Encantamentos raros (peso ≤ 2): até ×%s (máx. ×%s)",
   "enchanttransfer.lectern.power": "  Poder: %s estantes (máx. %s)",
   "enchanttransfer.lectern.combined": "Na mesa, combina-se com os outros atris ao redor",
-  "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)"
+  "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)",
+  "enchantment.enchanttransfer.magnetism": "Magnetismo",
+  "enchantment.enchanttransfer.harvesting": "Colheita"
 }

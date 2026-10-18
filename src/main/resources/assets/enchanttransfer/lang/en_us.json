@@ -84,5 +84,7 @@
   "enchanttransfer.lectern.rarity": "  Rare enchantments (weight ≤ 2): up to ×%s (max ×%s)",
   "enchanttransfer.lectern.power": "  Power: %s bookshelves (max %s)",
   "enchanttransfer.lectern.combined": "At a table it combines with the other lecterns around it",
-  "enchanttransfer.lectern.reserve": "  Wear reserve: %s (max %s)"
+  "enchanttransfer.lectern.reserve": "  Wear reserve: %s (max %s)",
+  "enchantment.enchanttransfer.magnetism": "Magnetism",
+  "enchantment.enchanttransfer.harvesting": "Harvesting"
 }

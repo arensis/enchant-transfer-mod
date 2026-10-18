@@ -3,6 +3,7 @@ package net.alfonsormadrid.enchanttransfer.item;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import net.alfonsormadrid.enchanttransfer.enchantment.ModEnchantments;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -25,9 +26,9 @@ import net.minecraft.world.item.enchantment.Enchantments;
  *
  * <p>Mapeo derivado de {@code DESIGN.md} sección "Categorías de
  * encantamientos (por color de cristal/gema)".  Los encantamientos
- * <em>nuevos</em> del mod (Harvesting, Momentum, Magnetism, Freezing)
- * todavía no existen como {@code RegistryKey}, así que aparecen comentados
- * en cada tipo hasta que se registren.
+ * <em>nuevos</em> del mod que ya existen ({@link ModEnchantments}) están en
+ * su tipo; los pendientes (Momentum, Freezing) aparecen comentados hasta que
+ * se registren.
  */
 public enum CardType {
 
@@ -48,8 +49,8 @@ public enum CardType {
                     Enchantments.SILK_TOUCH,
                     Enchantments.FORTUNE,
                     Enchantments.LUCK_OF_THE_SEA,
-                    Enchantments.LURE
-                    // + Harvesting (mod-custom, pendiente de registrar)
+                    Enchantments.LURE,
+                    ModEnchantments.HARVESTING
             )),
 
     RED("red", "combat",
@@ -79,8 +80,8 @@ public enum CardType {
                     Enchantments.FLAME,
                     Enchantments.MULTISHOT,
                     Enchantments.PIERCING,
-                    Enchantments.QUICK_CHARGE
-                    // + Magnetism (mod-custom, pendiente de registrar)
+                    Enchantments.QUICK_CHARGE,
+                    ModEnchantments.MAGNETISM
             )),
 
     PURPLE("purple", "arcane",

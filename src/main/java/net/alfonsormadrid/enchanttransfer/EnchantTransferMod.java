@@ -1,5 +1,6 @@
 package net.alfonsormadrid.enchanttransfer;
 
+import net.alfonsormadrid.enchanttransfer.enchantment.ModEnchantments;
 import net.alfonsormadrid.enchanttransfer.blocks.decklectern.DeckLecternBlock;
 import net.alfonsormadrid.enchanttransfer.blocks.decklectern.DeckLecternBlockEntity;
 import net.alfonsormadrid.enchanttransfer.blocks.infusioncoil.InfusionCoilBlock;
@@ -255,6 +256,9 @@ public class EnchantTransferMod implements ModInitializer {
 					entries.accept(BRASS_INGOT_ITEM);
 				})
 				.build());
+
+		// Magnetism and Harvesting effects (the enchantments themselves are data-driven)
+		ModEnchantments.init();
 
 		// Deck affinities per dimension/biome, from datapacks (reloads with /reload)
 		DataResourceLoader.get().registerReloadListener(LibraryAffinities.ID, LibraryAffinities::new);

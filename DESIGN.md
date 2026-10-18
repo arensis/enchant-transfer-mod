@@ -157,7 +157,7 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 | Azul | Protección | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
 | Verde | Naturaleza | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, Harvesting* |
 | Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Momentum* |
-| Amarillo | Utilidad | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge |
+| Amarillo | Utilidad | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge, Magnetism* |
 | Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed, Freezing* + encantamientos propios del mod |
 | Negro | Maldición | Curse of Vanishing, Curse of Binding + maldiciones propias del mod |
 
@@ -165,14 +165,20 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 ---
 
-### Magnetism *(nuevo — Utilidad/Amarillo)*
+### Magnetism *(nuevo — Utilidad/Amarillo)* — implementado
 - Ítems y orbes de XP cercanos se atraen automáticamente al jugador
-- Disponible en herramientas y armadura
+- Disponible en herramientas (`#minecraft:enchantable/mining`) y armadura; cuenta en mano o puesta, y vale el nivel más alto que lleve
+- **Niveles y alcance:** I = 4 bloques · II = 6 · III = 8
+- Agacharse lo desactiva; los ítems que tira el propio jugador (o con retraso de recogida) no se atraen
+- Mesa de encantamientos, aldeanos y botín (`non_treasure`); peso 2 (raro)
 - No existe en vanilla
 
-### Harvesting *(nuevo — Naturaleza/Verde)*
-- Los cultivos se auto-replanten al ser cosechados
-- Disponible en azada
+### Harvesting *(nuevo — Naturaleza/Verde)* — implementado
+- Clic derecho con la azada en un cultivo maduro: lo cosecha (botín normal, Fortuna incluida) y lo vuelve a plantar
+- **Solo si el jugador lleva en el inventario la semilla de ese cultivo** (gasta una; en creativo no). Sin semilla, o con el cultivo sin madurar, no hace nada
+- Desgasta la azada 1 punto por cultivo, igual que arar la tierra
+- Cultivos: tag de bloque `enchanttransfer:harvesting_replantable` (trigo, zanahorias, patatas, remolachas, verruga del Nether, cacao); maduro = propiedad `age` al máximo
+- Disponible en azada; nivel único; mesa de encantamientos, aldeanos y botín; peso 5
 - No existe en vanilla
 
 ### Momentum *(nuevo — Combate/Rojo)*
