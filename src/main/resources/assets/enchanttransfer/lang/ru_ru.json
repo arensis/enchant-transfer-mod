@@ -86,5 +86,9 @@
   "enchanttransfer.lectern.combined": "У стола суммируется с другими кафедрами вокруг",
   "enchanttransfer.lectern.reserve": "  Запас износа: %s (макс. %s)",
   "enchantment.enchanttransfer.magnetism": "Магнетизм",
-  "enchantment.enchanttransfer.harvesting": "Жатва"
+  "enchantment.enchanttransfer.harvesting": "Жатва",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "Жатва: опыт за поле",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "Уровни опыта за сбор целого поля с Жатвой III+ за каждый начатый участок 9×9 (вдвое больше с костной мукой на IV). 0 — бесплатно",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "Жатва: опыт за дерево",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "Уровни опыта за рубку целого дерева с Жатвой III+. 0 — бесплатно"
 }

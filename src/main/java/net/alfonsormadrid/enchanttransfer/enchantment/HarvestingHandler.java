@@ -53,8 +53,6 @@ final class HarvestingHandler {
     private static final int FIELD_LEVEL = 3;
     /** Crops in a 9×9: the field is paid per started block of this many. */
     static final int FIELD_CHUNK = 81;
-    /** Experience levels per started 9×9; doubled at IV when bone meal is in the inventory. */
-    static final double FIELD_CHUNK_LEVELS = 0.5;
     private static final int MAX_FIELD = 4096;
 
     private HarvestingHandler() {}
@@ -114,8 +112,9 @@ final class HarvestingHandler {
         }
         int seeds = player.hasInfiniteMaterials() ? Integer.MAX_VALUE : countItem(player, seed);
         if (harvesting >= FIELD_LEVEL) {
-            double levelsPerChunk = boneMeal && HarvestingSupport.findSlot(player.getInventory(), Items.BONE_MEAL) >= 0
-                    ? FIELD_CHUNK_LEVELS * 2 : FIELD_CHUNK_LEVELS;
+            // Levels per started 9×9 (a game rule, 0.5 by default), doubled at IV with bone meal.
+            double levelsPerChunk = HarvestingGameRules.get(level, HarvestingGameRules.FIELD_XP_COST)
+                    * (boneMeal && HarvestingSupport.findSlot(player.getInventory(), Items.BONE_MEAL) >= 0 ? 2 : 1);
             int affordable = ExperienceCost.affordableUnits(player, levelsPerChunk);
             if (affordable > 0) {
                 List<BlockPos> field = ripeField(level, pos, crop.getBlock());

@@ -1,0 +1,6 @@
+{
+  "deck": "enchanttransfer:card_deck_purple",
+  "dimension": "minecraft:the_nether",
+  "enchantments": ["minecraft:fire_aspect", "minecraft:flame"],
+  "multiplier": 2.0
+}

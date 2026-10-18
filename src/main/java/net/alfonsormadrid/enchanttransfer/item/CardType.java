@@ -59,42 +59,43 @@ public enum CardType {
                     Enchantments.SMITE,
                     Enchantments.BANE_OF_ARTHROPODS,
                     Enchantments.IMPALING,
-                    Enchantments.FIRE_ASPECT,
                     Enchantments.LOOTING,
                     Enchantments.THORNS,
                     Enchantments.SWEEPING_EDGE,
                     Enchantments.KNOCKBACK,
                     Enchantments.DENSITY,
                     Enchantments.BREACH,
-                    Enchantments.LUNGE
+                    Enchantments.LUNGE,
+                    // Bow and crossbow attacks
+                    Enchantments.POWER,
+                    Enchantments.PUNCH,
+                    Enchantments.MULTISHOT,
+                    Enchantments.PIERCING
                     // + Momentum (mod-custom, pendiente de registrar)
             )),
 
     YELLOW("yellow", "utility",
             List.of(
+                    // Speed and durability of the tool, weapon or wearer
                     Enchantments.EFFICIENCY,
                     Enchantments.UNBREAKING,
-                    Enchantments.INFINITY,
-                    Enchantments.POWER,
-                    Enchantments.PUNCH,
-                    Enchantments.FLAME,
-                    Enchantments.MULTISHOT,
-                    Enchantments.PIERCING,
                     Enchantments.QUICK_CHARGE,
+                    Enchantments.SWIFT_SNEAK,
                     ModEnchantments.MAGNETISM
             )),
 
     PURPLE("purple", "arcane",
             List.of(
+                    // Magic: lightning, water, wind, ice, fire, souls and experience
                     Enchantments.CHANNELING,
                     Enchantments.RIPTIDE,
                     Enchantments.LOYALTY,
                     Enchantments.FROST_WALKER,
                     Enchantments.WIND_BURST,
-                    // Treasure enchantments never come out of the table;
-                    // they're grouped here as "rare magic".
+                    Enchantments.FIRE_ASPECT,
+                    Enchantments.FLAME,
+                    Enchantments.INFINITY,
                     Enchantments.MENDING,
-                    Enchantments.SWIFT_SNEAK,
                     Enchantments.SOUL_SPEED
                     // + Freezing (mod-custom, pendiente de registrar)
                     // + futuros encantamientos arcanos del mod

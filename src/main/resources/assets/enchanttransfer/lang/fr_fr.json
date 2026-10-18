@@ -86,5 +86,9 @@
   "enchanttransfer.lectern.combined": "À une table, il se combine avec les autres pupitres autour",
   "enchanttransfer.lectern.reserve": "  Réserve d'usure : %s (max %s)",
   "enchantment.enchanttransfer.magnetism": "Magnétisme",
-  "enchantment.enchanttransfer.harvesting": "Récolte"
+  "enchantment.enchanttransfer.harvesting": "Récolte",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "Récolte : XP par champ",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "Niveaux d'expérience que coûte la récolte d'un champ entier avec Récolte III+ par carré de 9×9 entamé (doublé avec la poudre d'os au niveau IV). 0 la rend gratuite",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "Récolte : XP par arbre",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "Niveaux d'expérience que coûte l'abattage d'un arbre entier avec Récolte III+. 0 le rend gratuit"
 }

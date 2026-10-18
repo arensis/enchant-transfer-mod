@@ -253,17 +253,17 @@
         <tr>
           <td><img class="card-icon" src="images/magic_card_red.png" alt="">Red</td>
           <td>Combat</td>
-          <td>Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge</td>
+          <td>Sharpness, Smite, Bane of Arthropods, Impaling, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Power, Punch, Multishot, Piercing</td>
         </tr>
         <tr>
           <td><img class="card-icon" src="images/magic_card_yellow.png" alt="">Yellow</td>
           <td>Utility</td>
-          <td>Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge, <a href="#enchantments">Magnetism</a>*</td>
+          <td>Efficiency, Unbreaking, Quick Charge, Swift Sneak, <a href="#enchantments">Magnetism</a>*</td>
         </tr>
         <tr>
           <td><img class="card-icon" src="images/magic_card_purple.png" alt="">Purple</td>
           <td>Arcane</td>
-          <td>Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed</td>
+          <td>Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Fire Aspect, Flame, Infinity, Mending, Soul Speed</td>
         </tr>
         <tr>
           <td><img class="card-icon" src="images/magic_card_black.png" alt="">Black</td>
@@ -303,6 +303,7 @@
   </div>
   <ul>
     <li><strong>Wear:</strong> 1 durability per crop or log, like tilling or chopping. <strong>Sneak</strong> to harvest a single crop or chop a single log</li>
+    <li><strong>XP cost:</strong> 0.5 levels by default, set per world with the game rules <code>enchanttransfer:harvesting_field_xp_cost</code> and <code>enchanttransfer:harvesting_tree_xp_cost</code> (0 makes it free)</li>
     <li><strong>Not enough XP:</strong> the field is cut to the 9×9s you can pay for (or a row if not even one), and a tree falls like level II</li>
     <li><strong>Safe for builds:</strong> it only fells trees whose logs touch leaves that grew there, not leaves placed by a player (up to 256 logs)</li>
   </ul>
@@ -419,9 +420,9 @@
     <table class="card-table">
       <thead><tr><th>Where</th><th>Deck</th><th>Boost</th></tr></thead>
       <tbody>
-        <tr><td>Nether</td><td><img class="card-icon deck-icon" src="images/card_deck_red.png" alt="">Combat</td><td>×2 (Fire Aspect ×3)</td></tr>
+        <tr><td>Nether</td><td><img class="card-icon deck-icon" src="images/card_deck_red.png" alt="">Combat</td><td>×2</td></tr>
         <tr><td>Nether</td><td><img class="card-icon deck-icon" src="images/card_deck_blue.png" alt="">Protection</td><td>Fire &amp; Blast Protection ×1.5</td></tr>
-        <tr><td>Nether</td><td><img class="card-icon deck-icon" src="images/card_deck_yellow.png" alt="">Utility</td><td>Flame ×1.5</td></tr>
+        <tr><td>Nether</td><td><img class="card-icon deck-icon" src="images/card_deck_purple.png" alt="">Arcane</td><td>Fire Aspect &amp; Flame ×2</td></tr>
         <tr><td>Nether</td><td><img class="card-icon deck-icon" src="images/card_deck_rare.png" alt="">Rarity</td><td>×1.5</td></tr>
         <tr><td>End</td><td><img class="card-icon deck-icon" src="images/card_deck_purple.png" alt="">Arcane</td><td>×2</td></tr>
         <tr><td>Oceans &amp; rivers</td><td><img class="card-icon deck-icon" src="images/card_deck_green.png" alt="">Nature</td><td>Water enchantments ×1.5</td></tr>
@@ -675,6 +676,8 @@
     <li><strong>Crops and trees from other mods</strong> — Harvesting works with other mods' crops out of the box, and their trees through datapack rules in <code>data/&lt;namespace&gt;/enchanttransfer/harvesting_sapling/</code> or the <code>_log</code> → <code>_sapling</code> naming convention</li>
     <li><strong>Shift + click at the Transfer Table</strong> — A card goes straight onto the item when it fits; otherwise the stack is split evenly into both combine slots. Colored cards can now be shift-clicked too</li>
     <li><strong>Zinc Smelter drops itself</strong> — It dropped nothing when mined; it now drops with an iron pickaxe or better</li>
+    <li><strong>Card categories reviewed</strong> — Each color now has a clear theme: bow and crossbow attacks (Power, Punch, Multishot, Piercing) move to <strong>Combat</strong>; Fire Aspect, Flame and Infinity move to <strong>Arcane</strong>, which now means magic (fire, ice, lightning, wind, souls, experience) rather than "treasure"; Swift Sneak moves to <strong>Utility</strong> (speed and durability). Cards already extracted keep their color; take them out of their old deck and they go into the new one</li>
+    <li><strong>Configurable XP cost</strong> — Game rules <code>enchanttransfer:harvesting_field_xp_cost</code> and <code>enchanttransfer:harvesting_tree_xp_cost</code> (0.5 levels by default; 0 makes them free, any higher value works)</li>
     <li><strong>Plains affinity</strong> — Nature decks favor Harvesting ×1.5 at tables in plains (<code>#c:is_plains</code>, so modded plains count too)</li>
     <li><strong>New languages</strong> — French (fr_fr), German (de_de) and Japanese (ja_jp)</li>
   </ul>

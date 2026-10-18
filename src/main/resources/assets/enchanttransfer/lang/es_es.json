@@ -86,5 +86,9 @@
   "enchanttransfer.lectern.combined": "En la mesa se combina con los demás atriles a su alrededor",
   "enchanttransfer.lectern.reserve": "  Reserva de desgaste: %s (máx. %s)",
   "enchantment.enchanttransfer.magnetism": "Magnetismo",
-  "enchantment.enchanttransfer.harvesting": "Cosecha"
+  "enchantment.enchanttransfer.harvesting": "Cosecha",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "Cosecha: XP por campo",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "Niveles de experiencia que cuesta cosechar un campo entero con Cosecha III+ por cada 9×9 empezado (el doble con polvo de hueso en IV). 0 lo hace gratis",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "Cosecha: XP por árbol",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "Niveles de experiencia que cuesta talar un árbol entero con Cosecha III+. 0 lo hace gratis"
 }

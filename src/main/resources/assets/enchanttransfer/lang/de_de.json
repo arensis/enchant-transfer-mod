@@ -86,5 +86,9 @@
   "enchanttransfer.lectern.combined": "An einem Tisch wirkt es mit den anderen Lesepulten in der Nähe zusammen",
   "enchanttransfer.lectern.reserve": "  Verschleißreserve: %s (max. %s)",
   "enchantment.enchanttransfer.magnetism": "Magnetismus",
-  "enchantment.enchanttransfer.harvesting": "Ernte"
+  "enchantment.enchanttransfer.harvesting": "Ernte",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "Ernte: EP pro Feld",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "Erfahrungsstufen, die das Ernten eines ganzen Felds mit Ernte III+ pro angefangenem 9×9 kostet (doppelt mit Knochenmehl auf IV). 0 macht es kostenlos",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "Ernte: EP pro Baum",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "Erfahrungsstufen, die das Fällen eines ganzen Baums mit Ernte III+ kostet. 0 macht es kostenlos"
 }

@@ -14,9 +14,12 @@ final class ExperienceCost {
         return player.hasInfiniteMaterials() || currentLevels(player) >= levels;
     }
 
-    /** Whole multiples of {@code levelsEach} the player can pay for (no limit in creative). */
+    /** Whole multiples of {@code levelsEach} the player can pay for (no limit in creative or when free). */
     static int affordableUnits(Player player, double levelsEach) {
-        return player.hasInfiniteMaterials() ? Integer.MAX_VALUE : (int) Math.floor(currentLevels(player) / levelsEach);
+        if (player.hasInfiniteMaterials() || levelsEach <= 0) {
+            return Integer.MAX_VALUE;
+        }
+        return (int) Math.floor(currentLevels(player) / levelsEach);
     }
 
     static void charge(Player player, double levels) {

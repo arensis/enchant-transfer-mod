@@ -86,5 +86,9 @@
   "enchanttransfer.lectern.combined": "テーブルでは周りのほかの書見台と組み合わさる",
   "enchanttransfer.lectern.reserve": "  摩耗予備: %s (最大 %s)",
   "enchantment.enchanttransfer.magnetism": "磁力",
-  "enchantment.enchanttransfer.harvesting": "収穫"
+  "enchantment.enchanttransfer.harvesting": "収穫",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost": "収穫: 畑ごとの経験値",
+  "gamerule.enchanttransfer.harvesting_field_xp_cost.description": "収穫 III 以上で畑全体を収穫するときに、始めた 9×9 ごとに消費する経験値レベル（IV で骨粉を使うと 2 倍）。0 で無料",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost": "収穫: 木ごとの経験値",
+  "gamerule.enchanttransfer.harvesting_tree_xp_cost.description": "収穫 III 以上で木を丸ごと伐採するときに消費する経験値レベル。0 で無料"
 }

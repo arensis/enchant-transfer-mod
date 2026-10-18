@@ -25,6 +25,7 @@ public final class ModEnchantments {
     private ModEnchantments() {}
 
     public static void init() {
+        HarvestingGameRules.init();
         MagnetismHandler.register();
         HarvestingHandler.register();
         TreeHarvestingHandler.register();

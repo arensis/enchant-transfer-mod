@@ -32,8 +32,8 @@ import java.util.Set;
  *   <li>I: replants the tree's sapling where a base log (one on soil) was, taking it
  *       from the inventory;</li>
  *   <li>II: also fells the logs straight above the broken one;</li>
- *   <li>III: fells the whole tree, branches included (up to {@link #MAX_LOGS}), for half
- *       an experience level; without it, like II;</li>
+ *   <li>III: fells the whole tree, branches included (up to {@link #MAX_LOGS}), for
+ *       {@link HarvestingGameRules#TREE_XP_COST} experience levels; without them, like II;</li>
  *   <li>IV: grows the replanted sapling with bone meal from the inventory.</li>
  * </ul>
  * Felling goes top to bottom and costs one durability per log; sneaking turns it off.
@@ -45,8 +45,6 @@ final class TreeHarvestingHandler {
     static final int MAX_LOGS = 256;
     private static final int COLUMN_LEVEL = 2;
     private static final int WHOLE_TREE_LEVEL = 3;
-    /** Experience levels a whole-tree felling costs; without them III fells like II. */
-    static final double WHOLE_TREE_LEVELS = 0.5;
 
     /** Blocks that, besides non-persistent leaves, mark a tree as natural (Nether wart blocks). */
     static final TagKey<Block> NATURAL_FOLIAGE = TagKey.create(Registries.BLOCK,
@@ -75,9 +73,10 @@ final class TreeHarvestingHandler {
         List<BlockPos> felled = new ArrayList<>();
         felled.add(pos);
         if (harvesting >= COLUMN_LEVEL && !player.isShiftKeyDown()) {
-            boolean wholeTree = harvesting >= WHOLE_TREE_LEVEL && ExperienceCost.canAfford(player, WHOLE_TREE_LEVELS);
+            double treeLevels = HarvestingGameRules.get(level, HarvestingGameRules.TREE_XP_COST);
+            boolean wholeTree = harvesting >= WHOLE_TREE_LEVEL && ExperienceCost.canAfford(player, treeLevels);
             if (wholeTree) {
-                ExperienceCost.charge(player, WHOLE_TREE_LEVELS);
+                ExperienceCost.charge(player, treeLevels);
             }
             List<BlockPos> toFell = wholeTree ? new ArrayList<BlockPos>(tree) : columnAbove(level, pos);
             toFell.sort(Comparator.comparingInt((BlockPos log) -> log.getY()).reversed());

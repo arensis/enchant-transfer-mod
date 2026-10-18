@@ -89,14 +89,14 @@ Estuche de latón (10×14×4 px) que guarda cartas de un tipo. En un atril de ba
 | Protección / Naturaleza / Combate / Utilidad / Arcano | Cartas de su color | Sesgo hacia su categoría y, más aún, hacia los encantamientos guardados |
 | Comodín de Rareza | Cartas de maldición | Favorece encantamientos de peso bajo |
 
-Arcano agrupa los encantamientos de tesoro (Mending, Swift Sneak, Soul Speed, Frost Walker, Wind Burst) como "magia rara": la mesa nunca los da, pero sus cartas suman fuerza a la baraja Arcana.
+Cada color tiene un tema: **Combate**, todo lo que hace daño o empuja (también arco y ballesta); **Arcano**, lo mágico —fuego, hielo, rayo, viento, almas y experiencia—, salga o no de la mesa (Mending, Soul Speed, Frost Walker y Wind Burst son de tesoro: la mesa nunca los da, pero sus cartas suman fuerza a la baraja Arcana); **Utilidad**, velocidad y durabilidad (Efficiency, Unbreaking, Quick Charge, Swift Sneak, Magnetism).
 
 - **Receta**: 2 latón + 2 cuero + 1 carta del tipo (se consume). Rareza: carta negra.
 - **Puntos**: carta de nivel N = 2^(N-1) puntos (misma equivalencia que combinar). Máximo 64 por baraja.
 - **Resonancia** `R = min(1, √(puntos de categoría / 64))`; comodín `Rr = min(1, √(puntos / 64))`. Crece rápido al principio (unas pocas cartas de nivel I ya se notan) y llega al máximo con una baraja llena; más barajas no lo suben, pero añaden reserva y poder.
 - **Peso** de cada candidato `e`: `w · (1 + 2·R·cuotaCategoría) · (1 + 4·R·cuotaEncantamiento) · (1 + 2·Rr·(10 − w)/9)`. La parte de categoría favorece la categoría frente a las otras (hasta ×3); la exacta, el encantamiento frente al resto de su categoría (hasta ×5, ×15 en total). La cuota de categoría cuenta todas las cartas; la del encantamiento, solo las de nivel máximo. El factor de Rareza solo se aplica con peso ≤ 2. El sesgo es relativo: una librería equilibrada ≈ vanilla.
 - **Poder de la mesa**: cada 3 barajas con cartas cuentan como 2 librerías (un atril lleno = las 2 librerías apiladas que cabrían en su columna): `⌊2·barajas/3⌋`. Se suman a las librerías normales y vanilla limita el total a 15. Es lo que sube el nivel, igual que con librerías.
-- **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2 (Fire Aspect ×3), Fire/Blast Protection ×1,5, Flame ×1,5, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5; llanuras (`#c:is_plains`) → Harvesting ×1,5.
+- **Afinidad por lugar** (datapack, `data/<ns>/enchanttransfer/library_affinity/*.json`): cada regla dice qué baraja (`deck`) rinde más en qué `dimension` y/o `biome`, opcionalmente solo para algunos `enchantments`, con un `multiplier`. Escala el extra de la baraja: `factor' = 1 + (factor − 1)·afinidad`. Las reglas que coinciden se multiplican (una específica se suma a una general), con tope ×3. Por defecto: Nether → Combate ×2, Fire/Blast Protection ×1,5, fuego Arcano (Fire Aspect, Flame) ×2, Rareza ×1,5; End → Arcano ×2; océanos y ríos → encantamientos de agua de Naturaleza ×1,5; bosques, junglas y taigas → Fortune y Silk Touch ×1,5; llanuras (`#c:is_plains`) → Harvesting ×1,5.
 - **Influencia**: cada elección se acopla a la vanilla (acoplamiento máximo): se hace la tirada vanilla con el random de la mesa y se conserva con probabilidad `min(1, p_baraja / p_vanilla)`; si no, se elige entre los encantamientos favorecidos en proporción a `p_baraja − p_vanilla`. La distribución final es la de las barajas, pero solo cambian una elección que han causado. Esas elecciones son las *influidas*; no cuentan las que salen igual que en vanilla, las que cambian en cadena porque una anterior cambió (se eligen con pesos vanilla) ni las debidas al poder. El azar del acoplamiento sale de un random aparte sembrado por opción, para que la pista coincida con el resultado. La mesa marca las opciones con alguno (carta pequeña arriba a la derecha y línea en el tooltip), sincronizado con un `DataSlot`.
 - **Desgaste**: ver *Desgaste de cartas* más abajo.
 - Código: paquete `library/` (`DeckEffect` y sus implementaciones, `CardStorage`, `DeckLibrary`, `LibraryProfile`), servicios `LibraryResonanceService`, `DeckEnchantmentSelector`, `DeckWearService` y mixin `EnchantmentMenuMixin`.
@@ -156,9 +156,9 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 |---|---|---|
 | Azul | Protección | Protection, Fire Protection, Blast Protection, Projectile Protection, Feather Falling |
 | Verde | Naturaleza | Respiration, Aqua Affinity, Depth Strider, Silk Touch, Fortune, Luck of the Sea, Lure, Harvesting* |
-| Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Fire Aspect, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Momentum* |
-| Amarillo | Utilidad | Efficiency, Unbreaking, Infinity, Power, Punch, Flame, Multishot, Piercing, Quick Charge, Magnetism* |
-| Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Mending, Swift Sneak, Soul Speed, Freezing* + encantamientos propios del mod |
+| Rojo | Combate | Sharpness, Smite, Bane of Arthropods, Impaling, Looting, Thorns, Sweeping Edge, Knockback, Density, Breach, Lunge, Power, Punch, Multishot, Piercing, Momentum* |
+| Amarillo | Utilidad | Efficiency, Unbreaking, Quick Charge, Swift Sneak, Magnetism* |
+| Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Fire Aspect, Flame, Infinity, Mending, Soul Speed, Freezing* + encantamientos propios del mod |
 | Negro | Maldición | Curse of Vanishing, Curse of Binding + maldiciones propias del mod |
 
 > *Encantamientos nuevos del mod
@@ -179,6 +179,7 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 **Azada** — clic derecho en un cultivo maduro:
 - Lo cosecha (botín normal, Fortuna incluida) y lo vuelve a plantar
 - **Solo si el jugador lleva en el inventario la semilla de ese cultivo** (gasta una; en creativo no). Sin semilla, o con el cultivo sin madurar, no hace nada
+- Coste de experiencia configurable por mundo con reglas de juego: `enchanttransfer:harvesting_field_xp_cost` (por 9×9) y `enchanttransfer:harvesting_tree_xp_cost` (por árbol), 0,5 niveles por defecto; 0 lo hace gratis
 - Desgasta la azada 1 punto por cultivo, igual que arar la tierra; cada cultivo gasta su semilla, así que se cosecha como mucho tantos como semillas lleves
 - **II:** además los dos cultivos siguientes en la dirección a la que miras (fila de 3)
 - **III:** el campo entero: todos los cultivos iguales conectados en esa capa (los que no están maduros se cruzan pero no se cosechan). Sin tope de tamaño: cuesta **0,5 niveles de experiencia por cada 9×9 empezado** (81 cultivos), cobrados tras cosechar por lo realmente cosechado. Si no llega la experiencia se cosechan solo los 9×9 que se puedan pagar; si no llega ni para uno, hace la fila de II
