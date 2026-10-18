@@ -1,7 +1,7 @@
 # Enchant Transfer Mod — Diseño y decisiones
 
 > Documento de referencia. Registra decisiones de diseño tomadas, no implementación técnica.
-> Última actualización: 2026-05-29
+> Última actualización: 2026-10-18
 
 ---
 
@@ -12,6 +12,14 @@
 - Aplica cartas a ítems (**coste 0**, respeta reglas vanilla de compatibilidad)
 - Combina dos cartas del mismo encantamiento y mismo nivel → carta de nivel superior (**coste 0**)
 - GUI: grid visual de cartas, 100% configurable dentro de los límites vanilla
+- **Shift + clic** en una carta del inventario: va al objeto de la mesa si la admite y no choca con sus encantamientos (una carta); si no, al par de combinación, repartiendo el stack a partes iguales entre las dos ranuras (lo impar se queda en el inventario). Con objeto en la mesa que la rechaza, solo pasa a combinación si forma pareja que pueda subir de nivel
+
+### Zinc Smelter
+- Horno independiente para la cadena del latón (calcita → óxido de zinc → lámina de zinc → lingote de latón); combustible solo lava o varas de blaze
+- Se rompe con pico de hierro o superior y suelta el bloque (loot table)
+
+### Idiomas
+- Inglés y español (revisados); portugués de Brasil, ruso, chino simplificado, francés, alemán y japonés pendientes de revisión nativa
 
 ### Infusion Coil (módulo 1)
 - Carta mágica → XP almacenado en tank interno
@@ -150,6 +158,10 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 ## Nuevos encantamientos
 
+### Peso y rareza
+
+El **peso** de un encantamiento (vanilla) es su probabilidad relativa en la mesa: cuanto mayor, más común. La mesa elige con probabilidad `peso / suma de pesos` de los candidatos. Vanilla usa 10 (común: Protection, Sharpness, Efficiency, Power), 5 (poco común: Smite, Unbreaking, Feather Falling), 2 (raro: Fortune, Looting, Fire Aspect) y 1 (muy raro: Silk Touch, Thorns, Infinity). Las barajas multiplican esos pesos; la de Rareza solo actúa con peso ≤ 2, así ayuda a lo raro sin volverlo común. Los del mod: Magnetism 2 (raro, entra en Rareza), Harvesting 3.
+
 ### Categorías de encantamientos (por color de cristal/gema)
 
 | Color | Categoría | Encantamientos vanilla incluidos |
@@ -229,6 +241,7 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 - Atrae ítems y orbes de XP cercanos hacia él
 - Útil junto a granjas automáticas
 - Crafteado con esencia mágica
+- Ojo: Magnetism ya atrae ítems y XP al jugador; el Attractor solo aportaría hacerlo hacia un punto fijo
 
 ---
 
