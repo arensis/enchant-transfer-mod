@@ -184,16 +184,17 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 - **III:** el campo entero: todos los cultivos iguales conectados en esa capa (los que no están maduros se cruzan pero no se cosechan). Sin tope de tamaño: cuesta **0,5 niveles de experiencia por cada 9×9 empezado** (81 cultivos), cobrados tras cosechar por lo realmente cosechado. Si no llega la experiencia se cosechan solo los 9×9 que se puedan pagar; si no llega ni para uno, hace la fila de II
 - **IV:** además hace crecer con polvo de hueso cada cultivo replantado; en campo entero, si llevas polvo de hueso, el coste se duplica (1 nivel por 9×9)
 - Agacharse limita la cosecha al cultivo pinchado
-- Cultivos: tag de bloque `enchanttransfer:harvesting_replantable` (trigo, zanahorias, patatas, remolachas, verruga del Nether, cacao); maduro = propiedad `age` al máximo
+- Cultivos: cualquier `CropBlock` (trigo, zanahorias, patatas, remolachas y los de otros mods que usen esa clase, sin configurar nada) + el tag de bloque `enchanttransfer:harvesting_replantable` para los que crecen con una propiedad `age` sin ser `CropBlock` (verruga del Nether, cacao) − el tag `enchanttransfer:harvesting_excluded`. La semilla que gasta es el ítem de "pick block" del cultivo
 
-**Hacha** — al romper un tronco de un **árbol natural** (algún tronco conectado toca hojas que no colocó un jugador, o bloques de verruga del Nether); con construcciones no hace nada:
+**Hacha** — al romper un tronco de un **árbol natural** (algún tronco conectado toca hojas que no colocó un jugador, o follaje de `harvesting_foliage`); con construcciones no hace nada:
 - **I:** si el tronco roto estaba sobre tierra (la base), planta el plantón del árbol, si el jugador lo lleva (gasta uno)
 - **II:** además tala los troncos que hay justo encima, en línea recta (el tronco principal, sin ramas)
 - **III:** tala el árbol entero, ramas incluidas (tope de 256 troncos), por **0,5 niveles de experiencia**; sin ellos tala como II
 - **IV:** además hace crecer el plantón replantado con polvo de hueso del inventario, uno a uno con la probabilidad de vanilla, hasta que sale el árbol; si no hay sitio, se detiene sin gastar más
 - La tala va de arriba abajo y cuesta 1 punto de durabilidad por tronco (para si el hacha se rompe). Agacharse desactiva la tala en cadena
 - Árboles de 2×2 (roble oscuro, roble pálido, abeto y jungla gigantes): con III se replanta un plantón en cada una de las 4 bases
-- Plantones: roble, abeto, abedul, jungla, acacia, roble oscuro, mangle (propágulo), cerezo, roble pálido; carmesí y distorsionado (hongos, sobre nilio)
+- Plantón de cada árbol: reglas de datapack en `data/<ns>/enchanttransfer/harvesting_sapling/*.json` (`logs`: id, lista o `#tag`; `sapling`), con las de vanilla incluidas (el mangle da propágulo; carmesí y distorsionado, hongos sobre nilio). Sin regla, se deduce por nombre en el mismo namespace: `x_log`/`x_stem` → `x_sapling`, `x_propagule` o `x_fungus`; si no existe, se tala pero no se replanta
+- Árboles de otros mods: funcionan si sus troncos están en `#minecraft:logs` y sus hojas en `#minecraft:leaves` (lo normal); otro follaje natural se añade al tag `enchanttransfer:harvesting_foliage` (por defecto, los bloques de verruga del Nether)
 
 ### Momentum *(nuevo — Combate/Rojo)*
 - Cada golpe consecutivo al mismo mob aumenta ligeramente el daño

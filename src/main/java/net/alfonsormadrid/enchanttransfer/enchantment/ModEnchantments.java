@@ -1,6 +1,7 @@
 package net.alfonsormadrid.enchanttransfer.enchantment;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
+import net.fabricmc.fabric.api.resource.v1.DataResourceLoader;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -27,6 +28,8 @@ public final class ModEnchantments {
         MagnetismHandler.register();
         HarvestingHandler.register();
         TreeHarvestingHandler.register();
+        // Saplings per log, from datapacks (reloads with /reload)
+        DataResourceLoader.get().registerReloadListener(SaplingRules.ID, SaplingRules::new);
     }
 
     /** The enchantment's holder in this level, if a datapack hasn't removed it. */

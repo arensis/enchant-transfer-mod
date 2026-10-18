@@ -1,16 +1,19 @@
 package net.alfonsormadrid.enchanttransfer.enchantment;
 
+import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -20,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -35,6 +37,9 @@ import java.util.Set;
  *   <li>IV: grows the replanted sapling with bone meal from the inventory.</li>
  * </ul>
  * Felling goes top to bottom and costs one durability per log; sneaking turns it off.
+ * Works for other mods' trees too: logs in {@code #minecraft:logs}, leaves in
+ * {@code #minecraft:leaves} (or {@code #enchanttransfer:harvesting_foliage}), and the
+ * sapling from {@link SaplingRules}.
  */
 final class TreeHarvestingHandler {
     static final int MAX_LOGS = 256;
@@ -43,18 +48,9 @@ final class TreeHarvestingHandler {
     /** Experience levels a whole-tree felling costs; without them III fells like II. */
     static final double WHOLE_TREE_LEVELS = 0.5;
 
-    private static final Map<Block, Block> SAPLINGS = Map.ofEntries(
-            Map.entry(Blocks.OAK_LOG, Blocks.OAK_SAPLING),
-            Map.entry(Blocks.SPRUCE_LOG, Blocks.SPRUCE_SAPLING),
-            Map.entry(Blocks.BIRCH_LOG, Blocks.BIRCH_SAPLING),
-            Map.entry(Blocks.JUNGLE_LOG, Blocks.JUNGLE_SAPLING),
-            Map.entry(Blocks.ACACIA_LOG, Blocks.ACACIA_SAPLING),
-            Map.entry(Blocks.DARK_OAK_LOG, Blocks.DARK_OAK_SAPLING),
-            Map.entry(Blocks.MANGROVE_LOG, Blocks.MANGROVE_PROPAGULE),
-            Map.entry(Blocks.CHERRY_LOG, Blocks.CHERRY_SAPLING),
-            Map.entry(Blocks.PALE_OAK_LOG, Blocks.PALE_OAK_SAPLING),
-            Map.entry(Blocks.CRIMSON_STEM, Blocks.CRIMSON_FUNGUS),
-            Map.entry(Blocks.WARPED_STEM, Blocks.WARPED_FUNGUS));
+    /** Blocks that, besides non-persistent leaves, mark a tree as natural (Nether wart blocks). */
+    static final TagKey<Block> NATURAL_FOLIAGE = TagKey.create(Registries.BLOCK,
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "harvesting_foliage"));
 
     private TreeHarvestingHandler() {}
 
@@ -88,7 +84,7 @@ final class TreeHarvestingHandler {
             fell(level, player, axe, toFell, felled);
         }
 
-        Block sapling = SAPLINGS.get(state.getBlock());
+        Block sapling = SaplingRules.saplingFor(state);
         if (sapling != null) {
             replant(level, player, sapling, felled, harvesting >= HarvestingSupport.BONE_MEAL_LEVEL);
         }
@@ -112,12 +108,12 @@ final class TreeHarvestingHandler {
         return logs;
     }
 
-    /** A tree, not a build: some log touches leaves that grew there (or Nether wart blocks). */
+    /** A tree, not a build: some log touches leaves that grew there (or other natural foliage). */
     private static boolean touchesNaturalLeaves(ServerLevel level, Set<BlockPos> logs) {
         for (BlockPos log : logs) {
             for (BlockPos near : BlockPos.betweenClosed(log.offset(-1, -1, -1), log.offset(1, 1, 1))) {
                 BlockState state = level.getBlockState(near);
-                if (state.is(BlockTags.WART_BLOCKS)
+                if (state.is(NATURAL_FOLIAGE)
                         || state.is(BlockTags.LEAVES) && state.hasProperty(LeavesBlock.PERSISTENT)
                                 && !state.getValue(LeavesBlock.PERSISTENT)) {
                     return true;

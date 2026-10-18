@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -37,12 +38,16 @@ import java.util.Set;
  * durability per crop, like tilling. Without that seed in the inventory nothing happens.
  * II also takes the next two crops ahead, III the whole connected field (for
  * experience), and IV grows every replanted crop with bone meal from the inventory.
- * Which blocks count is the {@code enchanttransfer:harvesting_replantable} block tag;
- * ripe means its {@code age} property is at its maximum.
+ * Any {@link CropBlock} counts (other mods' crops included), plus the blocks in the
+ * {@code enchanttransfer:harvesting_replantable} tag, minus {@code harvesting_excluded}.
  */
 final class HarvestingHandler {
+    /** Crops that aren't a {@link CropBlock} but grow through an {@code age} property. */
     static final TagKey<Block> REPLANTABLE = TagKey.create(Registries.BLOCK,
             Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "harvesting_replantable"));
+    /** Crops left alone even though they qualify (a mod crop that misbehaves when replanted). */
+    static final TagKey<Block> EXCLUDED = TagKey.create(Registries.BLOCK,
+            Identifier.fromNamespaceAndPath(EnchantTransferMod.MOD_ID, "harvesting_excluded"));
     private static final int ROW_LEVEL = 2;
     private static final int ROW_LENGTH = 3;
     private static final int FIELD_LEVEL = 3;
@@ -70,8 +75,8 @@ final class HarvestingHandler {
 
         BlockPos pos = hit.getBlockPos();
         BlockState crop = level.getBlockState(pos);
-        Item seed = crop.getBlock().asItem();
-        if (ripeAge(crop) == null || HarvestingSupport.findSlot(player.getInventory(), seed) < 0) {
+        Item seed = seedOf(level, pos, crop);
+        if (!isRipe(crop) || HarvestingSupport.findSlot(player.getInventory(), seed) < 0) {
             return InteractionResult.PASS;
         }
 
@@ -122,7 +127,7 @@ final class HarvestingHandler {
         Direction ahead = player.getDirection();
         for (int i = 0; i < ROW_LENGTH && row.size() < seeds; i++) {
             BlockPos next = pos.relative(ahead, i);
-            if (level.getBlockState(next).is(crop.getBlock()) && ripeAge(level.getBlockState(next)) != null) {
+            if (level.getBlockState(next).is(crop.getBlock()) && isRipe(level.getBlockState(next))) {
                 row.add(next);
             }
         }
@@ -143,7 +148,7 @@ final class HarvestingHandler {
         ArrayDeque<BlockPos> queue = new ArrayDeque<>(List.of(start));
         while (!queue.isEmpty() && seen.size() < MAX_FIELD) {
             BlockPos current = queue.poll();
-            if (ripeAge(level.getBlockState(current)) != null) {
+            if (isRipe(level.getBlockState(current))) {
                 ripe.add(current);
             }
             for (Direction side : Direction.Plane.HORIZONTAL) {
@@ -158,13 +163,13 @@ final class HarvestingHandler {
 
     private static boolean harvestAndReplant(ServerLevel level, Player player, BlockPos pos, Item seed) {
         BlockState crop = level.getBlockState(pos);
-        IntegerProperty age = ripeAge(crop);
-        if (age == null || !HarvestingSupport.consume(player, seed)) {
+        BlockState replanted = replanted(crop);
+        if (replanted == null || !HarvestingSupport.consume(player, seed)) {
             return false;
         }
         Block.dropResources(crop, level, pos, level.getBlockEntity(pos), player, player.getMainHandItem());
         level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(crop));
-        level.setBlock(pos, crop.setValue(age, minAge(age)), Block.UPDATE_ALL);
+        level.setBlock(pos, replanted, Block.UPDATE_ALL);
         level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
         return true;
     }
@@ -180,20 +185,40 @@ final class HarvestingHandler {
         return count;
     }
 
-    /** The crop's {@code age} property when it is replantable and fully grown, else null. */
-    private static @Nullable IntegerProperty ripeAge(BlockState state) {
+    /**
+     * What a crop drops as its pick-block item is what plants it (wheat seeds, carrots,
+     * cocoa beans, a mod's seeds), so that is the seed it costs.
+     */
+    private static Item seedOf(Level level, BlockPos pos, BlockState crop) {
+        return crop.getCloneItemStack(level, pos, false).getItem();
+    }
+
+    private static boolean isRipe(BlockState state) {
+        return replanted(state) != null;
+    }
+
+    /**
+     * The freshly planted state of a ripe crop, or null if it isn't one or isn't ripe.
+     * Any {@link CropBlock} counts, so other mods' crops work without setup; other blocks
+     * need the {@link #REPLANTABLE} tag and an {@code age} property.
+     */
+    private static @Nullable BlockState replanted(BlockState state) {
+        if (state.is(EXCLUDED)) {
+            return null;
+        }
+        if (state.getBlock() instanceof CropBlock crop) {
+            return crop.isMaxAge(state) ? crop.getStateForAge(0) : null;
+        }
         if (!state.is(REPLANTABLE)) {
             return null;
         }
         for (var property : state.getProperties()) {
             if (property instanceof IntegerProperty age && age.getName().equals("age")) {
-                return state.getValue(age).equals(Collections.max(age.getPossibleValues())) ? age : null;
+                return state.getValue(age).equals(Collections.max(age.getPossibleValues()))
+                        ? state.setValue(age, Collections.min(age.getPossibleValues()))
+                        : null;
             }
         }
         return null;
-    }
-
-    private static int minAge(IntegerProperty age) {
-        return Collections.min(age.getPossibleValues());
     }
 }
