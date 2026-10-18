@@ -1,11 +1,14 @@
 # Enchant Transfer Mod — Diseño y decisiones
 
 > Documento de referencia. Registra decisiones de diseño tomadas, no implementación técnica.
+> Tres partes: **✅ Implementado** (está en el mod), **📝 Diseñado, sin implementar** (decidido pero sin código) y **❌ Descartado**.
 > Última actualización: 2026-10-18
 
 ---
 
-## Estado actual del mod (implementado)
+# ✅ Implementado
+
+## Bloques y sistemas
 
 ### Transfer Table (core)
 - Extrae encantamientos de cualquier ítem encantable → carta mágica (**coste 0**)
@@ -17,9 +20,6 @@
 ### Zinc Smelter
 - Horno independiente para la cadena del latón (calcita → óxido de zinc → lámina de zinc → lingote de latón); combustible solo lava o varas de blaze
 - Se rompe con pico de hierro o superior y suelta el bloque (loot table)
-
-### Idiomas
-- Inglés y español (revisados); portugués de Brasil, ruso, chino simplificado, francés, alemán y japonés pendientes de revisión nativa
 
 ### Infusion Coil (módulo 1)
 - Carta mágica → XP almacenado en tank interno
@@ -41,50 +41,8 @@
 - Estética general: fondo estrellado oscuro, acentos dorados y cian, borde morado
 - Referencia visual interactiva en `reference/`
 
----
-
-## Material base del mod
-
-### Cristal Horneado ♦
-**Crafteo:** Cuarzo de Nether → (horno) → Cristal Horneado
-
-- Forma de rombo, igual que un fragmento de amatista pero transparente/blanquecino
-- **Material base de todo lo mágico del mod** — aparece en la cadena de crafteo de cristales de color, gemas arcanas, essence shield y futuros módulos
-- Requiere haber ido al Nether → progresión natural antes de acceder a mecánicas avanzadas
-- Equivalente al *vis cristal* de Thaumcraft: señaliza al jugador que está en territorio avanzado del mod
-
-### Cristales de Color
-**Crafteo:** Cristal Horneado + mineral de color → Cristal de [color]
-
-6 tipos, forma de rombo, cada uno con su color distintivo:
-
-| Color | Mineral | Usos en el mod |
-|---|---|---|
-| Azul | Lapislázuli | Gemas de Protección |
-| Verde | Esmeralda | Gemas de Naturaleza |
-| Rojo | Redstone | Gemas de Combate |
-| Amarillo | Oro (lingote) | Gemas de Utilidad |
-| Morado | Fragmento de amatista | Gemas Arcanas |
-| Negro | Obsidiana | Gemas de Maldición |
-
-- El **color identifica la categoría** del encantamiento
-- La **runa grabada** sobre el cristal identifica el encantamiento específico dentro de esa categoría
-- Son el ingrediente intermedio para craftear gemas arcanas del colgante
-- Se reutilizarán en futuras mecánicas del mod como material común
-
----
-
-## Esencia Mágica
-- Nuevo material producido a partir de cartas + XP (módulo destilador, **pendiente de definir**)
-- Ingrediente en crafteos avanzados: cristales de color, essence shield, gemas arcanas, Cristal Foco
-- No es un recurso de energía en tiempo real, es un material crafteable/consumible
-
-### Cristal Foco
-- Curio equipable que el jugador lleva encima para almacenar esencia mágica
-- Crafteado con Cristal Horneado
-- Los encantamientos mágicos del mod (como Freezing) consumen esencia de este depósito al activarse
-- Si se agota, los efectos que requieren esencia no se activan
-- Niveles con distintas capacidades de almacenamiento (**pendiente de definir**)
+### Idiomas
+- Inglés y español (revisados); portugués de Brasil, ruso, chino simplificado, francés, alemán y japonés pendientes de revisión nativa
 
 ---
 
@@ -156,7 +114,7 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 
 ---
 
-## Nuevos encantamientos
+## Encantamientos
 
 ### Peso y rareza
 
@@ -173,11 +131,9 @@ El **peso** de un encantamiento (vanilla) es su probabilidad relativa en la mesa
 | Morado | Arcano | Channeling, Riptide, Loyalty, Frost Walker, Wind Burst, Fire Aspect, Flame, Infinity, Mending, Soul Speed, Freezing* + encantamientos propios del mod |
 | Negro | Maldición | Curse of Vanishing, Curse of Binding + maldiciones propias del mod |
 
-> *Encantamientos nuevos del mod
+> \* Encantamientos nuevos del mod. Magnetism y Harvesting están implementados; Momentum y Freezing, solo diseñados (ver más abajo).
 
----
-
-### Magnetism *(nuevo — Utilidad/Amarillo)* — implementado
+### Magnetism *(nuevo — Utilidad/Amarillo)*
 - Ítems y orbes de XP cercanos se atraen automáticamente al jugador
 - Solo armaduras metálicas (malla, hierro, cobre, oro y netherita; tag `enchanttransfer:enchantable/magnetism`); cuenta puesta, y vale el nivel más alto que lleve
 - **Niveles y alcance:** I = 4 bloques · II = 6 · III = 8 · IV = 10 · V = 12
@@ -185,7 +141,7 @@ El **peso** de un encantamiento (vanilla) es su probabilidad relativa en la mesa
 - Mesa de encantamientos, aldeanos y botín (`non_treasure`); peso 2 (raro)
 - No existe en vanilla
 
-### Harvesting *(nuevo — Naturaleza/Verde)* — implementado
+### Harvesting *(nuevo — Naturaleza/Verde)*
 Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_treasure`); peso 3. No existe en vanilla.
 
 **Azada** — clic derecho en un cultivo maduro:
@@ -208,6 +164,57 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 - Árboles de 2×2 (roble oscuro, roble pálido, abeto y jungla gigantes): con III se replanta un plantón en cada una de las 4 bases
 - Plantón de cada árbol: reglas de datapack en `data/<ns>/enchanttransfer/harvesting_sapling/*.json` (`logs`: id, lista o `#tag`; `sapling`), con las de vanilla incluidas (el mangle da propágulo; carmesí y distorsionado, hongos sobre nilio). Sin regla, se deduce por nombre en el mismo namespace: `x_log`/`x_stem` → `x_sapling`, `x_propagule` o `x_fungus`; si no existe, se tala pero no se replanta
 - Árboles de otros mods: funcionan si sus troncos están en `#minecraft:logs` y sus hojas en `#minecraft:leaves` (lo normal); otro follaje natural se añade al tag `enchanttransfer:harvesting_foliage` (por defecto, los bloques de verruga del Nether)
+
+---
+
+# 📝 Diseñado, sin implementar
+
+## Material base del mod
+
+### Cristal Horneado ♦
+**Crafteo:** Cuarzo de Nether → (horno) → Cristal Horneado
+
+- Forma de rombo, igual que un fragmento de amatista pero transparente/blanquecino
+- **Material base de todo lo mágico del mod** — aparece en la cadena de crafteo de cristales de color, gemas arcanas, essence shield y futuros módulos
+- Requiere haber ido al Nether → progresión natural antes de acceder a mecánicas avanzadas
+- Equivalente al *vis cristal* de Thaumcraft: señaliza al jugador que está en territorio avanzado del mod
+
+### Cristales de Color
+**Crafteo:** Cristal Horneado + mineral de color → Cristal de [color]
+
+6 tipos, forma de rombo, cada uno con su color distintivo:
+
+| Color | Mineral | Usos en el mod |
+|---|---|---|
+| Azul | Lapislázuli | Gemas de Protección |
+| Verde | Esmeralda | Gemas de Naturaleza |
+| Rojo | Redstone | Gemas de Combate |
+| Amarillo | Oro (lingote) | Gemas de Utilidad |
+| Morado | Fragmento de amatista | Gemas Arcanas |
+| Negro | Obsidiana | Gemas de Maldición |
+
+- El **color identifica la categoría** del encantamiento
+- La **runa grabada** sobre el cristal identifica el encantamiento específico dentro de esa categoría
+- Son el ingrediente intermedio para craftear gemas arcanas del colgante
+- Se reutilizarán en futuras mecánicas del mod como material común
+
+---
+
+## Esencia Mágica
+- Nuevo material producido a partir de cartas + XP (módulo destilador, **pendiente de definir**)
+- Ingrediente en crafteos avanzados: cristales de color, essence shield, gemas arcanas, Cristal Foco
+- No es un recurso de energía en tiempo real, es un material crafteable/consumible
+
+### Cristal Foco
+- Curio equipable que el jugador lleva encima para almacenar esencia mágica
+- Crafteado con Cristal Horneado
+- Los encantamientos mágicos del mod (como Freezing) consumen esencia de este depósito al activarse
+- Si se agota, los efectos que requieren esencia no se activan
+- Niveles con distintas capacidades de almacenamiento (**pendiente de definir**)
+
+---
+
+## Encantamientos pendientes
 
 ### Momentum *(nuevo — Combate/Rojo)*
 - Cada golpe consecutivo al mismo mob aumenta ligeramente el daño
@@ -233,6 +240,8 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 
 ## Nuevos bloques
 
+> En revisión: ideas parecidas existen en otros mods (Cyclic, etc.).
+
 ### Speed Pad
 - Aumenta la velocidad de movimiento al pisarlo
 - Crafteado con esencia mágica
@@ -241,7 +250,7 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 - Atrae ítems y orbes de XP cercanos hacia él
 - Útil junto a granjas automáticas
 - Crafteado con esencia mágica
-- Ojo: Magnetism ya atrae ítems y XP al jugador; el Attractor solo aportaría hacerlo hacia un punto fijo
+- Independiente de Magnetism: este atrae hacia un **bloque** (p. ej. para que una tolva los recoja); Magnetism, hacia el jugador
 
 ---
 
@@ -286,25 +295,6 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 
 ---
 
-## Sistema de Portales
-> ⚠️ **DESCARTADO** — demasiado similar a Waystones (mod muy popular que hace exactamente esto). Los cristales de color siguen existiendo como material del mod con otros usos.
-
----
-
-## Ideas descartadas
-
-| Idea | Motivo |
-|---|---|
-| Sistema de portales | Demasiado similar a Waystones (mod muy popular) |
-| Romper reglas vanilla (encantamientos incompatibles, superar nivel máximo, ítems no compatibles) | Más un cheat que una mecánica satisfactoria |
-| Scrying Basin (ver otra ubicación en tiempo real) | Demasiado costoso en servidor |
-| Echo Module (duplicar cartas con mucho XP) | Controvertido, rompe balance |
-| Curse Siphon, Tome Binder, Auto-Combiner | No suficientemente diferenciadores |
-| Efectos de área sin catalizador | Demasiado pasivo, no convence |
-| Speed Pad, Attractor | Replicados en docenas de mods (Cyclic, etc.) — reconsiderar |
-
----
-
 ## Pendiente de definir
 
 ### Mecánicas
@@ -321,3 +311,17 @@ Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_t
 - [ ] Receta del Essence Shield (lleva Cristal Horneado, resto pendiente)
 - [ ] Receta del Cristal Foco (lleva Cristal Horneado, resto pendiente)
 - [ ] Niveles del Cristal Foco y sus capacidades
+
+---
+
+# ❌ Descartado
+
+| Idea | Motivo |
+|---|---|
+| Sistema de portales | Demasiado similar a Waystones (mod muy popular). Los cristales de color siguen como material del mod con otros usos |
+| Romper reglas vanilla (encantamientos incompatibles, superar nivel máximo, ítems no compatibles) | Más un cheat que una mecánica satisfactoria |
+| Scrying Basin (ver otra ubicación en tiempo real) | Demasiado costoso en servidor |
+| Echo Module (duplicar cartas con mucho XP) | Controvertido, rompe balance |
+| Curse Siphon, Tome Binder, Auto-Combiner | No suficientemente diferenciadores |
+| Efectos de área sin catalizador | Demasiado pasivo, no convence |
+
