@@ -18,6 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import java.util.stream.IntStream;
 
 public class TransferTableScreenHandler extends AbstractContainerMenu {
@@ -113,15 +114,26 @@ public class TransferTableScreenHandler extends AbstractContainerMenu {
 
     /**
      * Shift-click of a card from the player inventory: one card onto the item on the
-     * table when it accepts it; otherwise (no item, or the item rejects it) into the
-     * combine slots, split in two. Whatever doesn't move stays in the clicked slot.
+     * table when it accepts it. If the item rejects it, the cards only go to the combine
+     * slots when they form a pair that can level up; with no item they always go there,
+     * split in two. Whatever doesn't move stays in the clicked slot.
      */
     private boolean moveCardIntoTable(ItemStack cards) {
-        if (this.slots.get(3).hasItem() && !cards.getEnchantments().isEmpty()
-                && this.moveItemStackTo(cards, 4, GUI_SLOTS_END, false)) {
-            return true;
+        if (this.slots.get(3).hasItem()) {
+            if (!cards.getEnchantments().isEmpty() && this.moveItemStackTo(cards, 4, GUI_SLOTS_END, false)) {
+                return true;
+            }
+            return canLevelUp(cards) && splitIntoCombineSlots(cards);
         }
         return splitIntoCombineSlots(cards) || this.moveItemStackTo(cards, 0, 2, false);
+    }
+
+    private boolean canLevelUp(ItemStack card) {
+        ItemEnchantments enchants = card.getEnchantments();
+        return enchants.keySet().stream()
+                .findFirst()
+                .map(entry -> enchants.getLevel(entry) < entry.value().getMaxLevel())
+                .orElse(false);
     }
 
     /**
