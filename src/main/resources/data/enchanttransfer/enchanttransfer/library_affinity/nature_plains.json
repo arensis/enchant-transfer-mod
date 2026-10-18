@@ -1,0 +1,6 @@
+{
+  "deck": "enchanttransfer:card_deck_green",
+  "biome": "#c:is_plains",
+  "enchantments": ["enchanttransfer:harvesting"],
+  "multiplier": 1.5
+}

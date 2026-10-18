@@ -286,7 +286,7 @@
   <p>Two new enchantments, from the Enchanting Table, villagers and loot — and, like any other, extractable into Magic Cards.</p>
 
   <h3>Magnetism</h3>
-  <p><strong>Utility · I–III · tools and armor.</strong> Held or worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 blocks. Sneak to switch it off; items you throw yourself are left alone.</p>
+  <p><strong>Utility · I–V · metal armor</strong> (chainmail, iron, copper, gold, netherite). Worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 / 10 / 12 blocks (the highest level you wear counts). Sneak to switch it off; items you throw yourself are left alone.</p>
 
   <h3>Harvesting</h3>
   <p><strong>Nature · I–IV · hoes and axes.</strong> It only works when you carry what it replants — the crop's seed or the tree's sapling — and spends one per plant.</p>
@@ -426,6 +426,7 @@
         <tr><td>End</td><td><img class="card-icon deck-icon" src="images/card_deck_purple.png" alt="">Arcane</td><td>×2</td></tr>
         <tr><td>Oceans &amp; rivers</td><td><img class="card-icon deck-icon" src="images/card_deck_green.png" alt="">Nature</td><td>Water enchantments ×1.5</td></tr>
         <tr><td>Forests, jungles &amp; taigas</td><td><img class="card-icon deck-icon" src="images/card_deck_green.png" alt="">Nature</td><td>Fortune &amp; Silk Touch ×1.5</td></tr>
+        <tr><td>Plains</td><td><img class="card-icon deck-icon" src="images/card_deck_green.png" alt="">Nature</td><td>Harvesting ×1.5</td></tr>
       </tbody>
     </table>
   </div>
@@ -669,11 +670,12 @@
 
   <h3>3.2.0</h3>
   <ul>
-    <li><strong>Magnetism</strong> — New Utility enchantment (I–III) for tools and armor: pulls nearby items and XP orbs toward you (4 / 6 / 8 blocks). Sneak to switch it off</li>
+    <li><strong>Magnetism</strong> — New Utility enchantment (I–V) for metal armor: pulls nearby items and XP orbs toward you (4 to 12 blocks). Sneak to switch it off</li>
     <li><strong>Harvesting</strong> — New Nature enchantment (I–IV) for hoes and axes. Hoe: right-click a ripe crop to harvest and replant it, then a row of 3, the whole field (0.5 XP levels per 9×9) and bone meal growth. Axe: replant the sapling, then fell the trunk, the whole tree (0.5 XP levels) and grow the sapling back with bone meal. It spends a seed or sapling from your inventory per plant, and only fells natural trees</li>
     <li><strong>Crops and trees from other mods</strong> — Harvesting works with other mods' crops out of the box, and their trees through datapack rules in <code>data/&lt;namespace&gt;/enchanttransfer/harvesting_sapling/</code> or the <code>_log</code> → <code>_sapling</code> naming convention</li>
     <li><strong>Shift + click at the Transfer Table</strong> — A card goes straight onto the item when it fits; otherwise the stack is split evenly into both combine slots. Colored cards can now be shift-clicked too</li>
     <li><strong>Zinc Smelter drops itself</strong> — It dropped nothing when mined; it now drops with an iron pickaxe or better</li>
+    <li><strong>Plains affinity</strong> — Nature decks favor Harvesting ×1.5 at tables in plains (<code>#c:is_plains</code>, so modded plains count too)</li>
     <li><strong>New languages</strong> — French (fr_fr), German (de_de) and Japanese (ja_jp)</li>
   </ul>
 

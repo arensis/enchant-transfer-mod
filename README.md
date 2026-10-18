@@ -91,7 +91,7 @@ Two new enchantments, from the Enchanting Table, villagers and loot — and, lik
 
 ### Magnetism
 
-**Utility · I–III · tools and armor.** Held or worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 blocks. Sneak to switch it off; items you throw yourself are left alone.
+**Utility · I–V · metal armor** (chainmail, iron, copper, gold, netherite). Worn, it pulls nearby items and XP orbs toward you: 4 / 6 / 8 / 10 / 12 blocks (the highest level you wear counts). Sneak to switch it off; items you throw yourself are left alone.
 
 ### Harvesting
 
@@ -139,7 +139,7 @@ A **Card Deck** is a brass-bound case that stores Magic Cards of one type. Place
 - **Points**: a level N card is worth 2^(N-1) points (same ratio as combining). Each deck holds up to 64 points.
 - **Enchanting power**: a full Deck Lectern counts as **two bookshelves** — the two that would stack in its column (every 3 decks holding cards = 2 bookshelves). They add up with regular bookshelves, and the vanilla cap of 15 still applies — so higher enchantment levels come from power, just like with bookshelves; 8 full lecterns alone reach level 30.
 - **Balance**: the bias is relative — a library with every category in equal parts barely changes anything; a specialized one makes its category up to ×3 more likely. Every card favors its category; only max-level cards (Efficiency V, Fortune III, Silk Touch I…) also favor their exact enchantment, up to ×15 in all. Strength builds up with the points stored — fast at first, so even a few level I cards show, and in full with one full deck (64 points); more decks don't raise it further, but add reserve and power.
-- **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers and Fortune/Silk Touch ×1.5 in forests, jungles and taigas. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
+- **Location affinity**: some decks resonate with where the table is — Combat ×2 in the Nether (Fire Aspect ×3), Fire/Blast Protection and Flame ×1.5 in the Nether, Rarity ×1.5 in the Nether, Arcane ×2 in the End, Nature's water enchantments ×1.5 in oceans and rivers Fortune/Silk Touch ×1.5 in forests, jungles and taigas, and Harvesting ×1.5 in plains. It scales the deck's extra effect (capped at ×3). Rules are datapack JSON in `data/<namespace>/enchanttransfer/library_affinity/`, so modpacks can add their own dimensions and biomes (`deck`, optional `dimension`, `biome`, `enchantments`, and `multiplier`); they reload with `/reload`.
 - **Wear**: decks pay, in card reserve, only for what their bonus brings in — not for what the table would have rolled anyway, nor for what comes from the decks' power. Each card holds as much reserve as the points it takes (a level V card holds 16, so a full deck always holds 64); worn cards show it as a bar. Each marked enchantment costs 20% of a max-level card of it, scaled by the level obtained (Efficiency V: 3.2, Efficiency III: 1.92, Silk Touch I: 0.2): in full when max-level cards of it are in the decks, half for a category or Rarity bonus. It's split among the deck kinds that boosted it, in proportion to their boost, and taken first from a card already started, then from the lowest-level ones. An option the decks can't pay for is disabled. Worn cards work normally at the Transfer Table, and combining two adds up what they had left.
 - **Influence mark**: options changed by the decks show a small card in their top-right corner and an *Influenced by card decks* line in their tooltip.
 
@@ -285,11 +285,12 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ### 3.2.0
 
-- **Magnetism** — New Utility enchantment (I–III) for tools and armor: pulls nearby items and XP orbs toward you (4 / 6 / 8 blocks). Sneak to switch it off
+- **Magnetism** — New Utility enchantment (I–V) for metal armor: pulls nearby items and XP orbs toward you (4 to 12 blocks). Sneak to switch it off
 - **Harvesting** — New Nature enchantment (I–IV) for hoes and axes. Hoe: right-click a ripe crop to harvest and replant it, then a row of 3, the whole field (0.5 XP levels per 9×9) and bone meal growth. Axe: replant the sapling, then fell the trunk, the whole tree (0.5 XP levels) and grow the sapling back with bone meal. It spends a seed or sapling from your inventory per plant, and only fells natural trees
 - **Crops and trees from other mods** — Harvesting works with other mods' crops out of the box, and their trees through datapack rules in `data/<namespace>/enchanttransfer/harvesting_sapling/` or the `_log` → `_sapling` naming convention
 - **Shift + click at the Transfer Table** — A card goes straight onto the item when it fits; otherwise the stack is split evenly into both combine slots. Colored cards can now be shift-clicked too
 - **Zinc Smelter drops itself** — It dropped nothing when mined; it now drops with an iron pickaxe or better
+- **Plains affinity** — Nature decks favor Harvesting ×1.5 at tables in plains (`#c:is_plains`, so modded plains count too)
 - **New languages** — French (fr_fr), German (de_de) and Japanese (ja_jp)
 
 <details>

@@ -11,12 +11,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * Magnetism: items and XP orbs within reach drift towards the player wearing or
- * holding the enchanted tool/armour. Sneaking switches it off, and items the player
+ * Magnetism: items and XP orbs within reach drift towards the player wearing the
+ * enchanted metal armour (the highest level worn counts). Sneaking switches it off, and items the player
  * threw themselves are left alone, so dropping something on purpose still works.
  */
 final class MagnetismHandler {
-    /** Reach in blocks: I = 4, II = 6, III = 8. */
+    /** Reach in blocks: I = 4, II = 6, III = 8, IV = 10, V = 12. */
     static final int BASE_RADIUS = 2;
     static final int RADIUS_PER_LEVEL = 2;
     private static final double PULL_SPEED = 0.35;
