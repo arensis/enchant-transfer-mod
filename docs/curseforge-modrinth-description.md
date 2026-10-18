@@ -4,7 +4,7 @@
 
 <p><img src="https://raw.githubusercontent.com/arensis/enchant-transfer-mod/master/docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;"></p>
 
-<p><img src="https://img.shields.io/badge/version-3.1.2-d2962a" alt="Version"> <img src="https://img.shields.io/badge/minecraft-26.2%20%7C%201.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft"> <img src="https://img.shields.io/badge/fabric%20loader-0.19.3%20%7C%200.19.2-dbd0b4" alt="Fabric"> <img src="https://img.shields.io/badge/java-25%20%7C%2021-ED8B00?logo=openjdk&logoColor=white" alt="Java"> <img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey" alt="License"> <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"><img src="https://img.shields.io/curseforge/dt/1540807?logo=curseforge&label=curseforge&color=F16436" alt="CurseForge"></a> <a href="https://modrinth.com/mod/enchant-transfer"><img src="https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&label=modrinth&color=00AF5C" alt="Modrinth"></a></p>
+<p><img src="https://img.shields.io/badge/version-3.2.0-d2962a" alt="Version"> <img src="https://img.shields.io/badge/minecraft-26.2%20%7C%201.21.11-62b47a?logo=minecraft&logoColor=white" alt="Minecraft"> <img src="https://img.shields.io/badge/fabric%20loader-0.19.3%20%7C%200.19.2-dbd0b4" alt="Fabric"> <img src="https://img.shields.io/badge/java-25%20%7C%2021-ED8B00?logo=openjdk&logoColor=white" alt="Java"> <img src="https://img.shields.io/badge/license-CC0--1.0-lightgrey" alt="License"> <a href="https://www.curseforge.com/minecraft/mc-mods/enchant-transfer"><img src="https://img.shields.io/curseforge/dt/1540807?logo=curseforge&label=curseforge&color=F16436" alt="CurseForge"></a> <a href="https://modrinth.com/mod/enchant-transfer"><img src="https://img.shields.io/modrinth/dt/enchant-transfer?logo=modrinth&label=modrinth&color=00AF5C" alt="Modrinth"></a></p>
 
 <p><strong>Extract, transfer, and combine enchantments through Magic Cards — now with colored cards, attachable modules, and an XP conversion system.</strong></p>
 
@@ -23,7 +23,7 @@ Version 2.0 introduced the **Module System**: specialized blocks that attach to 
 
 | Mod version | Minecraft | Status |
 |-------------|-----------|--------|
-| **3.1.x** | 26.2 | Active development |
+| **3.2.x** | 26.2 | Active development |
 | **2.0.x** | 1.21.11 | Maintenance (critical bug fixes only) |
 
 **Requires:** Fabric Loader and Fabric API
@@ -288,12 +288,12 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ## Installation
 
-### Minecraft 26.2 — mod v3.1.x
+### Minecraft 26.2 — mod v3.2.x
 
 1. Make sure Minecraft runs with **Java 25**
 2. Install [Fabric Loader](https://fabricmc.net/use/) **≥ 0.19.3** for Minecraft 26.2
 3. Download [Fabric API](https://modrinth.com/mod/fabric-api) for 26.2 and place it in the `mods/` folder
-4. Download the Enchant Transfer **3.1.x** JAR and place it in `mods/` as well
+4. Download the Enchant Transfer **3.2.x** JAR and place it in `mods/` as well
 5. Launch Minecraft with the Fabric profile
 
 ### Minecraft 1.21.11 — mod v2.0.x (maintenance)
@@ -310,7 +310,7 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ## Requirements
 
-| Dependency | Minecraft 26.2 (v3.1.x) | Minecraft 1.21.11 (v2.0.x) |
+| Dependency | Minecraft 26.2 (v3.2.x) | Minecraft 1.21.11 (v2.0.x) |
 |------------|-------------------------|----------------------------|
 | Java | 25 | 21 |
 | Fabric Loader | ≥ 0.19.3 | ≥ 0.19.2 |
