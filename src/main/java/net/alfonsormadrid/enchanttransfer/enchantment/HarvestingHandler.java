@@ -5,15 +5,14 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.Block;
@@ -26,9 +25,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 
 /**
- * Harvesting: right-clicking a ripe crop with the enchanted hoe harvests it (normal
- * loot, Fortune included) and replants it, taking one seed from the inventory and one
- * point of durability, like tilling. Without that seed in the inventory nothing happens.
+ * Harvesting on a hoe: right-clicking a ripe crop harvests it (normal loot, Fortune
+ * included) and replants it, taking one seed from the inventory and one point of
+ * durability, like tilling. Without that seed in the inventory nothing happens. At
+ * level IV the replanted crop is grown with bone meal from the inventory.
  * Which blocks count is the {@code enchanttransfer:harvesting_replantable} block tag;
  * ripe means its {@code age} property is at its maximum.
  */
@@ -43,14 +43,12 @@ final class HarvestingHandler {
     }
 
     private static InteractionResult onUseBlock(Player player, Level level, InteractionHand hand, BlockHitResult hit) {
-        if (player.isSpectator()) {
+        ItemStack hoe = player.getItemInHand(hand);
+        if (player.isSpectator() || !hoe.is(ItemTags.HOES)) {
             return InteractionResult.PASS;
         }
-        ItemStack hoe = player.getItemInHand(hand);
-        boolean enchanted = ModEnchantments.holder(level, ModEnchantments.HARVESTING)
-                .map(harvesting -> EnchantmentHelper.getItemEnchantmentLevel(harvesting, hoe) > 0)
-                .orElse(false);
-        if (!enchanted) {
+        int harvesting = HarvestingSupport.harvestingLevel(player, hoe);
+        if (harvesting <= 0) {
             return InteractionResult.PASS;
         }
 
@@ -58,23 +56,20 @@ final class HarvestingHandler {
         BlockState crop = level.getBlockState(pos);
         IntegerProperty age = ripeAge(crop);
         Item seed = crop.getBlock().asItem();
-        if (age == null || seed == Items.AIR) {
-            return InteractionResult.PASS;
-        }
-        int seedSlot = findSeed(player.getInventory(), seed);
-        if (seedSlot < 0) {
+        if (age == null || HarvestingSupport.findSlot(player.getInventory(), seed) < 0) {
             return InteractionResult.PASS;
         }
 
-        if (!level.isClientSide()) {
-            Block.dropResources(crop, level, pos, level.getBlockEntity(pos), player, hoe);
-            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(crop));
-            level.setBlock(pos, crop.setValue(age, minAge(age)), Block.UPDATE_ALL);
-            level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
-            if (!player.hasInfiniteMaterials()) {
-                player.getInventory().getItem(seedSlot).shrink(1);
-            }
+        if (level instanceof ServerLevel server) {
+            Block.dropResources(crop, server, pos, server.getBlockEntity(pos), player, hoe);
+            server.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(crop));
+            server.setBlock(pos, crop.setValue(age, minAge(age)), Block.UPDATE_ALL);
+            server.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
+            HarvestingSupport.consume(player, seed);
             hoe.hurtAndBreak(1, player, hand);
+            if (harvesting >= HarvestingSupport.BONE_MEAL_LEVEL) {
+                HarvestingSupport.growWithBoneMeal(server, pos, player);
+            }
         }
         return InteractionResult.SUCCESS;
     }
@@ -94,14 +89,5 @@ final class HarvestingHandler {
 
     private static int minAge(IntegerProperty age) {
         return Collections.min(age.getPossibleValues());
-    }
-
-    private static int findSeed(Inventory inventory, Item seed) {
-        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
-            if (inventory.getItem(slot).is(seed)) {
-                return slot;
-            }
-        }
-        return -1;
     }
 }

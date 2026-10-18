@@ -5,6 +5,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.item.enchantment.Enchantment;
 
@@ -24,11 +26,17 @@ public final class ModEnchantments {
     public static void init() {
         MagnetismHandler.register();
         HarvestingHandler.register();
+        TreeHarvestingHandler.register();
     }
 
     /** The enchantment's holder in this level, if a datapack hasn't removed it. */
     static Optional<Holder.Reference<Enchantment>> holder(Level level, ResourceKey<Enchantment> key) {
         return level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(key);
+    }
+
+    /** The enchantment's level on the stack; 0 when absent or removed by a datapack. */
+    static int level(Level level, ResourceKey<Enchantment> key, ItemStack stack) {
+        return holder(level, key).map(enchantment -> EnchantmentHelper.getItemEnchantmentLevel(enchantment, stack)).orElse(0);
     }
 
     private static ResourceKey<Enchantment> key(String path) {

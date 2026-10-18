@@ -174,12 +174,23 @@ Así toda carta aguanta 5 encantamientos de su nivel con bonus exacto, o 10 con 
 - No existe en vanilla
 
 ### Harvesting *(nuevo — Naturaleza/Verde)* — implementado
-- Clic derecho con la azada en un cultivo maduro: lo cosecha (botín normal, Fortuna incluida) y lo vuelve a plantar
+Azada y hacha; niveles I–IV; mesa de encantamientos, aldeanos y botín (`non_treasure`); peso 3. No existe en vanilla.
+
+**Azada** — clic derecho en un cultivo maduro:
+- Lo cosecha (botín normal, Fortuna incluida) y lo vuelve a plantar
 - **Solo si el jugador lleva en el inventario la semilla de ese cultivo** (gasta una; en creativo no). Sin semilla, o con el cultivo sin madurar, no hace nada
 - Desgasta la azada 1 punto por cultivo, igual que arar la tierra
+- **IV:** además gasta polvo de hueso del inventario para que el cultivo replantado crezca al momento
 - Cultivos: tag de bloque `enchanttransfer:harvesting_replantable` (trigo, zanahorias, patatas, remolachas, verruga del Nether, cacao); maduro = propiedad `age` al máximo
-- Disponible en azada; nivel único; mesa de encantamientos, aldeanos y botín; peso 5
-- No existe en vanilla
+
+**Hacha** — al romper un tronco de un **árbol natural** (algún tronco conectado toca hojas que no colocó un jugador, o bloques de verruga del Nether); con construcciones no hace nada:
+- **I:** si el tronco roto estaba sobre tierra (la base), planta el plantón del árbol, si el jugador lo lleva (gasta uno)
+- **II:** además tala los troncos que hay justo encima, en línea recta (el tronco principal, sin ramas)
+- **III:** tala el árbol entero, ramas incluidas (tope de 256 troncos)
+- **IV:** además hace crecer el plantón replantado con polvo de hueso del inventario, uno a uno con la probabilidad de vanilla, hasta que sale el árbol; si no hay sitio, se detiene sin gastar más
+- La tala va de arriba abajo y cuesta 1 punto de durabilidad por tronco (para si el hacha se rompe). Agacharse desactiva la tala en cadena
+- Árboles de 2×2 (roble oscuro, roble pálido, abeto y jungla gigantes): con III se replanta un plantón en cada una de las 4 bases
+- Plantones: roble, abeto, abedul, jungla, acacia, roble oscuro, mangle (propágulo), cerezo, roble pálido; carmesí y distorsionado (hongos, sobre nilio)
 
 ### Momentum *(nuevo — Combate/Rojo)*
 - Cada golpe consecutivo al mismo mob aumenta ligeramente el daño
