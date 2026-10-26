@@ -148,6 +148,7 @@ Empty → dim dot. Active screen → filled dot + cyan ring (border at radius 5)
 
 - `cachedCoreFace` in `InfusionCoilBlockEntity` is server-only; never synced to client.  
   The client BER scans adjacent block states directly in `extractRenderState()`.
+- **Never load chunks from `setRemoved()`**: it also runs when a chunk unloads, including on server shutdown. `InfusionCoilBlockEntity.detachFromCachedCore` checks `level.isLoaded(cachedCorePos)` before `getBlockEntity`; without it, a coil unloading after its core's chunk made `getBlockEntity` reload that chunk and the dedicated server hung forever on "Saving worlds" (found on the Pi, 3.2.0 → fixed in 3.2.1). Same guard in `attemptAttachToCore` (first server tick after load): unloaded neighbours are skipped and the check retried next tick. Rule for new code: before `getBlockEntity`/`getBlockState` on a neighbour that may be in another chunk, check `level.isLoaded(pos)` — always in `setRemoved`, ideally in ticks too.
 - The `InfusionCoilBlock` must have `.nonOpaque()` in settings to prevent Minecraft culling the top face of the block it sits on (inset model has corner gaps).
 
 ## Changelog & releases

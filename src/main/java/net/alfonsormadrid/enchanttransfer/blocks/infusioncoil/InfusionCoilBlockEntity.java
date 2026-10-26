@@ -152,8 +152,8 @@ public class InfusionCoilBlockEntity extends BlockEntity
     // ── Tick ────────────────────────────────────────────────────────────────
 
     public static void serverTick(Level world, BlockPos pos, BlockState state, InfusionCoilBlockEntity be) {
-        if (be.needsAttachmentCheck) {
-            be.attemptAttachToCore();
+        // Retried every tick until every neighbour's chunk could be checked.
+        if (be.needsAttachmentCheck && be.attemptAttachToCore()) {
             be.needsAttachmentCheck = false;
         }
 
@@ -255,28 +255,45 @@ public class InfusionCoilBlockEntity extends BlockEntity
 
     // ── Module attachment ───────────────────────────────────────────────────
 
-    private void attemptAttachToCore() {
-        if (!(level instanceof ServerLevel)) return;
+    /**
+     * Looks for a Transfer Table on the 6 faces.  Neighbours in a chunk
+     * that isn't loaded are skipped rather than looked up (getBlockEntity
+     * would load the chunk on the spot, see {@link #detachFromCachedCore}).
+     *
+     * @return {@code false} if a neighbour was skipped, so the caller retries later
+     */
+    private boolean attemptAttachToCore() {
+        if (!(level instanceof ServerLevel)) return true;
 
+        boolean checkedAll = true;
         for (Direction faceFromCoil : Direction.values()) {
             BlockPos neighborPos = worldPosition.relative(faceFromCoil);
-            BlockEntity neighbor = level.getBlockEntity(neighborPos);
-            if (neighbor instanceof TransferTableBlockEntity core) {
+            if (!level.isLoaded(neighborPos)) {
+                checkedAll = false;
+                continue;
+            }
+            if (level.getBlockEntity(neighborPos) instanceof TransferTableBlockEntity core) {
                 Direction coreFace = faceFromCoil.getOpposite();
                 core.attachModule(coreFace, this);
                 cachedCorePos = neighborPos;
                 cachedCoreFace = coreFace;
                 setChanged();
-                return;
+                return true;
             }
         }
+        return checkedAll;
     }
 
     private void detachFromCachedCore() {
         if (level == null || cachedCorePos == null || cachedCoreFace == null) return;
 
-        BlockEntity neighbor = level.getBlockEntity(cachedCorePos);
-        if (neighbor instanceof TransferTableBlockEntity core) {
+        // Only while the core's chunk is still loaded: setRemoved also runs
+        // when this chunk unloads, and getBlockEntity on an unloaded chunk
+        // would load it again — on server shutdown that waits forever and
+        // the server hangs on "Saving worlds".  An unloaded core has no
+        // module list left to update anyway.
+        if (level.isLoaded(cachedCorePos)
+                && level.getBlockEntity(cachedCorePos) instanceof TransferTableBlockEntity core) {
             core.detachModule(cachedCoreFace);
         }
         cachedCorePos = null;
