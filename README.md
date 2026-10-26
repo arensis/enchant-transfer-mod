@@ -5,7 +5,7 @@
 <img src="docs/images/transfer_table_logo.png" alt="Transfer Table" width="128" style="image-rendering: pixelated;">
 
 <!-- AUTO:badges -->
-![Version](https://img.shields.io/badge/version-3.2.0-d2962a)
+![Version](https://img.shields.io/badge/version-3.2.1-d2962a)
 ![Minecraft](https://img.shields.io/badge/minecraft-26.2_%7C_1.21.11-62b47a?logo=minecraft&logoColor=white)
 ![Fabric](https://img.shields.io/badge/fabric_loader-≥0.19.3_%7C_≥0.19.2-dbd0b4)
 ![Java](https://img.shields.io/badge/java-25_%7C_21-ED8B00?logo=openjdk&logoColor=white)
