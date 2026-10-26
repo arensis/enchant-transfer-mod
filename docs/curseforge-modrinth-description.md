@@ -270,6 +270,11 @@ The 3D model reflects its recipe — gold on the outer edge, redstone in the mid
 
 ## Changelog — 3.2.x
 
+### 3.2.1
+
+- **Enchantment names on older clients** — Magnetism and Harvesting fall back to their English name instead of a raw translation key when a client has an older version of the mod
+- **Server stop hang fixed** — Stopping the server could hang forever on "Saving worlds" when a chunk with an Infusion Coil unloaded after its Transfer Table's chunk. Modules no longer keep track of their connection: the Transfer Table reads the modules on its faces when needed, without ever loading a chunk, so this can't happen with any module
+
 ### 3.2.0
 
 - **Magnetism** — New Utility enchantment (I–V) for metal armor: pulls nearby items and XP orbs toward you (4 to 12 blocks). Sneak to switch it off

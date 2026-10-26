@@ -1,7 +1,8 @@
 {
   "anvil_cost": 4,
   "description": {
-    "translate": "enchantment.enchanttransfer.harvesting"
+    "translate": "enchantment.enchanttransfer.harvesting",
+    "fallback": "Harvesting"
   },
   "max_cost": {
     "base": 60,

@@ -23,7 +23,7 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 /**
  * Snapshot of every Card Deck in the libraries around one enchanting table.
  * <p>
- * Plays the role {@link net.alfonsormadrid.enchanttransfer.modules.ModuleConnectionRegistry}
+ * Plays the role {@link net.alfonsormadrid.enchanttransfer.modules.ModuleNetwork}
  * plays for the Transfer Table: it collects the raw numbers and exposes
  * aggregated views over the {@link DeckEffect}s present, so callers ask the
  * profile instead of iterating decks themselves.

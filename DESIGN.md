@@ -29,7 +29,7 @@
 
 ### Infraestructura modular
 - Interfaz `TransferTableModule` como contrato de cualquier módulo
-- `ModuleConnectionRegistry` — gestiona conexiones core↔módulos por cara
+- `ModuleNetwork` — módulos en las caras del core, leídos del mundo al consultarlos (sin registro que sincronizar); `storages(...)` encuentra recursos compartidos (`ExperienceStorage`, en el futuro esencia…) y la vista agregada de XP los trata como un solo depósito
 - `ModulePreview` — snapshot de estado para la GUI del core
 - `ExperienceStorage` + `SimpleExperienceTank`
 - Máximo 6 módulos por core (uno por cara)

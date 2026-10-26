@@ -42,8 +42,7 @@ public class InfusionCoilRenderState extends BlockEntityRenderState {
     /**
      * Direction <em>from this coil toward the adjacent Transfer Table</em>,
      * or {@code null} when not connected. Populated by scanning adjacent
-     * block states on the game thread (avoids relying on the server-only
-     * {@code cachedCoreFace} field, which is never synced to the client).
+     * block states on the game thread.
      */
     @Nullable
     public Direction dirToTable = null;

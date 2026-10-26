@@ -1,7 +1,6 @@
 package net.alfonsormadrid.enchanttransfer.blocks.infusioncoil;
 
 import net.alfonsormadrid.enchanttransfer.EnchantTransferMod;
-import net.alfonsormadrid.enchanttransfer.blocks.transfertable.TransferTableBlockEntity;
 import net.alfonsormadrid.enchanttransfer.energy.ExperienceStorage;
 import net.alfonsormadrid.enchanttransfer.energy.SimpleExperienceTank;
 import net.alfonsormadrid.enchanttransfer.item.MagicCardItem;
@@ -48,8 +47,10 @@ import org.jetbrains.annotations.Nullable;
  *   <li>Own an {@link SimpleExperienceTank} (acts as {@link ExperienceStorage})</li>
  *   <li>Process cards over time (furnace pattern) into stored XP</li>
  *   <li>Convert glass bottles to experience bottles by draining the tank</li>
- *   <li>Self-attach to an adjacent {@link TransferTableBlockEntity} core
- *       so its tank is visible to the rest of the network</li>
+ *   <li>Share its tank with the network when it sits next to a Transfer
+ *       Table core: as an {@link ExperienceStorage} module,
+ *       {@link net.alfonsormadrid.enchanttransfer.modules.ModuleNetwork}
+ *       finds it — no attach/detach code here</li>
  * </ul>
  */
 public class InfusionCoilBlockEntity extends BlockEntity
@@ -72,8 +73,6 @@ public class InfusionCoilBlockEntity extends BlockEntity
 
     private static final String NBT_PROGRESS = "Progress";
     private static final String NBT_TANK = "Tank";
-    private static final String NBT_CORE_POS = "CorePos";
-    private static final String NBT_CORE_FACE = "CoreFace";
 
     private final NonNullList<ItemStack> inventory = NonNullList.withSize(3, ItemStack.EMPTY);
     private final SimpleExperienceTank tank = new SimpleExperienceTank(TANK_CAPACITY);
@@ -88,10 +87,6 @@ public class InfusionCoilBlockEntity extends BlockEntity
     /** Counts ticks since last forced sync; resets every {@value SYNC_INTERVAL} ticks. */
     private int syncTimer = 0;
     private static final int SYNC_INTERVAL = 20; // sync ~once per second while processing
-
-    @Nullable private BlockPos cachedCorePos;
-    @Nullable private Direction cachedCoreFace;
-    private boolean needsAttachmentCheck = true;
 
     private final ContainerData propertyDelegate = new ContainerData() {
         @Override
@@ -152,11 +147,6 @@ public class InfusionCoilBlockEntity extends BlockEntity
     // ── Tick ────────────────────────────────────────────────────────────────
 
     public static void serverTick(Level world, BlockPos pos, BlockState state, InfusionCoilBlockEntity be) {
-        if (be.needsAttachmentCheck) {
-            be.attemptAttachToCore();
-            be.needsAttachmentCheck = false;
-        }
-
         boolean dirty = false;
         dirty |= be.tickInfusion();
         dirty |= be.tickBottleConversion();
@@ -253,73 +243,11 @@ public class InfusionCoilBlockEntity extends BlockEntity
         return true;
     }
 
-    // ── Module attachment ───────────────────────────────────────────────────
-
-    private void attemptAttachToCore() {
-        if (!(level instanceof ServerLevel)) return;
-
-        for (Direction faceFromCoil : Direction.values()) {
-            BlockPos neighborPos = worldPosition.relative(faceFromCoil);
-            BlockEntity neighbor = level.getBlockEntity(neighborPos);
-            if (neighbor instanceof TransferTableBlockEntity core) {
-                Direction coreFace = faceFromCoil.getOpposite();
-                core.attachModule(coreFace, this);
-                cachedCorePos = neighborPos;
-                cachedCoreFace = coreFace;
-                setChanged();
-                return;
-            }
-        }
-    }
-
-    private void detachFromCachedCore() {
-        if (level == null || cachedCorePos == null || cachedCoreFace == null) return;
-
-        BlockEntity neighbor = level.getBlockEntity(cachedCorePos);
-        if (neighbor instanceof TransferTableBlockEntity core) {
-            core.detachModule(cachedCoreFace);
-        }
-        cachedCorePos = null;
-        cachedCoreFace = null;
-    }
-
-    @Override
-    public void setRemoved() {
-        detachFromCachedCore();
-        super.setRemoved();
-    }
-
     // ── TransferTableModule ─────────────────────────────────────────────────
 
     @Override
     public ModuleType getModuleType() {
         return MODULE_TYPE;
-    }
-
-    @Nullable
-    @Override
-    public BlockPos getCorePos() {
-        return cachedCorePos;
-    }
-
-    @Nullable
-    @Override
-    public Direction getCoreFace() {
-        return cachedCoreFace;
-    }
-
-    @Override
-    public void onAttachedToCore(BlockPos corePos, Direction coreFace) {
-        this.cachedCorePos = corePos;
-        this.cachedCoreFace = coreFace;
-        setChanged();
-    }
-
-    @Override
-    public void onDetachedFromCore() {
-        this.cachedCorePos = null;
-        this.cachedCoreFace = null;
-        setChanged();
     }
 
     @Override
@@ -505,13 +433,7 @@ public class InfusionCoilBlockEntity extends BlockEntity
         ContainerHelper.loadAllItems(view, inventory);
         tank.readData(view.childOrEmpty(NBT_TANK));
         progress = view.getIntOr(NBT_PROGRESS, 0);
-
-        view.read(NBT_CORE_POS, BlockPos.CODEC).ifPresent(p -> cachedCorePos = p);
-        view.getString(NBT_CORE_FACE).ifPresent(name -> {
-            try { cachedCoreFace = Direction.valueOf(name); } catch (IllegalArgumentException ignored) {}
-        });
-        // Re-validate attachment on next tick — neighbor BE may not be loaded yet.
-        needsAttachmentCheck = true;
+        // Saves before 3.2.1 also hold "CorePos"/"CoreFace": no longer used, ignored.
     }
 
     @Override
@@ -520,12 +442,5 @@ public class InfusionCoilBlockEntity extends BlockEntity
         ContainerHelper.saveAllItems(view, inventory);
         tank.writeData(view.child(NBT_TANK));
         view.putInt(NBT_PROGRESS, progress);
-
-        if (cachedCorePos != null) {
-            view.store(NBT_CORE_POS, BlockPos.CODEC, cachedCorePos);
-        }
-        if (cachedCoreFace != null) {
-            view.putString(NBT_CORE_FACE, cachedCoreFace.name());
-        }
     }
 }

@@ -1,7 +1,8 @@
 {
   "anvil_cost": 4,
   "description": {
-    "translate": "enchantment.enchanttransfer.magnetism"
+    "translate": "enchantment.enchanttransfer.magnetism",
+    "fallback": "Magnetism"
   },
   "max_cost": {
     "base": 55,

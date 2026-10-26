@@ -89,9 +89,9 @@ public class TransferTableRenderer
         long worldTime = entity.getLevel() != null ? entity.getLevel().getGameTime() : 0L;
         state.animTime = (worldTime + tickDelta) * 0.05f;
 
-        // Scan the 6 neighbours.  We can't trust the server-only
-        // ModuleConnectionRegistry on the client, so we check block states
-        // directly — same pattern the coil renderer uses to find its table.
+        // Scan the 6 neighbours' block states — same pattern the coil
+        // renderer uses to find its table (ModuleNetwork does the same with
+        // block entities on the server).
         if (entity.getLevel() != null) {
             BlockPos pos = entity.getBlockPos();
             for (Direction dir : Direction.values()) {
